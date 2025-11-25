@@ -365,7 +365,6 @@ export default function HowItWorks() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-bl-full transform translate-x-16 -translate-y-16 group-hover:scale-150 transition-transform" />
                 
                 <div className="relative">
-                  <div className="text-5xl mb-4">{result.avatar}</div>
                   <h3 className="text-xl font-bold mb-1">{result.business}</h3>
                   <p className="text-sm text-muted-foreground mb-4">{result.industry}</p>
                   
