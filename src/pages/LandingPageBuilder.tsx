@@ -35,7 +35,7 @@ export default function LandingPageBuilder() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: '👋 **היי! אני בונה אתרים חכם.**\n\n💬 **תאר לי מה אתה רוצה** ואני אבנה לך את הדף בזמן אמת!\n\n**דוגמאות:**\n• "בנה לי דף נחיתה למסעדה איטלקית בתל אביב"\n• "אני צריך landing page לסטודיו יוגה עם אווירה רגועה"\n• "דף למכירת קורס דיגיטלי עם וידאו וטופס הרשמה"\n\n✨ אני אבנה את הקוד, תראה תצוגה חיה, ותוכל להוריד או לפרסם!'
+      content: '👋 **היי! אני בונה אתרים חכם.**\n\n💬 **תאר לי בפירוט** מה אתה רוצה ואני אבנה לך דף מקצועי!\n\n📝 **תן לי פרטים כמו:**\n• שם העסק\n• סוג העסק (מסעדה, סלון, סטודיו...)\n• עיר או אזור\n• כתובת (אם יש)\n• טלפון\n• מה מיוחד בעסק שלך\n\n💡 **דוגמה:**\n"בנה לי דף למסעדה בשם \'טרטוף\' ברחוב דיזנגוף 100 תל אביב, מסעדה איטלקית אותנטית, טלפון 03-1234567"\n\n✨ אני אחלץ את הפרטים, אבחר תמונות מתאימות, ואבנה לך דף מוכן!'
     }
   ]);
   const [input, setInput] = useState('');
@@ -53,33 +53,80 @@ export default function LandingPageBuilder() {
     scrollToBottom();
   }, [messages]);
 
+  const extractInfo = (text: string) => {
+    // Extract business name, location, and other details from user input
+    const info: any = {
+      businessName: 'העסק שלי',
+      location: 'תל אביב',
+      description: 'שירות מקצועי ואיכותי',
+      phone: '050-1234567',
+      address: '',
+      type: 'general'
+    };
+
+    // Try to extract business name (after words like "שם", "עסק", "מקום")
+    const nameMatch = text.match(/(?:שם|עסק|מקום|מסעדה|סטודיו|חנות)[\s:]*([\u0590-\u05FF\s\w]+?)(?:\s+ב|,|\.|\s+עם)/i);
+    if (nameMatch) info.businessName = nameMatch[1].trim();
+
+    // Try to extract location/city
+    const locationMatch = text.match(/ב([\u0590-\u05FF\s]+?)(?:\s|,|\.|\s+עם|$)/);
+    if (locationMatch) info.location = locationMatch[1].trim();
+
+    // Try to extract address
+    const addressMatch = text.match(/(?:כתובת|רחוב|ברח)[\s:]*([^\n.]+)/i);
+    if (addressMatch) info.address = addressMatch[1].trim();
+
+    // Try to extract phone
+    const phoneMatch = text.match(/(?:טלפון|פלאפון|נייד|צור קשר)[\s:]*([0-9\-]+)/i);
+    if (phoneMatch) info.phone = phoneMatch[1].trim();
+
+    // Detect business type
+    if (text.match(/מסעדה|אוכל|מזון|פיצה|המבורגר|סושי|איטלקי|סטייק/i)) {
+      info.type = 'restaurant';
+      info.unsplashQuery = 'restaurant food dining';
+    } else if (text.match(/יוגה|פילאטיס|כושר|ספורט|אימון|פיטנס/i)) {
+      info.type = 'yoga';
+      info.unsplashQuery = 'yoga fitness wellness';
+    } else if (text.match(/קורס|הדרכה|למידה|לימוד|שיעור/i)) {
+      info.type = 'course';
+      info.unsplashQuery = 'online course learning';
+    } else if (text.match(/סלון|יופי|עיצוב שיער|מניקור|פדיקור/i)) {
+      info.type = 'salon';
+      info.unsplashQuery = 'beauty salon hair';
+    } else if (text.match(/רופא|קליניקה|מרפאה|בריאות/i)) {
+      info.type = 'medical';
+      info.unsplashQuery = 'medical clinic health';
+    } else {
+      info.unsplashQuery = 'business professional modern';
+    }
+
+    return info;
+  };
+
   const generateWebsiteCode = (userRequest: string): string => {
-    // This would normally call an AI API (Claude/GPT-4)
-    // For now, we'll create a dynamic template based on the request
-    
-    const hasRestaurant = userRequest.includes('מסעדה') || userRequest.includes('restaurant');
-    const hasYoga = userRequest.includes('יוגה') || userRequest.includes('yoga');
-    const hasCourse = userRequest.includes('קורס') || userRequest.includes('course');
+    // Extract info from user request
+    const info = extractInfo(userRequest);
     
     let template = '';
     
-    if (hasRestaurant) {
+    if (info.type === 'restaurant') {
       template = `<!DOCTYPE html>
 <html dir="rtl" lang="he">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מסעדה איטלקית - ארוחה אמיתית</title>
+    <title>${info.businessName} - ${info.location}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50">
-    <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-red-600 to-orange-600 text-white py-20">
-        <div class="container mx-auto px-4 text-center">
-            <h1 class="text-5xl font-bold mb-4">🍝 מסעדה איטלקית אותנטית</h1>
-            <p class="text-2xl mb-8">הטעם של איטליה, בלב תל אביב</p>
-            <button class="bg-white text-red-600 px-8 py-4 rounded-full text-xl font-bold hover:bg-gray-100 transition">
-                הזמינו שולחן עכשיו 📞
+    <!-- Hero Section with Background Image -->
+    <section class="relative min-h-[600px] flex items-center justify-center text-white" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1920&q=80') center/cover;">
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <h1 class="text-5xl md:text-6xl font-bold mb-4">🍽️ ${info.businessName}</h1>
+            <p class="text-2xl mb-2">${info.description}</p>
+            <p class="text-xl mb-8">${info.location}${info.address ? ' • ' + info.address : ''}</p>
+            <button class="bg-white text-red-600 px-8 py-4 rounded-full text-xl font-bold hover:bg-gray-100 transition shadow-lg">
+                הזמינו שולחן עכשיו 📞 ${info.phone}
             </button>
         </div>
     </section>
@@ -123,23 +170,28 @@ export default function LandingPageBuilder() {
     </section>
 </body>
 </html>`;
-    } else if (hasYoga) {
+    } else if (info.type === 'yoga' || info.type === 'salon') {
+      const bgImage = info.type === 'yoga' 
+        ? 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1920&q=80'
+        : 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1920&q=80';
+      
       template = `<!DOCTYPE html>
 <html dir="rtl" lang="he">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>סטודיו יוגה - שלווה ואיזון</title>
+    <title>${info.businessName} - ${info.location}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gradient-to-br from-purple-50 to-pink-50">
-    <!-- Hero -->
-    <section class="min-h-screen flex items-center justify-center px-4">
-        <div class="text-center max-w-3xl">
-            <h1 class="text-6xl font-light mb-6 text-purple-900">🧘‍♀️ מקום של שלווה</h1>
-            <p class="text-2xl text-purple-700 mb-12">גלי את האיזון הפנימי שלך</p>
-            <button class="bg-purple-600 text-white px-10 py-4 rounded-full text-xl hover:bg-purple-700 transition">
-                הרשמי לשיעור ניסיון חינם ✨
+    <!-- Hero with Background -->
+    <section class="relative min-h-screen flex items-center justify-center px-4" style="background: linear-gradient(rgba(147,51,234,0.7), rgba(219,39,119,0.7)), url('${bgImage}') center/cover;">
+        <div class="text-center max-w-3xl text-white">
+            <h1 class="text-5xl md:text-7xl font-light mb-6 drop-shadow-lg">✨ ${info.businessName}</h1>
+            <p class="text-2xl mb-4">${info.description}</p>
+            <p class="text-xl mb-12">${info.location}${info.address ? ' • ' + info.address : ''}</p>
+            <button class="bg-white text-purple-600 px-10 py-4 rounded-full text-xl hover:bg-gray-100 transition shadow-lg font-bold">
+                ${info.type === 'yoga' ? 'הרשמי לשיעור ניסיון' : 'קבעי תור'} • ${info.phone}
             </button>
         </div>
     </section>
@@ -167,22 +219,24 @@ export default function LandingPageBuilder() {
 </body>
 </html>`;
     } else {
-      // Generic template
+      // Generic template with extracted info
       template = `<!DOCTYPE html>
 <html dir="rtl" lang="he">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>דף נחיתה מקצועי</title>
+    <title>${info.businessName} - ${info.location}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50">
-    <section class="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center text-white" style="background: linear-gradient(135deg, rgba(59,130,246,0.9), rgba(147,51,234,0.9)), url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80') center/cover;">
         <div class="container mx-auto px-4 text-center">
-            <h1 class="text-6xl font-bold mb-6">הפתרון שחיפשת 🚀</h1>
-            <p class="text-2xl mb-8 max-w-2xl mx-auto">תיאור מקצועי שמסביר בדיוק מה אתה מציע ולמה זה ישנה את החיים</p>
-            <button class="bg-white text-blue-600 px-10 py-4 rounded-full text-xl font-bold hover:bg-gray-100 transition">
-                התחל עכשיו ✨
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 drop-shadow-lg">${info.businessName} 🚀</h1>
+            <p class="text-2xl md:text-3xl mb-4 max-w-3xl mx-auto">${info.description}</p>
+            <p class="text-xl mb-8">${info.location}${info.address ? ' • ' + info.address : ''}</p>
+            <button class="bg-white text-blue-600 px-10 py-4 rounded-full text-xl font-bold hover:bg-gray-100 transition shadow-lg">
+                צור קשר עכשיו • ${info.phone}
             </button>
         </div>
     </section>
@@ -239,11 +293,14 @@ export default function LandingPageBuilder() {
     const code = generateWebsiteCode(userMessage);
     setGeneratedCode(code);
 
+    // Extract info for response
+    const info = extractInfo(userMessage);
+
     // Deduct tokens
     setTokens(prev => prev - tokensNeeded);
 
-    // Add AI response
-    const aiResponse = `🎨 **בניתי לך דף נחיתה מקצועי!**\n\nהדף כולל:\n✅ עיצוב מודרני ורספונסיבי\n✅ צבעים ואווירה מותאמת\n✅ קריאה לפעולה ברורה\n✅ קוד מוכן לפרסום\n\n💡 **רוצה לשנות משהו?** פשוט תגיד לי מה ואני אעדכן!\n\nעלות: -${tokensNeeded} טוקנים | נשארו: ${tokens - tokensNeeded} טוקנים`;
+    // Add AI response with extracted details
+    const aiResponse = `🎨 **בניתי לך דף נחיתה מקצועי!**\n\n📝 **זיהיתי:**\n• שם עסק: ${info.businessName}\n• מיקום: ${info.location}\n• טלפון: ${info.phone}\n${info.address ? `• כתובת: ${info.address}\n` : ''}\n✅ **הדף כולל:**\n• תמונות רקע מקצועיות מ-Unsplash\n• עיצוב מותאם לתחום שלך\n• כל הפרטים שלך משולבים\n• רספונסיבי ומוכן לפרסום\n\n💡 **רוצה לשנות משהו?** תגיד "שנה את..." ואני אעדכן!\n\nעלות: -${tokensNeeded} טוקנים | נשארו: ${tokens - tokensNeeded} טוקנים`;
     
     setMessages(prev => [...prev, { 
       role: 'assistant', 
