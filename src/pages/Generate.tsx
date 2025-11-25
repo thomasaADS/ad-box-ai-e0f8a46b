@@ -17,7 +17,8 @@ export default function Generate() {
   useEffect(() => {
     const briefData = sessionStorage.getItem("briefData");
     if (!briefData) {
-      navigate("/");
+      toast.error("אנא מלא תחילה את פרטי הקמפיין");
+      navigate("/brief");
       return;
     }
 
@@ -105,8 +106,8 @@ export default function Generate() {
         <div className="mb-8">
           <Button
             variant="ghost"
-            onClick={() => navigate("/")}
-            className="mb-4"
+            onClick={() => navigate("/brief")}
+            className="mb-4 hover:bg-purple-500/10 hover:text-purple-500 transition-all"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             חזרה לברייף
@@ -121,16 +122,26 @@ export default function Generate() {
         {/* Platform Filters */}
         <Tabs value={selectedPlatform} onValueChange={(v) => setSelectedPlatform(v as Platform | 'all')} className="mb-6">
           <TabsList>
-            <TabsTrigger value="all">הכל ({variants.length})</TabsTrigger>
-            {Object.entries(variantsByPlatform).map(([platform, count]) => (
-              <TabsTrigger key={platform} value={platform}>
-                {platform === 'meta' && '📱'} 
-                {platform === 'google' && '🔍'} 
-                {platform === 'taboola' && '📰'} 
-                {platform === 'outbrain' && '📊'} 
-                {' '}{platform.charAt(0).toUpperCase() + platform.slice(1)} ({count})
-              </TabsTrigger>
-            ))}
+            <TabsTrigger value="all">🎯 הכל ({variants.length})</TabsTrigger>
+            {Object.entries(variantsByPlatform).map(([platform, count]) => {
+              const icons: Record<Platform, string> = {
+                meta: '📱',
+                google: '🔍',
+                tiktok: '🎵',
+                twitter: '🐦',
+                youtube: '▶️',
+                taboola: '📰',
+                outbrain: '📊',
+                linkedin: '💼',
+                sms: '💬',
+                email: '📧'
+              };
+              return (
+                <TabsTrigger key={platform} value={platform}>
+                  {icons[platform as Platform]} {platform.charAt(0).toUpperCase() + platform.slice(1)} ({count})
+                </TabsTrigger>
+              );
+            })}
           </TabsList>
         </Tabs>
 

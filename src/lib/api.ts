@@ -22,12 +22,12 @@ interface GenerateRequest {
   brief: BriefData;
 }
 
-export type Platform = 'meta' | 'google' | 'taboola' | 'outbrain' | 'tiktok' | 'linkedin' | 'twitter' | 'sms' | 'email';
+export type Platform = 'meta' | 'google' | 'taboola' | 'outbrain' | 'tiktok' | 'linkedin' | 'twitter' | 'youtube' | 'sms' | 'email';
 
 export interface PlatformConfig {
   label: string;
   icon: string;
-  iconName: 'Users' | 'Search' | 'Music' | 'Briefcase' | 'Twitter' | 'Newspaper' | 'BarChart3' | 'Mail' | 'MessageSquare';
+  iconName: 'Users' | 'Search' | 'Music' | 'Briefcase' | 'Twitter' | 'Newspaper' | 'BarChart3' | 'Mail' | 'MessageSquare' | 'Youtube';
   gradient: string;
   glowColor: string;
   color: string;
@@ -256,6 +256,50 @@ export const platformConfig: Record<Platform, PlatformConfig> = {
       min: 300,
       recommended: 1000,
       note: 'נהדר למודעות, פחות להמרות ישירות',
+    },
+  },
+  youtube: {
+    label: 'יוטיוב',
+    icon: '▶️',
+    iconName: 'Youtube',
+    gradient: 'icon-gradient-youtube',
+    glowColor: 'shadow-red-500/50',
+    color: 'bg-red-500/10 text-red-500 border-red-500/20',
+    description: 'וידאו 16:9 (1920×1080), 6-15 שניות לבאמפר. כותרת עד 100 תווים, תיאור עד 200.',
+    image_requirements: {
+      landscape: '1920x1080',
+      thumbnail: '1280x720',
+    },
+    copy_requirements: {
+      headline: '100 תווים',
+      description: '200 תווים',
+      cta: '10 תווים',
+    },
+    howToPublish: [
+      'עבור ל-Google Ads',
+      'צור קמפיין וידאו חדש',
+      'העלה וידאו ל-YouTube',
+      'הוסף כותרת, תיאור ו-CTA',
+      'הגדר קהל ותקציב והשק'
+    ],
+    bestPractices: [
+      'תפוס תשומת לב ב-5 השניות הראשונות',
+      'השתמש בטקסט על המסך למסרים מרכזיים',
+      'כלול לוגו מוקדם לזיהוי מותג',
+      'בדוק וידאו אנכי קצר (Shorts) לעלות נמוכה',
+      'הוסף כפתור CTA ברור בכרטיס סיום'
+    ],
+    audienceTips: [
+      'מקד קהלים בשוק (In-Market Audiences) לכוונת קנייה גבוהה',
+      'השתמש במיקוד מילות מפתח + נושאים יחד',
+      'מקד מחדש מבקרי אתר עם הצעות מיוחדות',
+      'צור קהלים דומים ממנויים',
+      'הוצא מכשירי טלוויזיה חכמה אם ממוקד פעולה'
+    ],
+    budgetGuide: {
+      min: 1000,
+      recommended: 3000,
+      note: 'מינימום $10 ליום, קריאייטיב וידאו איכותי חשוב',
     },
   },
   taboola: {

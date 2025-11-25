@@ -92,21 +92,23 @@ export default function Brief() {
         <div className="max-w-3xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary shadow-glow mb-6">
-              <Sparkles className="w-8 h-8 text-primary-foreground" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-lg mb-6">
+              <Sparkles className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-4xl font-bold mb-4">צור את הברייף לקמפיין</h1>
-            <p className="text-muted-foreground text-lg">
-              ספר לנו על העסק שלך ונייצר עבורך וריאנטים של מודעות ממירות
+            <h1 className="text-4xl font-bold mb-3 text-foreground">
+              צור את הברייף לקמפיין
+            </h1>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              ספר לנו על העסק שלך ונייצר עבורך וריאנטים של מודעות ממירות בכל הפלטפורמות
             </p>
           </div>
 
           {/* Form */}
-          <Card className="p-8 gradient-card shadow-card border-border/50">
+          <Card className="p-8 shadow-lg border border-border/50 bg-card">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Brand Details */}
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold flex items-center gap-2">
+                <h2 className="text-xl font-semibold text-foreground border-b pb-2 border-border/50">
                   פרטי המותג
                 </h2>
                 
@@ -164,7 +166,9 @@ export default function Brief() {
 
               {/* Campaign Details */}
               <div className="space-y-4 pt-6 border-t border-border/50">
-                <h2 className="text-xl font-semibold">פרטי הקמפיין</h2>
+                <h2 className="text-xl font-semibold text-foreground border-b pb-2 border-border/50">
+                  פרטי הקמפיין
+                </h2>
 
                 <div className="space-y-2">
                   <Label htmlFor="industry">תחום עיסוק / סוג עסק *</Label>
@@ -236,27 +240,40 @@ export default function Brief() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="budget">תקציב יומי (אגורות)</Label>
+                    <Label htmlFor="budget">תקציב יומי (₪)</Label>
                     <Input
                       id="budget"
                       type="number"
                       value={formData.budget}
                       onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                      placeholder="1000 = ₪10.00"
+                      placeholder="100"
+                      min="10"
+                      step="10"
                     />
+                    <p className="text-xs text-muted-foreground">מומלץ לפחות ₪50 ליום לתוצאות טובות</p>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>פלטפורמות פרסום *</Label>
-                  <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">פלטפורמות פרסום *</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {[
-                      { value: 'meta', label: 'Meta (FB/IG)', icon: '📱' },
-                      { value: 'google', label: 'Google Ads', icon: '🔍' },
-                      { value: 'taboola', label: 'Taboola', icon: '📰' },
-                      { value: 'outbrain', label: 'Outbrain', icon: '📊' },
+                      { value: 'meta', label: 'Meta', sublabel: 'Facebook & Instagram', color: 'blue' },
+                      { value: 'google', label: 'Google Ads', sublabel: 'Search & Display', color: 'green' },
+                      { value: 'tiktok', label: 'TikTok', sublabel: 'Short Video', color: 'pink' },
+                      { value: 'twitter', label: 'Twitter/X', sublabel: 'Social Feed', color: 'sky' },
+                      { value: 'youtube', label: 'YouTube', sublabel: 'Video Platform', color: 'red' },
+                      { value: 'taboola', label: 'Taboola', sublabel: 'Native Ads', color: 'orange' },
+                      { value: 'outbrain', label: 'Outbrain', sublabel: 'Content Discovery', color: 'purple' },
                     ].map((platform) => (
-                      <label key={platform.value} className="flex items-center gap-2 p-3 rounded-lg border border-border hover:bg-accent/50 cursor-pointer transition-colors">
+                      <label 
+                        key={platform.value} 
+                        className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                          formData.platforms.includes(platform.value as Platform)
+                            ? `border-${platform.color}-500 bg-${platform.color}-50/50 dark:bg-${platform.color}-950/20`
+                            : 'border-border hover:border-muted-foreground/30 hover:bg-muted/30'
+                        }`}
+                      >
                         <Checkbox
                           checked={formData.platforms.includes(platform.value as Platform)}
                           onCheckedChange={(checked) => {
@@ -266,8 +283,10 @@ export default function Brief() {
                             setFormData({ ...formData, platforms });
                           }}
                         />
-                        <span className="text-lg">{platform.icon}</span>
-                        <span className="text-sm">{platform.label}</span>
+                        <div className="flex-1 text-right">
+                          <div className="font-semibold text-sm">{platform.label}</div>
+                          <div className="text-xs text-muted-foreground">{platform.sublabel}</div>
+                        </div>
                       </label>
                     ))}
                   </div>
@@ -278,13 +297,13 @@ export default function Brief() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full gradient-primary hover:opacity-90 shadow-glow text-lg h-14"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold h-14 shadow-lg transition-colors"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    שומר...
+                    יוצר קמפיין...
                   </>
                 ) : (
                   <>

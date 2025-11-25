@@ -56,19 +56,23 @@ export default function About() {
 
   const team = [
     {
-      name: 'דני כהן',
+      name: 'תמיר בן יחיאל',
       role: 'מייסד ו-CEO',
-      description: 'מומחה בשיווק דיגיטלי עם 10+ שנות ניסיון בניהול קמפיינים',
+      description: 'מומחה בשיווק דיגיטלי וקריאייטיב, מוביל את החזון של AdSync להפוך שיווק לנגיש ויעיל לכולם',
+      image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=400&q=80',
+      isActive: true,
     },
     {
-      name: 'מיכל לוי',
+      name: 'מצטרף בקרוב',
       role: 'CTO',
-      description: 'מהנדסת תוכנה ומומחית AI עם רקורד מוכח בפיתוח מוצרים',
+      description: 'מחפשים מהנדס/ת תוכנה מוכשר/ת להוביל את הפיתוח הטכנולוגי',
+      isActive: false,
     },
     {
-      name: 'רון אברהם',
+      name: 'מצטרף בקרוב',
       role: 'Head of Product',
-      description: 'בעל ניסיון רב בבניית מוצרים שממוקדים במשתמש',
+      description: 'מחפשים איש/אשת מוצר להוביל את חווית המשתמש והחדשנות',
+      isActive: false,
     },
   ];
 
@@ -143,8 +147,21 @@ export default function About() {
             </div>
 
             <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <div className="aspect-video bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center">
-                <Globe className="w-32 h-32 text-primary/40" />
+              <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl group">
+                <img
+                  src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80"
+                  alt="Team collaboration"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6">
+                  <div className="flex items-center gap-2 text-white">
+                    <Sparkles className="w-5 h-5" />
+                    <p className="text-lg font-semibold">
+                      צוות שדוחף גבולות בשיווק דיגיטלי
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -222,15 +239,29 @@ export default function About() {
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {team.map((member, index) => (
               <Card
-                key={member.name}
-                className="glass-card p-6 text-center hover-scale animate-fade-in"
+                key={member.name + index}
+                className={`glass-card p-6 text-center hover-scale animate-fade-in ${
+                  !member.isActive ? 'opacity-60 border-dashed' : ''
+                }`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                  <Users className="w-12 h-12 text-primary" />
-                </div>
+                {member.isActive && member.image ? (
+                  <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden ring-4 ring-primary/20">
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center border-2 border-dashed border-muted-foreground/30">
+                    <Users className="w-12 h-12 text-muted-foreground/50" />
+                  </div>
+                )}
                 <h3 className="text-xl font-semibold mb-1">{member.name}</h3>
-                <div className="text-primary font-medium mb-3">{member.role}</div>
+                <div className={`font-medium mb-3 ${member.isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                  {member.role}
+                </div>
                 <p className="text-muted-foreground text-sm">{member.description}</p>
               </Card>
             ))}
