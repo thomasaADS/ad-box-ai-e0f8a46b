@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Sparkles, FileText, BarChart3, Settings } from "lucide-react";
+import { Sparkles, FileText, BarChart3, Settings, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -10,6 +10,7 @@ export function TopNav() {
   const links = [
     { href: "/brief", label: "ברייף", icon: FileText },
     { href: "/ai-chat", label: "AI Chat", icon: Sparkles },
+    { href: "/landing-builder", label: "בניית אתר", icon: Globe },
     { href: "/dashboard", label: "קמפיינים", icon: BarChart3 },
     { href: "/settings", label: "הגדרות", icon: Settings },
   ];

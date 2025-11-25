@@ -15,6 +15,7 @@ import AIChat from "./pages/AIChat";
 import Generate from "./pages/Generate";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
+import LandingPageBuilder from "./pages/LandingPageBuilder";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Auth from "./pages/Auth";
@@ -78,6 +79,11 @@ const App = () => (
                 <Route path="/settings" element={
                   <ProtectedRoute>
                     <Settings />
+                  </ProtectedRoute>
+                } />
+                <Route path="/landing-builder" element={
+                  <ProtectedRoute>
+                    <LandingPageBuilder />
                   </ProtectedRoute>
                 } />
                 <Route path="*" element={<NotFound />} />

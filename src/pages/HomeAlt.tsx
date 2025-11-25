@@ -41,14 +41,16 @@ const HomeAlt = () => {
       description: 'בינה מלאכותית מתקדמת שיוצרת תוכן ממוטב לכל פלטפורמה',
     },
     {
+      icon: Globe,
+      title: 'בניית דפי נחיתה',
+      description: 'אין אתר? בנה דף נחיתה מקצועי תוך 5 דקות שממיר מבקרים ללקוחות',
+      highlight: true,
+      link: '/landing-builder',
+    },
+    {
       icon: Target,
       title: 'מיקוד מדויק',
       description: 'הגדרות קהל יעד חכמות שמביאות את הלקוחות הנכונים',
-    },
-    {
-      icon: Globe,
-      title: 'כל הפלטפורמות',
-      description: 'כיסוי מלא של Meta, Google, TikTok, LinkedIn ועוד',
     },
     {
       icon: BarChart3,
@@ -226,28 +228,48 @@ const HomeAlt = () => {
             {features.map((feature, index) => {
               const Icon = feature.icon;
               const colors = [
-                { bg: 'bg-purple-100', icon: 'text-purple-600', border: 'border-purple-200' },
-                { bg: 'bg-blue-100', icon: 'text-blue-600', border: 'border-blue-200' },
-                { bg: 'bg-green-100', icon: 'text-green-600', border: 'border-green-200' },
-                { bg: 'bg-orange-100', icon: 'text-orange-600', border: 'border-orange-200' }
+                { bg: 'bg-purple-100', icon: 'text-purple-600', border: 'border-purple-200', gradient: 'from-purple-600 to-purple-800' },
+                { bg: 'bg-blue-100', icon: 'text-blue-600', border: 'border-blue-200', gradient: 'from-blue-600 to-blue-800' },
+                { bg: 'bg-green-100', icon: 'text-green-600', border: 'border-green-200', gradient: 'from-green-600 to-green-800' },
+                { bg: 'bg-orange-100', icon: 'text-orange-600', border: 'border-orange-200', gradient: 'from-orange-600 to-orange-800' }
               ];
               const color = colors[index % colors.length];
               return (
                 <Card
                   key={index}
-                  className={`p-8 hover:shadow-xl transition-all hover:scale-105 border-2 ${color.border}`}
+                  className={`p-8 hover:shadow-xl transition-all hover:scale-105 border-2 ${color.border} ${
+                    feature.highlight ? 'ring-2 ring-yellow-400 relative overflow-hidden' : ''
+                  } ${feature.link ? 'cursor-pointer' : ''}`}
+                  onClick={feature.link ? () => navigate(feature.link) : undefined}
                 >
-                  <div className="flex items-start gap-4">
+                  {feature.highlight && (
+                    <div className="absolute top-0 left-0 right-0">
+                      <Badge className="rounded-t-lg rounded-b-none w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black border-0 justify-center">
+                        ⭐ חדש! פיצ'ר מיוחד
+                      </Badge>
+                    </div>
+                  )}
+                  <div className={`flex items-start gap-4 ${feature.highlight ? 'mt-6' : ''}`}>
                     <div className={`p-4 rounded-xl ${color.bg}`}>
                       <Icon className={`w-7 h-7 ${color.icon}`} />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <h3 className="text-xl font-semibold mb-2">
                         {feature.title}
                       </h3>
-                      <p className="text-muted-foreground">
+                      <p className="text-muted-foreground mb-3">
                         {feature.description}
                       </p>
+                      {feature.link && (
+                        <Button
+                          size="sm"
+                          className={`bg-gradient-to-r ${color.gradient} hover:opacity-90`}
+                          onClick={() => navigate(feature.link)}
+                        >
+                          בנה דף נחיתה עכשיו
+                          <ArrowRight className="w-4 h-4 mr-2" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </Card>
