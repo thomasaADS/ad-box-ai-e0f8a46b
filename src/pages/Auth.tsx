@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Logo } from '@/components/Logo';
 import { AnimatedParticles } from '@/components/AnimatedParticles';
 import { Eye, EyeOff, Chrome } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Auth() {
   const { t } = useTranslation();
@@ -161,7 +162,7 @@ export default function Auth() {
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700" disabled={loading}>
+                  <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? 'מתחבר...' : 'התחבר'}
                   </Button>
                 </form>
@@ -240,7 +241,7 @@ export default function Auth() {
 
                   <Button 
                     type="submit" 
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700" 
+                    className="w-full" 
                     disabled={loading || signupForm.password !== signupForm.confirmPassword}
                   >
                     {loading ? 'נרשם...' : 'הירשם'}
