@@ -11,6 +11,7 @@ export function TopNav() {
     { href: "/", label: "ברייף", icon: FileText },
     { href: "/generate", label: "יצירה", icon: Sparkles },
     { href: "/dashboard", label: "לוח בקרה", icon: BarChart3 },
+    { href: "/analytics", label: "אנליטיקס", icon: BarChart3 },
     { href: "/settings", label: "הגדרות", icon: Settings },
   ];
 

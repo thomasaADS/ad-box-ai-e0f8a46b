@@ -2,7 +2,7 @@ import { TopNav } from "@/components/TopNav";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, Eye, MousePointerClick, DollarSign, Plus, FileText, Sparkles } from "lucide-react";
+import { TrendingUp, Eye, MousePointerClick, DollarSign, Plus, FileText, Sparkles, BarChart3 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -109,14 +109,25 @@ export default function Dashboard() {
               כל הקמפיינים שלך במקום אחד - ניהול, ניטור והמשך יצירה
             </p>
           </div>
-          <Button 
-            onClick={() => navigate('/brief')} 
-            size="lg"
-            className="gradient-boosti-cta text-white hover:scale-105 transition-transform shadow-lg px-6 py-6 text-lg"
-          >
-            <Plus className="w-5 h-5 ml-2" />
-            צור קמפיין חדש
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => navigate('/analytics')} 
+              size="lg"
+              variant="outline"
+              className="hover:scale-105 transition-transform shadow-lg px-6 py-6 text-lg"
+            >
+              <BarChart3 className="w-5 h-5 ml-2" />
+              אנליטיקס
+            </Button>
+            <Button 
+              onClick={() => navigate('/brief')} 
+              size="lg"
+              className="gradient-boosti-cta text-white hover:scale-105 transition-transform shadow-lg px-6 py-6 text-lg"
+            >
+              <Plus className="w-5 h-5 ml-2" />
+              צור קמפיין חדש
+            </Button>
+          </div>
         </div>
 
         {/* Stats Grid */}
