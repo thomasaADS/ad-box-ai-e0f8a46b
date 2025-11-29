@@ -158,7 +158,7 @@ const HomeAlt = () => {
                   backdropFilter: 'blur(20px)'
                 }}
               >
-                ✨ השדרוג שהשיווק שלך חיכה לו
+                השדרוג שהשיווק שלך חיכה לו
               </Badge>
             </div>
 

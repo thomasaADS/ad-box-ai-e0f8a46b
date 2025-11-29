@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { facebookAPI, FacebookAdAccount } from '@/lib/facebook-api';
-import { CheckCircle2, AlertCircle, Loader2, Facebook } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Loader2, Facebook, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function FacebookConnect() {
@@ -213,11 +213,14 @@ export default function FacebookConnect() {
 
           {selectedAccount && (
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
-              <p className="font-semibold text-sm mb-2">✨ הכל מוכן!</p>
+              <p className="font-semibold text-sm mb-2 flex items-center gap-2">
+                <Sparkles className="w-4 h-4" />
+                הכל מוכן
+              </p>
               <p className="text-sm text-gray-700">
                 עכשיו תוכל לפרסם קמפיינים ישירות לחשבון הפרסום שבחרת.
                 <br />
-                פשוט צור קמפיין ולחץ על "פרסם לפייסבוק" 🚀
+                פשוט צור קמפיין ולחץ על "פרסם לפייסבוק"
               </p>
             </div>
           )}

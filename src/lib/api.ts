@@ -47,7 +47,7 @@ export interface PlatformConfig {
 export const platformConfig: Record<Platform, PlatformConfig> = {
   meta: {
     label: 'מטא (פייסבוק/אינסטגרם)',
-    icon: '📱',
+    icon: 'Meta',
     iconName: 'Users',
     gradient: 'icon-gradient-meta',
     glowColor: 'shadow-blue-500/50',
@@ -176,7 +176,7 @@ export const platformConfig: Record<Platform, PlatformConfig> = {
   },
   linkedin: {
     label: 'לינקדאין',
-    icon: '💼',
+    icon: 'LinkedIn',
     iconName: 'Briefcase',
     gradient: 'icon-gradient-linkedin',
     glowColor: 'shadow-blue-600/50',
@@ -301,7 +301,7 @@ export const platformConfig: Record<Platform, PlatformConfig> = {
   },
   outbrain: {
     label: 'אאוטבריין',
-    icon: '📊',
+    icon: 'Outbrain',
     iconName: 'BarChart3',
     gradient: 'icon-gradient-outbrain',
     glowColor: 'shadow-purple-500/50',
@@ -342,7 +342,7 @@ export const platformConfig: Record<Platform, PlatformConfig> = {
   },
   sms: {
     label: 'קמפיינים ב-SMS',
-    icon: '💬',
+    icon: 'TikTok',
     iconName: 'MessageSquare',
     gradient: 'icon-gradient-sms',
     glowColor: 'shadow-purple-500/50',
@@ -382,7 +382,7 @@ export const platformConfig: Record<Platform, PlatformConfig> = {
   },
   email: {
     label: 'שיווק במייל',
-    icon: '📧',
+    icon: 'Email',
     iconName: 'Mail',
     gradient: 'icon-gradient-email',
     glowColor: 'shadow-green-500/50',
@@ -482,7 +482,7 @@ export async function generateCampaign(data: GenerateRequest): Promise<{ objecti
       if (isHebrew) {
         variants.push({
           platform: 'meta',
-          primary_text: `מחפשים ${industry} מקצועי ב${city}? ${offer}! ${data.brand.name} - השירות שמבין אותך. קביעת תור בלחיצה! 🌟`,
+          primary_text: `מחפשים ${industry} מקצועי ב${city}? ${offer}! ${data.brand.name} - השירות שמבין אותך. קביעת תור בלחיצה!`,
           headline: `${industry} ב${city}`,
           description: offer,
           cta: "BOOK_NOW",
@@ -492,7 +492,7 @@ export async function generateCampaign(data: GenerateRequest): Promise<{ objecti
         });
         variants.push({
           platform: 'meta',
-          primary_text: `✨ ${data.brand.name} - ${industry} שמציב רף חדש ב${city}! ${offer} - רק השבוע. אל תפספסו!`,
+          primary_text: `${data.brand.name} - ${industry} שמציב רף חדש ב${city}! ${offer} - רק השבוע. אל תפספסו!`,
           headline: `${offer} - מבצע מיוחד`,
           description: `${data.brand.name} ב${city}`,
           cta: "LEARN_MORE",
@@ -503,7 +503,7 @@ export async function generateCampaign(data: GenerateRequest): Promise<{ objecti
       } else {
         variants.push({
           platform: 'meta',
-          primary_text: `Looking for professional ${industry} in ${city}? ${offer}! Book with ${data.brand.name} today. 🌟`,
+          primary_text: `Looking for professional ${industry} in ${city}? ${offer}! Book with ${data.brand.name} today.`,
           headline: `${industry} in ${city}`,
           description: offer,
           cta: "BOOK_NOW",

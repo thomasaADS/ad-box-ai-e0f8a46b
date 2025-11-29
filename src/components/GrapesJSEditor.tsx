@@ -170,12 +170,12 @@ export default function GrapesJSEditor({ onSave, initialHtml = '', initialCss = 
         <h2 style="font-size: 36px; margin-bottom: 40px; color: #333; font-weight: 600;">למה לבחור בנו?</h2>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto;">
           <div style="padding: 30px; background: #f8f9fa; border-radius: 10px;">
-            <div style="font-size: 48px; margin-bottom: 15px;">⚡</div>
+            <div style="font-size: 48px; margin-bottom: 15px; font-weight: bold; color: #7c3aed;">●</div>
             <h3 style="font-size: 24px; margin-bottom: 10px; color: #333; font-weight: 600;">מהיר ויעיל</h3>
             <p style="color: #666; line-height: 1.6;">תוצאות מיידיות שחוסכות לך זמן</p>
           </div>
           <div style="padding: 30px; background: #f8f9fa; border-radius: 10px;">
-            <div style="font-size: 48px; margin-bottom: 15px;">🎯</div>
+            <div style="font-size: 48px; margin-bottom: 15px; font-weight: bold; color: #7c3aed;">✓</div>
             <h3 style="font-size: 24px; margin-bottom: 10px; color: #333; font-weight: 600;">מדויק ומקצועי</h3>
             <p style="color: #666; line-height: 1.6;">פתרונות מותאמים אישית לצרכים שלך</p>
           </div>
