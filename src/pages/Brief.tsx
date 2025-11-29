@@ -1,96 +1,37 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TopNav } from "@/components/TopNav";
-import { AIBriefAgent } from "@/components/AIBriefAgent";
-import { Card } from "@/components/ui/card";
-import { Sparkles } from "lucide-react";
-import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import FreeChatBrief from "@/components/FreeChatBrief";
+import { Sparkles, MessageSquare } from "lucide-react";
 import { ChatWidget } from "@/components/ChatWidget";
-
-interface BriefData {
-  brandName?: string;
-  industry?: string;
-  city?: string;
-  offer?: string;
-  tone?: string;
-  platforms?: string[];
-  objective?: string;
-  budget?: string;
-  website?: string;
-  whatsapp?: string;
-}
 
 export default function Brief() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-
-  const handleBriefComplete = async (briefData: BriefData) => {
-    if (!user) {
-      toast.error("יש להתחבר כדי לשמור קמפיין");
-      navigate('/auth');
-      return;
-    }
-
-    try {
-      // Save campaign to Supabase
-      const { data, error } = await supabase
-        .from('campaigns')
-        .insert({
-          user_id: user.id,
-          brand_name: briefData.brandName || "העסק שלי",
-          website: briefData.website || "",
-          industry: briefData.industry || "",
-          city: briefData.city || "",
-          offer: briefData.offer || "",
-          budget: parseFloat(briefData.budget || "1000"),
-          tone: briefData.tone || "professional",
-          objective: briefData.objective || "TRAFFIC",
-          languages: ["he"],
-          platforms: briefData.platforms || ["meta", "google"],
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      toast.success("הקמפיין נשמר בהצלחה!");
-
-      // Store in sessionStorage to pass to generate page
-      sessionStorage.setItem("briefData", JSON.stringify(briefData));
-      navigate("/generate", { state: { campaignId: data.id } });
-    } catch (error) {
-      console.error('Error saving campaign:', error);
-      toast.error("שגיאה בשמירת הקמפיין");
-    }
-  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       <TopNav />
       
       <main className="container mx-auto px-4 py-12">
-        <div className="max-w-5xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl gradient-boosti-hero shadow-glow mb-6 animate-float">
-              <Sparkles className="w-10 h-10 text-white" />
-            </div>
-            <h1 className="text-5xl font-bold mb-4 gradient-text">
-              בוא ניצור קמפיין מנצח יחד
-            </h1>
-            <p className="text-muted-foreground text-xl max-w-2xl mx-auto">
-              הסוכן החכם שלנו ישאל כמה שאלות ויצור עבורך קמפיין פרסומי מקצועי וקריאטיבי בדקות ספורות
-            </p>
+        {/* Header */}
+        <div className="text-center mb-8 animate-fade-in">
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 shadow-2xl mb-6 animate-float">
+            <MessageSquare className="w-12 h-12 text-white" />
           </div>
-
-          {/* AI Agent */}
-          <Card className="p-8 shadow-strong border-border/50 bg-card/80 backdrop-blur-sm">
-            <AIBriefAgent onComplete={handleBriefComplete} />
-          </Card>
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
+            💬 ספר לי על העסק שלך
+          </h1>
+          <p className="text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+            פשוט כתוב בצורה חופשית - <span className="font-bold text-purple-600">הAI שלנו יבין הכל!</span>
+          </p>
+          <p className="text-lg text-gray-500 mt-3">
+            ✨ ללא טפסים • 🤖 שיחה טבעית • 🚀 תוצאות מיידיות
+          </p>
         </div>
+
+        {/* Free Chat Brief */}
+        <FreeChatBrief />
       </main>
+      
       <ChatWidget />
     </div>
   );
