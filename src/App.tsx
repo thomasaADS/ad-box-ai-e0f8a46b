@@ -40,11 +40,7 @@ const App = () => (
               <Route path="/landing-page-builder" element={<LandingPageBuilder />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
-              <Route path="/brief" element={
-                <ProtectedRoute>
-                  <Brief />
-                </ProtectedRoute>
-              } />
+              <Route path="/brief" element={<Brief />} />
               <Route path="/generate" element={
                 <ProtectedRoute>
                   <Generate />
