@@ -169,7 +169,10 @@ export default function Dashboard() {
                   </div>
                   <FileText className="w-20 h-20 text-primary relative" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3">הגיע הזמן להתחיל! 🚀</h3>
+                <h3 className="text-2xl font-bold mb-3 flex items-center gap-2">
+                  <Sparkles className="w-6 h-6" />
+                  הגיע הזמן להתחיל
+                </h3>
                 <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
                   עוד לא יצרת קמפיינים. הסוכן החכם שלנו מחכה לעזור לך ליצור את הקמפיין המושלם הראשון שלך
                 </p>
@@ -206,11 +209,7 @@ export default function Dashboard() {
                               variant="secondary"
                               className="text-sm px-3 py-1"
                             >
-                              {platform === 'meta' && '📱 '}
-                              {platform === 'google' && '🔍 '}
-                              {platform === 'tiktok' && '🎵 '}
-                              {platform === 'linkedin' && '💼 '}
-                              {platform}
+                              {platform.charAt(0).toUpperCase() + platform.slice(1)}
                             </Badge>
                           ))}
                         </div>

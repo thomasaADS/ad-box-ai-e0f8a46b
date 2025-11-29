@@ -56,7 +56,7 @@ export default function Generate() {
         }));
 
         setVariants(enhancedVariants);
-        toast.success(`✨ נוצרו ${enhancedVariants.length} וריאנטים עם AI!`, {
+        toast.success(`נוצרו ${enhancedVariants.length} וריאנטים עם AI`, {
           description: 'המודעות נוצרו על ידי Gemini AI',
         });
       } catch (aiError) {
@@ -129,7 +129,8 @@ export default function Generate() {
               <Wand2 className="w-16 h-16 text-primary animate-bounce relative z-10" />
             </div>
             <h2 className="text-3xl font-bold mt-8 mb-3 gradient-text">
-              ✨ הקסם קורה עכשיו...
+              <Sparkles className="w-5 h-5 inline ml-1 animate-pulse" />
+              הקסם קורה עכשיו...
             </h2>
             <p className="text-muted-foreground text-lg mb-4">
               Gemini AI יוצר עבורך קמפיינים מקצועיים וקריאטיביים
@@ -176,7 +177,8 @@ export default function Generate() {
             </div>
             <div>
               <h1 className="text-5xl font-bold gradient-text">
-                הקמפיינים שלך מוכנים! 🎉
+                <CheckCircle className="w-6 h-6 inline ml-2" />
+                הקמפיינים שלך מוכנים
               </h1>
               <p className="text-muted-foreground text-lg mt-2">
                 {variants.length} וריאציות מודעות מקצועיות: {Object.entries(variantsByPlatform).map(([p, c]) => `${c} ${p}`).join(' · ')}
@@ -191,11 +193,7 @@ export default function Generate() {
             <TabsTrigger value="all">הכל ({variants.length})</TabsTrigger>
             {Object.entries(variantsByPlatform).map(([platform, count]) => (
               <TabsTrigger key={platform} value={platform}>
-                {platform === 'meta' && '📱'} 
-                {platform === 'google' && '🔍'} 
-                {platform === 'taboola' && '📰'} 
-                {platform === 'outbrain' && '📊'} 
-                {' '}{platform.charAt(0).toUpperCase() + platform.slice(1)} ({count})
+                {platform.charAt(0).toUpperCase() + platform.slice(1)} ({count})
               </TabsTrigger>
             ))}
           </TabsList>

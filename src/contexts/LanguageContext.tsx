@@ -18,7 +18,7 @@ const translations: Record<Language, Record<string, any>> = {
     "nav.howItWork": "איך זה עובד",
     "nav.pricing": "תמחור",
     "nav.about": "אודות",
-    "nav.getStarted": "התחל חינם 🚀",
+    "nav.getStarted": "התחל חינם",
     "nav.login": "התחבר",
     "nav.dashboard": "לוח בקרה",
     "nav.settings": "הגדרות",

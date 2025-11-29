@@ -18,6 +18,7 @@ import {
   Filter,
   Search,
   ArrowUpDown,
+  BarChart3,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -155,7 +156,9 @@ export default function MyCampaigns() {
         {/* Campaigns Grid */}
         {filteredCampaigns.length === 0 ? (
           <Card className="p-12 text-center">
-            <div className="text-6xl mb-4">📊</div>
+            <div className="mb-4">
+              <BarChart3 className="w-16 h-16 mx-auto text-purple-600" />
+            </div>
             <h3 className="text-2xl font-bold mb-2">אין קמפיינים עדיין</h3>
             <p className="text-muted-foreground mb-6">
               התחל ליצור את הקמפיין הראשון שלך עכשיו!

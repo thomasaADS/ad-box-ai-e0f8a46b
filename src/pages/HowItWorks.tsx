@@ -17,6 +17,7 @@ import {
   FileText,
   Rocket,
   ChevronDown,
+  CreditCard,
 } from 'lucide-react';
 
 // Individual step component with scroll animation
@@ -279,7 +280,20 @@ export default function HowItWorks() {
               <Sparkles className="w-7 h-7 mr-3" />
               יצירת קמפיין חינם
             </Button>
-            <p className="mt-6 text-white/80">💳 ללא כרטיס אשראי • ⚡ תוצאות מיידיות • ✨ 100% בחינם</p>
+            <div className="mt-6 flex items-center justify-center gap-6 text-white/80">
+              <span className="flex items-center gap-2">
+                <CreditCard className="w-4 h-4" />
+                ללא כרטיס אשראי
+              </span>
+              <span className="flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                תוצאות מיידיות
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4" />
+                100% בחינם
+              </span>
+            </div>
           </div>
         </div>
       </section>
