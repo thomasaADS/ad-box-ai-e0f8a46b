@@ -55,10 +55,9 @@ export default function AnalyticsDashboard() {
 
   // Load data
   useEffect(() => {
-    if (user) {
-      loadData();
-    }
-  }, [user, filters]);
+    // Allow loading even without user for demo purposes
+    loadData();
+  }, [filters]);
 
   const loadData = async () => {
     setLoading(true);

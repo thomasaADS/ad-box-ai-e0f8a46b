@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Brief from "./pages/Brief";
 import Generate from "./pages/Generate";
 import Dashboard from "./pages/Dashboard";
+import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import Settings from "./pages/Settings";
 import MyCampaigns from "./pages/MyCampaigns";
 import Privacy from "./pages/Privacy";
@@ -44,6 +45,7 @@ const App = () => (
               <Route path="/brief" element={<Brief />} />
               <Route path="/generate" element={<Generate />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/analytics" element={<AnalyticsDashboard />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/my-campaigns" element={<MyCampaigns />} />
               <Route path="*" element={<NotFound />} />
