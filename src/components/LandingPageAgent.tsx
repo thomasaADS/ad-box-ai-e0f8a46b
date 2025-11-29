@@ -111,10 +111,10 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
       const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1200&height=800&nologo=true&enhance=true`;
       
       // Preload the image to ensure it's generated
-      await new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = resolve;
-        img.onerror = reject;
+      await new Promise<void>((resolve, reject) => {
+        const img = document.createElement('img');
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error('Failed to load image'));
         img.src = imageUrl;
       });
       

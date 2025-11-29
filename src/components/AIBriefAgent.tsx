@@ -230,9 +230,10 @@ export function AIBriefAgent({ onComplete }: AIBriefAgentProps) {
     
     if (question.multiSelect && question.field === 'platforms') {
       // For multi-select, toggle selection
-      const optValue = question.options?.find(opt => 
-        typeof opt === 'object' && opt.label === option
-      )?.value || option;
+      const optObj = question.options?.find(opt => 
+        typeof opt === 'object' && 'value' in opt && opt.label === option
+      );
+      const optValue = optObj && typeof optObj === 'object' && 'value' in optObj ? optObj.value : option;
       
       setSelectedPlatforms(prev => {
         if (prev.includes(optValue)) {
@@ -307,12 +308,11 @@ export function AIBriefAgent({ onComplete }: AIBriefAgentProps) {
                   {message.options && index === messages.length - 1 && (
                     <div className="mt-4 space-y-2">
                       {message.options.map((option, i) => {
-                        const isSelected = isMultiSelectQuestion && 
-                          selectedPlatforms.includes(
-                            currentQuestionData.options?.find(opt => 
-                              typeof opt === 'object' && opt.label === option
-                            )?.value || option
-                          );
+                        const optObj = currentQuestionData.options?.find(opt => 
+                          typeof opt === 'object' && 'value' in opt && opt.label === option
+                        );
+                        const optValue = optObj && typeof optObj === 'object' && 'value' in optObj ? optObj.value : option;
+                        const isSelected = isMultiSelectQuestion && selectedPlatforms.includes(optValue);
 
                         return (
                           <Button
