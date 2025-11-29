@@ -170,8 +170,9 @@ const HomeAlt = () => {
             </h1>
 
             {/* Subheading */}
-            <p className="text-2xl leading-[1.6] mx-auto max-w-4xl animate-slide-up text-white/95 drop-shadow-lg" style={{ animationDelay: '0.2s' }}>
-              🤖 AI חכם שמביא את המספרים הנכונים, בזמן הנכון, לקהל הנכון.
+            <p className="text-2xl leading-[1.6] mx-auto max-w-4xl animate-slide-up text-white/95 drop-shadow-lg flex items-center justify-center gap-3" style={{ animationDelay: '0.2s' }}>
+              <Zap className="w-7 h-7" />
+              AI חכם שמביא את המספרים הנכונים, בזמן הנכון, לקהל הנכון.
             </p>
 
             {/* Second Subheading */}
@@ -184,34 +185,37 @@ const HomeAlt = () => {
             {/* Value Props */}
             <div className="flex flex-wrap gap-4 justify-center pt-4 animate-slide-up" style={{ animationDelay: '0.4s' }}>
               <Badge 
-                className="text-sm px-5 py-2.5 font-medium border-0"
+                className="text-sm px-5 py-2.5 font-medium border-0 inline-flex items-center gap-2"
                 style={{
                   background: 'rgba(0, 196, 180, 0.2)',
                   backdropFilter: 'blur(10px)',
                   color: 'white'
                 }}
               >
-                📊 כל הפלטפורמות
+                <BarChart3 className="w-4 h-4" />
+                כל הפלטפורמות
               </Badge>
               <Badge 
-                className="text-sm px-5 py-2.5 font-medium border-0"
+                className="text-sm px-5 py-2.5 font-medium border-0 inline-flex items-center gap-2"
                 style={{
                   background: 'rgba(255, 255, 255, 0.2)',
                   backdropFilter: 'blur(10px)',
                   color: 'white'
                 }}
               >
-                🎯 קריאטיבים מותאמים אישית
+                <Target className="w-4 h-4" />
+                קריאטיבים מותאמים אישית
               </Badge>
               <Badge 
-                className="text-sm px-5 py-2.5 font-medium border-0"
+                className="text-sm px-5 py-2.5 font-medium border-0 inline-flex items-center gap-2"
                 style={{
                   background: 'rgba(122, 62, 250, 0.2)',
                   backdropFilter: 'blur(10px)',
                   color: 'white'
                 }}
               >
-                ⚡ תוצאות תוך 3 דקות
+                <Zap className="w-4 h-4" />
+                תוצאות תוך 3 דקות
               </Badge>
             </div>
 
@@ -227,7 +231,8 @@ const HomeAlt = () => {
                 }}
               >
                 <span className="relative z-10 flex items-center gap-3">
-                  🚀 יצור קמפיין עכשיו!
+                  <Sparkles className="w-5 h-5" />
+                  יצור קמפיין עכשיו
                 </span>
               </Button>
               <Button
@@ -241,7 +246,8 @@ const HomeAlt = () => {
                   color: 'white'
                 }}
               >
-                🎯 איך זה עובד?
+                <Target className="w-5 h-5" />
+                איך זה עובד?
               </Button>
             </div>
 
@@ -271,8 +277,9 @@ const HomeAlt = () => {
           <Card className="p-8 md:p-12 bg-card/90 backdrop-blur-sm border-2 border-primary/20 hover:border-primary/40 transition-all hover-lift">
             <div className="flex flex-col md:flex-row items-center gap-8">
               <div className="flex-1 text-center md:text-right">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  אין לך אתר? בנה דף נחיתה תוך 5 דקות! 🚀
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 flex items-center justify-center gap-3">
+                  <Layout className="w-8 h-8" />
+                  אין לך אתר? בנה דף נחיתה תוך 5 דקות
                 </h2>
                 <p className="text-lg text-muted-foreground mb-6">
                   סוכן AI חכם שיוצר דפי נחיתה מקצועיים + תמונות ייחודיות עם AI!
@@ -283,7 +290,7 @@ const HomeAlt = () => {
                   className="gradient-boosti-cta text-white hover:scale-105 transition-transform shadow-lg text-lg px-8 py-6 group"
                 >
                   <Wand2 className="w-5 h-5 ml-2 group-hover:rotate-12 transition-transform" />
-                  🎨 בנה דף נחיתה עם AI
+                  בנה דף נחיתה עם AI
                 </Button>
               </div>
               <div className="w-48 h-48 rounded-2xl gradient-boosti-hero flex items-center justify-center shadow-2xl">

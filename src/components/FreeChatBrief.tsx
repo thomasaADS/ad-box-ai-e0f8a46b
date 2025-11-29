@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Send, Bot, User, Sparkles, Loader2, CheckCircle } from 'lucide-react';
+import { Send, Bot, User, Sparkles, Loader2, CheckCircle, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
@@ -33,7 +33,7 @@ export default function FreeChatBrief() {
     {
       id: '1',
       role: 'assistant',
-      content: 'שלום! 👋 אני הסוכן החכם של AdSync.\n\nפשוט ספר לי על העסק שלך ומה אתה רוצה להשיג - אני אדאג לכל השאר!\n\n💡 לדוגמה:\n"אני בעל עסק לשרברבות בתל אביב, רוצה להגיע לאנשים בגילאי 30-50 שצריכים שרברב דחוף. התקציב שלי 2000₪ לחודש ואני רוצה לפרסם בפייסבוק וגוגל."\n\nאז... ספר לי, מה הסיפור שלך? 😊',
+      content: 'שלום! אני הסוכן החכם של AdSync.\n\nפשוט ספר לי על העסק שלך ומה אתה רוצה להשיג - אני אדאג לכל השאר!\n\nלדוגמה:\n"אני בעל עסק לשרברבות בתל אביב, רוצה להגיע לאנשים בגילאי 30-50 שצריכים שרברב דחוף. התקציב שלי 2000₪ לחודש ואני רוצה לפרסם בפייסבוק וגוגל."\n\nאז... ספר לי, מה הסיפור שלך?',
       timestamp: new Date(),
     },
   ]);
@@ -160,15 +160,15 @@ export default function FreeChatBrief() {
   const generateAIResponse = (brief: ParsedBrief): string => {
     const parts: string[] = ['מעולה! הבנתי את הפרטים הבאים:\n'];
 
-    if (brief.businessName) parts.push(`🏢 **עסק**: ${brief.businessName}`);
-    if (brief.businessType) parts.push(`💼 **תחום**: ${brief.businessType}`);
-    if (brief.targetAudience) parts.push(`🎯 **קהל יעד**: ${brief.targetAudience}`);
-    if (brief.location) parts.push(`📍 **מיקום**: ${brief.location}`);
-    if (brief.ageRange) parts.push(`👥 **גילאים**: ${brief.ageRange}`);
-    if (brief.goals) parts.push(`🎯 **מטרות**: ${brief.goals}`);
-    if (brief.budget) parts.push(`💰 **תקציב**: ${brief.budget}`);
+    if (brief.businessName) parts.push(`**עסק**: ${brief.businessName}`);
+    if (brief.businessType) parts.push(`**תחום**: ${brief.businessType}`);
+    if (brief.targetAudience) parts.push(`**קהל יעד**: ${brief.targetAudience}`);
+    if (brief.location) parts.push(`**מיקום**: ${brief.location}`);
+    if (brief.ageRange) parts.push(`**גילאים**: ${brief.ageRange}`);
+    if (brief.goals) parts.push(`**מטרות**: ${brief.goals}`);
+    if (brief.budget) parts.push(`**תקציב**: ${brief.budget}`);
     if (brief.platforms && brief.platforms.length > 0) {
-      parts.push(`📱 **פלטפורמות**: ${brief.platforms.join(', ')}`);
+      parts.push(`**פלטפורמות**: ${brief.platforms.join(', ')}`);
     }
     if (brief.specialOffers) parts.push(`🎁 **מבצעים**: ${brief.specialOffers}`);
 
@@ -176,7 +176,7 @@ export default function FreeChatBrief() {
       return 'אוקיי, מעניין! ספר לי עוד קצת - מה בדיוק אתה מוכר ולאיזה קהל אתה רוצה להגיע?';
     }
 
-    parts.push('\n✨ **אני מוכן ליצור את הקמפיין שלך!**\n\nאם יש עוד משהו שרצית להוסיף - כתוב עכשיו.\nאחרת, לחץ על "צור קמפיין עכשיו!" למטה. 🚀');
+    parts.push('\n**אני מוכן ליצור את הקמפיין שלך!**\n\nאם יש עוד משהו שרצית להוסיף - כתוב עכשיו.\nאחרת, לחץ על "צור קמפיין עכשיו" למטה.');
 
     return parts.join('\n');
   };
@@ -191,7 +191,7 @@ export default function FreeChatBrief() {
     localStorage.setItem('campaignBrief', JSON.stringify(parsedBrief));
     localStorage.setItem('campaignBriefText', messages.filter(m => m.role === 'user').map(m => m.content).join('\n\n'));
 
-    toast.success('מעולה! יוצר את הקמפיינים שלך... ⚡');
+    toast.success('מעולה! יוצר את הקמפיינים שלך...');
     
     // Navigate to generate page
     setTimeout(() => {
@@ -291,7 +291,8 @@ export default function FreeChatBrief() {
                 className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-xl py-7 rounded-xl shadow-xl hover:scale-105 transition-all"
               >
                 <CheckCircle className="w-6 h-6 mr-3" />
-                צור קמפיין עכשיו! 🚀
+                <Sparkles className="w-5 h-5 ml-2" />
+                צור קמפיין עכשיו
               </Button>
             </div>
           )}
@@ -325,7 +326,8 @@ export default function FreeChatBrief() {
             </Button>
           </div>
           <p className="text-sm text-gray-500 mt-3 text-center">
-            💡 טיפ: ספר לי הכל בצורה חופשית - אני אבין ואסדר את זה לקמפיין מנצח!
+            <Lightbulb className="w-4 h-4 inline ml-1" />
+            טיפ: ספר לי הכל בצורה חופשית - אני אבין ואסדר את זה לקמפיין מנצח!
           </p>
         </div>
       </Card>

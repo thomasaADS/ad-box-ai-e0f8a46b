@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Sparkles, Image, Wand2, Send, Bot } from 'lucide-react';
+import { Loader2, Sparkles, Image, Wand2, Send, Bot, Building2, Target, Users, Eye, Palette } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Message {
@@ -31,41 +31,47 @@ interface PageData {
 const questions = [
   {
     id: 'businessName',
-    question: 'מה שם העסק שלך? 🏢',
-    type: 'text'
+    question: 'מה שם העסק שלך?',
+    type: 'text',
+    icon: Building2,
   },
   {
     id: 'industry',
-    question: 'באיזה תחום אתה עוסק? 🎯',
+    question: 'באיזה תחום אתה עוסק?',
     type: 'options',
-    options: ['טכנולוגיה', 'אופנה', 'מזון ומסעדות', 'בריאות', 'נדל"ן', 'שירותים עסקיים', 'אחר']
+    options: ['טכנולוגיה', 'אופנה', 'מזון ומסעדות', 'בריאות', 'נדל"ן', 'שירותים עסקיים', 'אחר'],
+    icon: Target,
   },
   {
     id: 'targetAudience',
-    question: 'מי קהל היעד שלך? 👥',
-    type: 'text'
+    question: 'מי קהל היעד שלך?',
+    type: 'text',
+    icon: Users,
   },
   {
     id: 'mainGoal',
-    question: 'מה המטרה העיקרית של דף הנחיתה? 🎯',
+    question: 'מה המטרה העיקרית של דף הנחיתה?',
     type: 'options',
-    options: ['יצירת לידים', 'מכירת מוצר', 'הרשמה לאירוע', 'הורדת אפליקציה', 'הצטרפות לרשימת תפוצה']
+    options: ['יצירת לידים', 'מכירת מוצר', 'הרשמה לאירוע', 'הורדת אפליקציה', 'הצטרפות לרשימת תפוצה'],
+    icon: Eye,
   },
   {
     id: 'style',
-    question: 'איזה סטייל עיצובי אתה מעדיף? 🎨',
+    question: 'איזה סטייל עיצובי אתה מעדיף?',
     type: 'options',
-    options: ['מודרני ומינימליסטי', 'צעיר וצבעוני', 'מקצועי ועסקי', 'יצירתי ומקורי', 'אלגנטי ומעודן']
+    options: ['מודרני ומינימליסטי', 'צעיר וצבעוני', 'מקצועי ועסקי', 'יצירתי ומקורי', 'אלגנטי ומעודן'],
+    icon: Palette,
   },
   {
     id: 'colorScheme',
-    question: 'איזו פלטת צבעים תרצה? 🌈',
+    question: 'איזו פלטת צבעים תרצה?',
     type: 'options',
-    options: ['כחול וסגול', 'ירוק וכחול', 'כתום וורוד', 'שחור וזהב', 'כחול כהה ותכלת']
+    options: ['כחול וסגול', 'ירוק וכחול', 'כתום וורוד', 'שחור וזהב', 'כחול כהה ותכלת'],
+    icon: Palette,
   },
   {
     id: 'heroImage',
-    question: 'בוא ניצור תמונה מדהימה לדף הנחיתה! 🎨✨\n\nתאר לי מה תרצה לראות (או לחץ על אחת מהאפשרויות):',
+    question: 'בואו ניצור תמונה מדהימה לדף הנחיתה!\n\nתאר לי מה תרצה לראות (או לחץ על אחת מהאפשרויות):',
     type: 'image',
     options: [
       'צוות עובד יחד במשרד מודרני',
@@ -73,7 +79,8 @@ const questions = [
       'אנשים מאושרים משתמשים בשירות',
       'נוף עירוני עם טכנולוגיה',
       'תמונה אבסטרקטית צבעונית'
-    ]
+    ],
+    icon: Image,
   }
 ];
 
@@ -81,10 +88,10 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'שלום! 👋 אני הסוכן החכם לבניית דפי נחיתה.\n\nאני כאן כדי לעזור לך ליצור דף נחיתה מושלם שמתאים בדיוק לעסק שלך! 🚀\n\nבוא נתחיל?',
+      text: 'שלום! אני הסוכן החכם לבניית דפי נחיתה.\n\nאני כאן כדי לעזור לך ליצור דף נחיתה מושלם שמתאים בדיוק לעסק שלך!\n\nבוא נתחיל?',
       sender: 'ai',
       timestamp: new Date(),
-      options: ['בואו נתחיל! 🎯', 'ספר לי עוד על התהליך 🤔']
+      options: ['בואו נתחיל', 'ספר לי עוד על התהליך']
     }
   ]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(-1);
@@ -130,18 +137,18 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
       const timestamp = Date.now();
       const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1200&height=800&seed=${seed}&nologo=true&enhance=true&model=flux&t=${timestamp}`;
       
-      console.log('🎨 Generating image with prompt:', enhancedPrompt);
-      console.log('🎲 Using seed:', seed);
+      console.log('Generating image with prompt:', enhancedPrompt);
+      console.log('Using seed:', seed);
       
       // Preload the image to ensure it's generated
       await new Promise<void>((resolve, reject) => {
         const img = document.createElement('img');
         img.onload = () => {
-          console.log('✅ Image loaded successfully!');
+          console.log('Image loaded successfully!');
           resolve();
         };
         img.onerror = () => {
-          console.error('❌ Image failed to load');
+          console.error('Image failed to load');
           reject(new Error('Failed to load image'));
         };
         img.src = imageUrl;
@@ -219,9 +226,9 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
       addMessage(option, 'user');
       if (option.includes('ספר לי עוד')) {
         addMessage(
-          'התהליך פשוט ומהיר! 🚀\n\n✨ אני אשאל אותך כמה שאלות על העסק שלך\n🎨 נבחר ביחד עיצוב וצבעים\n🖼️ ניצור תמונה מושלמת עם AI\n🎯 ובסוף תקבל דף נחיתה מוכן לשימוש!\n\nכל התהליך לוקח בערך 2-3 דקות. מוכן להתחיל?',
+          'התהליך פשוט ומהיר!\n\nאני אשאל אותך כמה שאלות על העסק שלך, נבחר ביחד עיצוב וצבעים, ניצור תמונה מושלמת עם AI, ובסוף תקבל דף נחיתה מוכן לשימוש!\n\nכל התהליך לוקח בערך 2-3 דקות. מוכן להתחיל?',
           'ai',
-          ['בואו נתחיל! 🎯']
+          ['בואו נתחיל']
         );
       } else {
         proceedToNextQuestion();
@@ -233,18 +240,18 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
 
       if (currentQuestion.id === 'heroImage') {
         // Generate AI image
-        toast.info('יוצר תמונה מדהימה... ⏳✨');
+        toast.info('יוצר תמונה...');
         const imageUrl = await generateAIImage(option);
         
         setPageData((prev) => ({ ...prev, [currentQuestion.id]: imageUrl }));
         
         const imageMessage: Message = {
           id: Date.now().toString(),
-          text: 'הנה התמונה שיצרתי בשבילך! 🎨✨\n\nמה דעתך?',
+          text: 'הנה התמונה שיצרתי בשבילך!\n\nמה דעתך?',
           sender: 'ai',
           timestamp: new Date(),
           generatedImage: imageUrl,
-          options: ['מושלם! 😍', 'צור תמונה אחרת 🔄']
+          options: ['מושלם', 'צור תמונה אחרת']
         };
         setMessages((prev) => [...prev, imageMessage]);
       } else {
@@ -263,18 +270,18 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
 
     if (currentQuestion.id === 'heroImage') {
       // Generate AI image from custom prompt
-      toast.info('יוצר תמונה מדהימה מהתיאור שלך... ⏳✨');
+      toast.info('יוצר תמונה מהתיאור שלך...');
       const imageUrl = await generateAIImage(userInput);
       
       setPageData((prev) => ({ ...prev, [currentQuestion.id]: imageUrl }));
       
       const imageMessage: Message = {
         id: Date.now().toString(),
-        text: 'הנה התמונה שיצרתי לפי התיאור שלך! 🎨✨\n\nמה דעתך?',
+        text: 'הנה התמונה שיצרתי לפי התיאור שלך!\n\nמה דעתך?',
         sender: 'ai',
         timestamp: new Date(),
         generatedImage: imageUrl,
-        options: ['מושלם! 😍', 'צור תמונה אחרת 🔄']
+        options: ['מושלם', 'צור תמונה אחרת']
       };
       setMessages((prev) => [...prev, imageMessage]);
     } else {
@@ -302,12 +309,12 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
     } else {
       setTimeout(() => {
         addMessage(
-          '🎉 מעולה! אספתי את כל המידע.\n\nעכשיו אני בונה עבורך דף נחיתה מושלם... ⏳✨',
+          'מעולה! אספתי את כל המידע.\n\nעכשיו אני בונה עבורך דף נחיתה מושלם...',
           'ai'
         );
 
         setTimeout(() => {
-          toast.success('דף הנחיתה מוכן! 🎉');
+          toast.success('דף הנחיתה מוכן!');
           onComplete(pageData);
         }, 2000);
       }, 800);
@@ -318,65 +325,63 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
     const lastUserMessage = messages.filter(m => m.sender === 'user').pop();
     const prompt = lastUserMessage?.text || 'modern business landing page hero image';
     
-    toast.info('יוצר תמונה חדשה... ⏳✨');
+    toast.info('יוצר תמונה חדשה...');
     const imageUrl = await generateAIImage(prompt);
     
     setPageData((prev) => ({ ...prev, heroImage: imageUrl }));
     
     const imageMessage: Message = {
       id: Date.now().toString(),
-      text: 'הנה תמונה חדשה! 🎨✨',
+      text: 'הנה תמונה חדשה!',
       sender: 'ai',
       timestamp: new Date(),
       generatedImage: imageUrl,
-      options: ['מושלם! 😍', 'צור תמונה אחרת 🔄']
+      options: ['מושלם', 'צור תמונה אחרת']
     };
     setMessages((prev) => [...prev, imageMessage]);
   };
 
   const handleImageApprove = () => {
+    addMessage('מושלם, אני אוהב את התמונה!', 'user');
     proceedToNextQuestion();
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
-          <Badge className="mb-4 text-lg px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-            <Wand2 className="w-4 h-4 mr-2 inline" />
-            סוכן בניית דפי נחיתה AI
+          <Badge className="mb-4 text-base px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white inline-flex items-center gap-2">
+            <Wand2 className="w-4 h-4" />
+            בונה דפי נחיתה AI
           </Badge>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            בואו ניצור דף נחיתה מושלם ביחד! 🚀
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            בואו ניצור דף נחיתה מושלם ביחד
           </h1>
+          <p className="text-gray-600 text-lg">
+            ענה על מספר שאלות פשוטות ותקבל דף נחיתה מקצועי
+          </p>
         </div>
 
         {/* Chat Messages */}
-        <Card className="p-6 mb-6 max-h-[600px] overflow-y-auto">
+        <Card className="p-6 mb-4 max-h-[600px] overflow-y-auto">
           <div className="space-y-6">
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div
-                  className={`max-w-[80%] ${
-                    message.sender === 'user'
-                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
-                      : 'bg-white border-2 border-purple-200'
-                  } rounded-2xl p-5 shadow-lg`}
-                >
+                <div className={`max-w-[80%] ${message.sender === 'user' ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white' : 'bg-white border-2 border-purple-200'} rounded-2xl p-5 shadow-lg`}>
                   {message.sender === 'ai' && (
                     <div className="flex items-center gap-2 mb-3">
                       <Bot className="w-5 h-5 text-purple-600" />
-                      <span className="font-bold text-purple-600">סוכן AI</span>
+                      <span className="font-semibold text-purple-600">סוכן AI חכם</span>
                     </div>
                   )}
                   
-                  <p className="whitespace-pre-line text-lg leading-relaxed">{message.text}</p>
+                  <p className={`text-lg whitespace-pre-line ${message.sender === 'user' ? 'text-white' : 'text-gray-800'}`}>
+                    {message.text}
+                  </p>
 
-                  {/* Generated Image */}
                   {message.generatedImage && (
                     <div className="mt-4">
                       <img
@@ -422,7 +427,7 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
                   <div className="flex items-center gap-3">
                     <Loader2 className="w-6 h-6 animate-spin text-purple-600" />
                     <span className="text-lg font-medium text-purple-600">
-                      יוצר תמונה מדהימה עם AI... ✨
+                      יוצר תמונה מדהימה עם AI...
                     </span>
                   </div>
                 </div>
@@ -476,4 +481,3 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
     </div>
   );
 }
-

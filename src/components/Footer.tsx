@@ -1,5 +1,5 @@
 import { useTranslation } from '@/hooks/useTranslation';
-import { Sparkles, Facebook, Instagram, Linkedin, Mail, Phone } from 'lucide-react';
+import { Sparkles, Facebook, Instagram, Linkedin, Mail, Phone, Heart } from 'lucide-react';
 
 export const Footer = () => {
   const { t } = useTranslation();
@@ -111,7 +111,10 @@ export const Footer = () => {
               {t('footer.copyright')}
             </p>
             <div className="flex gap-4 text-sm text-muted-foreground">
-              <span>🇮🇱 Made in Israel with ❤️</span>
+              <span className="flex items-center gap-2">
+                <Heart className="w-4 h-4 text-red-500 fill-red-500" />
+                Made in Israel
+              </span>
             </div>
           </div>
         </div>

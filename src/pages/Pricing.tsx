@@ -12,6 +12,7 @@ import {
   Zap,
   Crown,
   ArrowRight,
+  BarChart3,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -133,7 +134,8 @@ export default function Pricing() {
               >
                 {plan.popular && (
                   <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0">
-                    הכי פופולרי 🔥
+                    <Sparkles className="w-4 h-4 inline ml-1" />
+                    הכי פופולרי
                   </Badge>
                 )}
 
@@ -178,12 +180,19 @@ export default function Pricing() {
         </div>
 
         {/* Features Image */}
-        <div className="mb-16 text-center">
+        <div className="mb-16">
+          <h2 className="text-4xl font-bold text-center mb-8 gradient-text flex items-center justify-center gap-3">
+            <BarChart3 className="w-10 h-10" />
+            הפלטפורמה שלנו בפעולה
+          </h2>
           <img 
-            src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&auto=format&fit=crop"
-            alt="Analytics Dashboard"
+            src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&auto=format&fit=crop"
+            alt="Digital Marketing Analytics Dashboard"
             className="rounded-2xl shadow-2xl mx-auto max-w-4xl w-full"
           />
+          <p className="text-center text-muted-foreground mt-4 text-lg">
+            דשבורד מתקדם לניהול ומעקב אחר כל הקמפיינים שלך במקום אחד
+          </p>
         </div>
       </main>
 
