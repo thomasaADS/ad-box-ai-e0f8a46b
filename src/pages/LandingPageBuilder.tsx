@@ -98,8 +98,8 @@ export default function LandingPageBuilder() {
               
               <div className="grid md:grid-cols-3 gap-8">
                 {[
-                  { icon: '⚡', title: 'מהיר ויעיל', desc: 'תוצאות מיידיות שחוסכות לך זמן' },
-                  { icon: '🎯', title: 'מדויק ומקצועי', desc: 'פתרונות מותאמים אישית לצרכים שלך' },
+                  { icon: Zap, title: 'מהיר ויעיל', desc: 'תוצאות מיידיות שחוסכות לך זמן' },
+                  { icon: Target, title: 'מדויק ומקצועי', desc: 'פתרונות מותאמים אישית לצרכים שלך' },
                   { icon: '💪', title: 'אמין ובטוח', desc: 'השירות הכי מהימן בשוק' }
                 ].map((feature, idx) => (
                   <Card key={idx} className="p-8 text-center hover:shadow-xl transition-shadow">
