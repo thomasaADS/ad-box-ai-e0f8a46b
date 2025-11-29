@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { TopNav } from "@/components/TopNav";
 import { VariantCard } from "@/components/VariantCard";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2, ArrowLeft, Sparkles, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import { generateCampaign, publishToMeta, type AdVariant, type Platform } from "@/lib/api";
+import { generateCampaignWithAI } from "@/lib/gemini";
 
 export default function Generate() {
   const navigate = useNavigate();
@@ -17,8 +18,7 @@ export default function Generate() {
   useEffect(() => {
     const briefData = sessionStorage.getItem("briefData");
     if (!briefData) {
-      toast.error("אנא מלא תחילה את פרטי הקמפיין");
-      navigate("/brief");
+      navigate("/");
       return;
     }
 
@@ -29,27 +29,61 @@ export default function Generate() {
     try {
       setLoading(true);
 
-      const result = await generateCampaign({
-        brand: {
-          name: briefData.brandName || "העסק שלך",
-          website: briefData.website,
-          tone: briefData.tone,
-          langs: briefData.languages,
-          whatsapp: briefData.whatsapp,
-        },
-        brief: {
+      // Try to use Gemini AI first, fallback to mock if it fails
+      let result;
+      try {
+        const aiResult = await generateCampaignWithAI({
+          brandName: briefData.brandName || "העסק שלך",
           industry: briefData.industry,
           city: briefData.city,
           offer: briefData.offer,
-          objective: briefData.objective,
-          platforms: briefData.platforms,
-        },
-      });
+          tone: briefData.tone || 'professional',
+          platforms: briefData.platforms || ['meta', 'google'],
+          objective: briefData.objective || 'TRAFFIC',
+          language: 'he',
+        });
 
-      setVariants(result.variants || []);
-      
-      if (result.variants?.length > 0) {
-        toast.success(`נוצרו ${result.variants.length} וריאנטים של מודעות!`);
+        // Add platform and final URL to each variant
+        const enhancedVariants = aiResult.variants.map((v: any) => ({
+          ...v,
+          final_url: briefData.website || briefData.whatsapp || '#',
+          utm: {
+            source: v.platform,
+            medium: 'cpc',
+            campaign: `${briefData.brandName}-${briefData.city}`.toLowerCase().replace(/\s+/g, '-'),
+            content: `${v.platform}-ai-variant`,
+          },
+        }));
+
+        setVariants(enhancedVariants);
+        toast.success(`✨ נוצרו ${enhancedVariants.length} וריאנטים עם AI!`, {
+          description: 'המודעות נוצרו על ידי Gemini AI',
+        });
+      } catch (aiError) {
+        console.warn('AI generation failed, using fallback:', aiError);
+        
+        // Fallback to mock generation
+        result = await generateCampaign({
+          brand: {
+            name: briefData.brandName || "העסק שלך",
+            website: briefData.website,
+            tone: briefData.tone,
+            langs: briefData.languages || ['he'],
+            whatsapp: briefData.whatsapp,
+          },
+          brief: {
+            industry: briefData.industry,
+            city: briefData.city,
+            offer: briefData.offer,
+            objective: briefData.objective,
+            platforms: briefData.platforms,
+          },
+        });
+
+        setVariants(result.variants || []);
+        toast.success(`נוצרו ${result.variants?.length || 0} וריאנטים!`, {
+          description: 'חבר Gemini API כדי לקבל תוכן מותאם אישית',
+        });
       }
     } catch (error) {
       console.error("Generation error:", error);
@@ -84,13 +118,36 @@ export default function Generate() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">
         <TopNav />
         <main className="container mx-auto px-4 py-20">
-          <div className="flex flex-col items-center justify-center min-h-[400px]">
-            <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
-            <h2 className="text-2xl font-semibold mb-2">יוצר את הקמפיין שלך...</h2>
-            <p className="text-muted-foreground">ה-AI יוצר עבורך וריאנטים מושלמים</p>
+          <div className="flex flex-col items-center justify-center min-h-[500px]">
+            <div className="relative">
+              <div className="absolute inset-0 animate-ping">
+                <Sparkles className="w-16 h-16 text-primary opacity-20" />
+              </div>
+              <Wand2 className="w-16 h-16 text-primary animate-bounce relative z-10" />
+            </div>
+            <h2 className="text-3xl font-bold mt-8 mb-3 gradient-text">
+              ✨ הקסם קורה עכשיו...
+            </h2>
+            <p className="text-muted-foreground text-lg mb-4">
+              Gemini AI יוצר עבורך קמפיינים מקצועיים וקריאטיביים
+            </p>
+            <div className="flex flex-col gap-2 text-sm text-muted-foreground max-w-md text-center mt-4">
+              <p className="flex items-center gap-2 justify-center">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                מנתח את פרטי העסק שלך...
+              </p>
+              <p className="flex items-center gap-2 justify-center">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                יוצר כותרות מושכות ותוכן מקצועי...
+              </p>
+              <p className="flex items-center gap-2 justify-center">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                מתאים לפלטפורמות שונות...
+              </p>
+            </div>
           </div>
         </main>
       </div>
@@ -98,7 +155,7 @@ export default function Generate() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <TopNav />
       
       <main className="container mx-auto px-4 py-12">
@@ -107,41 +164,40 @@ export default function Generate() {
           <Button
             variant="ghost"
             onClick={() => navigate("/brief")}
-            className="mb-4 hover:bg-purple-500/10 hover:text-purple-500 transition-all"
+            className="mb-4 hover-lift"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            חזרה לברייף
+            חזרה לשאלות
           </Button>
           
-          <h1 className="text-4xl font-bold mb-2">הוריאנטים שנוצרו</h1>
-          <p className="text-muted-foreground text-lg">
-            {variants.length} וריאציות מודעות: {Object.entries(variantsByPlatform).map(([p, c]) => `${c} ${p}`).join(' · ')}
-          </p>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 rounded-2xl gradient-boosti-cta shadow-glow">
+              <Sparkles className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-5xl font-bold gradient-text">
+                הקמפיינים שלך מוכנים! 🎉
+              </h1>
+              <p className="text-muted-foreground text-lg mt-2">
+                {variants.length} וריאציות מודעות מקצועיות: {Object.entries(variantsByPlatform).map(([p, c]) => `${c} ${p}`).join(' · ')}
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Platform Filters */}
         <Tabs value={selectedPlatform} onValueChange={(v) => setSelectedPlatform(v as Platform | 'all')} className="mb-6">
           <TabsList>
-            <TabsTrigger value="all">🎯 הכל ({variants.length})</TabsTrigger>
-            {Object.entries(variantsByPlatform).map(([platform, count]) => {
-              const icons: Record<Platform, string> = {
-                meta: '📱',
-                google: '🔍',
-                tiktok: '🎵',
-                twitter: '🐦',
-                youtube: '▶️',
-                taboola: '📰',
-                outbrain: '📊',
-                linkedin: '💼',
-                sms: '💬',
-                email: '📧'
-              };
-              return (
-                <TabsTrigger key={platform} value={platform}>
-                  {icons[platform as Platform]} {platform.charAt(0).toUpperCase() + platform.slice(1)} ({count})
-                </TabsTrigger>
-              );
-            })}
+            <TabsTrigger value="all">הכל ({variants.length})</TabsTrigger>
+            {Object.entries(variantsByPlatform).map(([platform, count]) => (
+              <TabsTrigger key={platform} value={platform}>
+                {platform === 'meta' && '📱'} 
+                {platform === 'google' && '🔍'} 
+                {platform === 'taboola' && '📰'} 
+                {platform === 'outbrain' && '📊'} 
+                {' '}{platform.charAt(0).toUpperCase() + platform.slice(1)} ({count})
+              </TabsTrigger>
+            ))}
           </TabsList>
         </Tabs>
 

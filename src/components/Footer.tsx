@@ -1,30 +1,28 @@
-import { Heart } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export const Footer = () => {
+  const { t } = useTranslation();
+
   const links = [
-    { label: 'אודות', href: '/about' },
-    { label: 'צור קשר', href: '#contact' },
-    { label: 'מדיניות פרטיות', href: '/privacy' },
-    { label: 'תנאי שימוש', href: '/terms' },
+    { label: t('footer.about'), href: '#' },
+    { label: t('footer.contact'), href: '#' },
+    { label: t('footer.privacy'), href: '/privacy' },
+    { label: t('footer.terms'), href: '/terms' },
   ];
 
   return (
-    <footer className="border-t border-border bg-gradient-to-br from-background to-muted/30">
+    <footer className="border-t border-border bg-card">
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>© 2025 AdSync. כל הזכויות שמורות.</span>
-            <span className="hidden sm:inline">•</span>
-            <span className="hidden sm:flex items-center gap-1">
-              נבנה עם <Heart className="w-3 h-3 fill-red-500 text-red-500" /> בישראל
-            </span>
-          </div>
-          <div className="flex flex-wrap gap-6 justify-center">
+          <p className="text-sm text-muted-foreground">
+            {t('footer.copyright')}
+          </p>
+          <div className="flex gap-6">
             {links.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="text-sm text-muted-foreground hover:text-purple-600 transition-colors font-medium"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 {link.label}
               </a>

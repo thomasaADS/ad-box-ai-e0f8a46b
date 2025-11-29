@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export type Language = 'he' | 'en' | 'ar' | 'ru' | 'fr';
+export type Language = 'he' | 'en' | 'ar' | 'ru';
 
 interface LanguageContextType {
   language: Language;
@@ -11,43 +11,14 @@ interface LanguageContextType {
 
 // Import translations directly
 const translations: Record<Language, Record<string, any>> = {
-  fr: {
-    "nav.home": "Accueil",
-    "nav.platforms": "Plateformes",
-    "nav.howItWorks": "Comment ça marche",
-    "nav.pricing": "Tarifs",
-    "nav.about": "À propos",
-    "nav.getStarted": "Commencer gratuitement",
-    "nav.login": "Se connecter",
-    "nav.dashboard": "Tableau de bord",
-    "nav.settings": "Paramètres",
-    "nav.logout": "Se déconnecter",
-    "brand.name": "AdSync",
-    "hero.headline": "Marketing intelligent qui vous apporte des clients en un clic",
-    "hero.subheadline": "Stratégie, campagnes et contenu conçus précisément pour votre audience",
-    "hero.title": "Créez des campagnes multi-canaux en quelques minutes",
-    "hero.subtitle": "Un brief. Toutes les plateformes. Entièrement automatique.",
-    "hero.cta": "Obtenez votre proposition maintenant",
-    "hero.getStarted": "Commencer maintenant",
-    "auth.welcome": "Bienvenue sur AdSync",
-    "auth.subtitle": "Connectez-vous ou inscrivez-vous pour commencer à créer des campagnes",
-    "auth.login": "Connexion",
-    "auth.signup": "Inscription",
-    "auth.email": "Email",
-    "auth.password": "Mot de passe",
-    "auth.loginButton": "Se connecter",
-    "auth.signupButton": "S'inscrire",
-    "auth.googleLogin": "Connexion avec Google",
-    "footer.copyright": "© 2025 AdSync. Tous droits réservés.",
-    "footer.builtWithLove": "Créé avec ❤️ en Israël",
-  },
   he: {
     "nav.home": "בית",
     "nav.platforms": "פלטפורמות",
     "nav.howItWorks": "איך זה עובד",
+    "nav.howItWork": "איך זה עובד",
     "nav.pricing": "תמחור",
     "nav.about": "אודות",
-    "nav.getStarted": "התחל חינם",
+    "nav.getStarted": "התחל חינם 🚀",
     "nav.login": "התחבר",
     "nav.dashboard": "לוח בקרה",
     "nav.settings": "הגדרות",
@@ -86,7 +57,8 @@ const translations: Record<Language, Record<string, any>> = {
     "footer.contact": "צור קשר",
     "footer.privacy": "פרטיות",
     "footer.terms": "תנאי שימוש",
-    "footer.copyright": "© 2025 AdSync. כל הזכויות שמורות."
+    "footer.copyright": "© 2025 AdSync. כל הזכויות שמורות.",
+    "footer.term": "תנאי שימוש"
   },
   en: {
     "nav.home": "Home",
@@ -99,10 +71,10 @@ const translations: Record<Language, Record<string, any>> = {
     "nav.dashboard": "Dashboard",
     "nav.settings": "Settings",
     "nav.logout": "Logout",
-    "brand.name": "AdSync",
+    "brand.name": "Boosti",
     "hero.headline": "Smart Marketing That Brings You Customers in One Click",
     "hero.subheadline": "Strategy, campaigns, and content built exactly for your audience - get instant proposal and start seeing results",
-    "auth.welcome": "Welcome to AdSync",
+    "auth.welcome": "Welcome to Boosti",
     "auth.subtitle": "Login or sign up to start creating campaigns",
     "auth.login": "Login",
     "auth.signup": "Sign Up",
@@ -124,7 +96,7 @@ const translations: Record<Language, Record<string, any>> = {
     "footer.contact": "Contact",
     "footer.privacy": "Privacy",
     "footer.terms": "Terms of Service",
-    "footer.copyright": "© 2025 AdSync. All rights reserved."
+    "footer.copyright": "© 2025 Boosti. All rights reserved."
   },
   ar: {
     "nav.home": "الرئيسية",
@@ -137,8 +109,8 @@ const translations: Record<Language, Record<string, any>> = {
     "nav.dashboard": "لوحة التحكم",
     "nav.settings": "الإعدادات",
     "nav.logout": "تسجيل الخروج",
-    "brand.name": "AdSync",
-    "auth.welcome": "مرحبًا بك في AdSync",
+    "brand.name": "بوستي",
+    "auth.welcome": "مرحبًا بك في بوستي",
     "auth.subtitle": "قم بتسجيل الدخول أو التسجيل لبدء إنشاء الحملات",
     "auth.login": "تسجيل الدخول",
     "auth.signup": "إنشاء حساب",
@@ -160,7 +132,7 @@ const translations: Record<Language, Record<string, any>> = {
     "footer.contact": "اتصل",
     "footer.privacy": "الخصوصية",
     "footer.terms": "شروط الخدمة",
-    "footer.copyright": "© 2025 AdSync. جميع الحقوق محفوظة."
+    "footer.copyright": "© 2025 بوستي. جميع الحقوق محفوظة."
   },
   ru: {
     "nav.home": "Главная",
@@ -173,8 +145,8 @@ const translations: Record<Language, Record<string, any>> = {
     "nav.dashboard": "Панель управления",
     "nav.settings": "Настройки",
     "nav.logout": "Выйти",
-    "brand.name": "AdSync",
-    "auth.welcome": "Добро пожаловать в AdSync",
+    "brand.name": "Boosti",
+    "auth.welcome": "Добро пожаловать в Boosti",
     "auth.subtitle": "Войдите или зарегистрируйтесь, чтобы начать создавать кампании",
     "auth.login": "Вход",
     "auth.signup": "Регистрация",
@@ -196,38 +168,35 @@ const translations: Record<Language, Record<string, any>> = {
     "footer.contact": "Контакты",
     "footer.privacy": "Конфиденциальность",
     "footer.terms": "Условия использования",
-    "footer.copyright": "© 2025 AdSync. Все права защищены."
+    "footer.copyright": "© 2025 Boosti. Все права защищены."
   }
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguageState] = useState<Language>('he');
+  // Force Hebrew as the only language
+  const language: Language = 'he';
 
-  // Load saved language on mount
+  // Set document attributes for Hebrew (RTL)
   useEffect(() => {
-    const saved = localStorage.getItem('language');
-    if (saved && (saved === 'he' || saved === 'en' || saved === 'ar' || saved === 'ru' || saved === 'fr')) {
-      setLanguageState(saved as Language);
-    }
+    document.documentElement.lang = 'he';
+    document.documentElement.dir = 'rtl';
   }, []);
 
-  // Set language and save to localStorage
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem('language', lang);
+  // No-op function for compatibility
+  const setLanguage = () => {
+    // Language is locked to Hebrew
   };
 
-  const dir = language === 'he' || language === 'ar' ? 'rtl' : 'ltr';
-
-  // Update document attributes when language changes
-  useEffect(() => {
-    document.documentElement.lang = language;
-    document.documentElement.dir = dir;
-  }, [language, dir]);
-
   const t = (key: string): string => {
+    // First try direct lookup (for flat keys like "nav.home")
+    const directValue = translations[language][key];
+    if (typeof directValue === 'string') {
+      return directValue;
+    }
+    
+    // Then try nested lookup (for backwards compatibility)
     const keys = key.split('.');
     let value: any = translations[language];
     
@@ -241,6 +210,8 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     
     return typeof value === 'string' ? value : key;
   };
+
+  const dir = language === 'he' || language === 'ar' ? 'rtl' : 'ltr';
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t, dir }}>

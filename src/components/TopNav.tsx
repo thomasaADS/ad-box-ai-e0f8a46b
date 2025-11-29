@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Sparkles, FileText, BarChart3, Settings, Globe } from "lucide-react";
+import { Sparkles, FileText, BarChart3, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -8,10 +8,9 @@ export function TopNav() {
   const { t } = useTranslation();
 
   const links = [
-    { href: "/brief", label: "ברייף", icon: FileText },
-    { href: "/ai-chat", label: "AI Chat", icon: Sparkles },
-    { href: "/landing-builder", label: "בניית אתר", icon: Globe },
-    { href: "/dashboard", label: "קמפיינים", icon: BarChart3 },
+    { href: "/", label: "ברייף", icon: FileText },
+    { href: "/generate", label: "יצירה", icon: Sparkles },
+    { href: "/dashboard", label: "לוח בקרה", icon: BarChart3 },
     { href: "/settings", label: "הגדרות", icon: Settings },
   ];
 
@@ -19,12 +18,12 @@ export function TopNav() {
     <nav className="border-b border-border bg-card/50 backdrop-blur-xl sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
-              <Sparkles className="w-5 h-5 text-white" />
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-foreground">
-              AdSync
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              {t('brand.name')}
             </span>
           </Link>
 

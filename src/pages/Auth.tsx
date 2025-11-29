@@ -9,12 +9,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Logo } from '@/components/Logo';
 import { AnimatedParticles } from '@/components/AnimatedParticles';
-import { Eye, EyeOff, Chrome } from 'lucide-react';
-import { toast } from 'sonner';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function Auth() {
   const { t } = useTranslation();
-  const { signIn, signUp, signInWithGoogle, user } = useAuth();
+  const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -29,7 +28,7 @@ export default function Auth() {
 
   // Redirect if already logged in
   if (user) {
-    navigate('/brief');
+    navigate('/');
     return null;
   }
 
@@ -40,8 +39,7 @@ export default function Auth() {
     const { error } = await signIn(loginForm.email, loginForm.password);
 
     if (!error) {
-      toast.success("התחברת בהצלחה! 🎉");
-      navigate('/brief');
+      navigate('/');
     }
 
     setLoading(false);
@@ -51,7 +49,6 @@ export default function Auth() {
     e.preventDefault();
 
     if (signupForm.password !== signupForm.confirmPassword) {
-      toast.error("הסיסמאות לא תואמות");
       return;
     }
 
@@ -60,17 +57,10 @@ export default function Auth() {
     const { error } = await signUp(signupForm.email, signupForm.password, signupForm.fullName);
 
     if (!error) {
-      toast.success("נרשמת בהצלחה! ברוך הבא ל-AdSync 🚀");
-      navigate('/brief');
+      navigate('/');
     }
 
     setLoading(false);
-  };
-
-  const handleGoogleSignIn = async () => {
-    setLoading(true);
-    await signInWithGoogle();
-    // Supabase will handle the redirect, so no need to manually navigate
   };
 
   return (
@@ -78,10 +68,10 @@ export default function Auth() {
       <AnimatedParticles />
       
       {/* Header */}
-      <div className="absolute top-4 right-4 z-10">
+      <div className="absolute top-4 left-4 z-10">
         <div className="flex items-center gap-2">
           <Logo />
-          <span className="text-xl font-bold">AdSync</span>
+          <span className="text-xl font-bold">{t('brand.name')}</span>
         </div>
       </div>
 
@@ -90,49 +80,26 @@ export default function Auth() {
         <Card className="w-full max-w-md shadow-glow-lg glass-card">
           <CardHeader className="space-y-2 text-center">
             <CardTitle className="text-3xl font-bold gradient-text">
-              ברוכים הבאים ל-AdSync
+              {t('auth.welcome')}
             </CardTitle>
-            <CardDescription>התחבר או הירשם כדי להתחיל ליצור קמפיינים</CardDescription>
+            <CardDescription>{t('auth.subtitle')}</CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Google Sign In Button - Outside tabs */}
-            <div className="mb-6">
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full gap-2"
-                onClick={handleGoogleSignIn}
-                disabled={loading}
-              >
-                <Chrome className="w-5 h-5" />
-                התחבר עם גוגל
-              </Button>
-              
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">או</span>
-                </div>
-              </div>
-            </div>
-
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="login">התחברות</TabsTrigger>
-                <TabsTrigger value="signup">הרשמה</TabsTrigger>
+                <TabsTrigger value="login">{t('auth.login')}</TabsTrigger>
+                <TabsTrigger value="signup">{t('auth.signup')}</TabsTrigger>
               </TabsList>
 
               {/* Login Tab */}
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">אימייל</Label>
+                    <Label htmlFor="login-email">{t('auth.email')}</Label>
                     <Input
                       id="login-email"
                       type="email"
-                      placeholder="your@email.com"
+                      placeholder={t('auth.emailPlaceholder')}
                       value={loginForm.email}
                       onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
                       required
@@ -141,12 +108,12 @@ export default function Auth() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="login-password">סיסמה</Label>
+                    <Label htmlFor="login-password">{t('auth.password')}</Label>
                     <div className="relative">
                       <Input
                         id="login-password"
                         type={showPassword ? 'text' : 'password'}
-                        placeholder="לפחות 6 תווים"
+                        placeholder={t('auth.passwordPlaceholder')}
                         value={loginForm.password}
                         onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
                         required
@@ -163,7 +130,7 @@ export default function Auth() {
                   </div>
 
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'מתחבר...' : 'התחבר'}
+                    {loading ? t('auth.loading') : t('auth.loginButton')}
                   </Button>
                 </form>
               </TabsContent>
@@ -172,11 +139,11 @@ export default function Auth() {
               <TabsContent value="signup">
                 <form onSubmit={handleSignup} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="signup-name">שם מלא</Label>
+                    <Label htmlFor="signup-name">{t('auth.fullName')}</Label>
                     <Input
                       id="signup-name"
                       type="text"
-                      placeholder="דני לוי"
+                      placeholder={t('auth.fullNamePlaceholder')}
                       value={signupForm.fullName}
                       onChange={(e) => setSignupForm({ ...signupForm, fullName: e.target.value })}
                       className="bg-background/50"
@@ -184,11 +151,11 @@ export default function Auth() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">אימייל</Label>
+                    <Label htmlFor="signup-email">{t('auth.email')}</Label>
                     <Input
                       id="signup-email"
                       type="email"
-                      placeholder="your@email.com"
+                      placeholder={t('auth.emailPlaceholder')}
                       value={signupForm.email}
                       onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
                       required
@@ -197,12 +164,12 @@ export default function Auth() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password">סיסמה</Label>
+                    <Label htmlFor="signup-password">{t('auth.password')}</Label>
                     <div className="relative">
                       <Input
                         id="signup-password"
                         type={showPassword ? 'text' : 'password'}
-                        placeholder="לפחות 6 תווים"
+                        placeholder={t('auth.passwordPlaceholder')}
                         value={signupForm.password}
                         onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
                         required
@@ -220,11 +187,11 @@ export default function Auth() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="signup-confirm">אימות סיסמה</Label>
+                    <Label htmlFor="signup-confirm">{t('auth.confirmPassword')}</Label>
                     <Input
                       id="signup-confirm"
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="הזן סיסמה שוב"
+                      placeholder={t('auth.confirmPasswordPlaceholder')}
                       value={signupForm.confirmPassword}
                       onChange={(e) =>
                         setSignupForm({ ...signupForm, confirmPassword: e.target.value })
@@ -236,7 +203,7 @@ export default function Auth() {
                   </div>
 
                   {signupForm.password && signupForm.confirmPassword && signupForm.password !== signupForm.confirmPassword && (
-                    <p className="text-sm text-destructive">הסיסמאות אינן תואמות</p>
+                    <p className="text-sm text-destructive">{t('auth.passwordMismatch')}</p>
                   )}
 
                   <Button 
@@ -244,7 +211,7 @@ export default function Auth() {
                     className="w-full" 
                     disabled={loading || signupForm.password !== signupForm.confirmPassword}
                   >
-                    {loading ? 'נרשם...' : 'הירשם'}
+                    {loading ? t('auth.loading') : t('auth.signupButton')}
                   </Button>
                 </form>
               </TabsContent>

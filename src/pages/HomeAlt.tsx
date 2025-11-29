@@ -21,6 +21,8 @@ import {
   CheckCircle,
   Star,
   MessageSquare,
+  Layout,
+  Wand2,
 } from 'lucide-react';
 
 const HomeAlt = () => {
@@ -41,16 +43,14 @@ const HomeAlt = () => {
       description: 'בינה מלאכותית מתקדמת שיוצרת תוכן ממוטב לכל פלטפורמה',
     },
     {
-      icon: Globe,
-      title: 'בניית דפי נחיתה',
-      description: 'אין אתר? בנה דף נחיתה מקצועי תוך 5 דקות שממיר מבקרים ללקוחות',
-      highlight: true,
-      link: '/landing-builder',
-    },
-    {
       icon: Target,
       title: 'מיקוד מדויק',
       description: 'הגדרות קהל יעד חכמות שמביאות את הלקוחות הנכונים',
+    },
+    {
+      icon: Globe,
+      title: 'כל הפלטפורמות',
+      description: 'כיסוי מלא של Meta, Google, TikTok, LinkedIn ועוד',
     },
     {
       icon: BarChart3,
@@ -131,54 +131,117 @@ const HomeAlt = () => {
       <div className="relative" style={{ zIndex: 1 }}>
         <Navbar />
 
-      {/* Hero Section - Young & Bold */}
-      <section className="relative pt-32 pb-20 px-4 overflow-hidden" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)' }}>
-        <div className="absolute inset-0 opacity-20 dot-pattern" style={{ backgroundImage: 'radial-gradient(white 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+      {/* Hero Section - Like Original with Stars */}
+      <section className="relative pt-32 pb-24 px-4 overflow-hidden bg-gradient-to-br from-[#667eea] via-[#764ba2] to-[#f093fb]">
+        {/* Animated Stars Background */}
+        <div className="absolute inset-0 opacity-60">
+          <div className="stars-small"></div>
+          <div className="stars-medium"></div>
+          <div className="stars-large"></div>
+        </div>
         
-        <div className="container mx-auto max-w-5xl relative">
-          <div className="text-center space-y-6">
+        {/* Animated gradient orbs for depth */}
+        <div className="absolute top-20 left-10 w-96 h-96 bg-purple-500 rounded-full mix-blend-soft-light filter blur-3xl opacity-30 animate-float"></div>
+        <div className="absolute top-40 right-10 w-96 h-96 bg-blue-500 rounded-full mix-blend-soft-light filter blur-3xl opacity-30 animate-float" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute bottom-20 left-1/2 w-96 h-96 bg-pink-500 rounded-full mix-blend-soft-light filter blur-3xl opacity-20 animate-float" style={{ animationDelay: '4s' }}></div>
+        
+        <div className="container mx-auto max-w-6xl relative">
+          <div className="text-center space-y-8">
             {/* Top Badge */}
-            <div className="inline-block">
+            <div className="inline-block animate-bounce-in">
               <Badge 
-                className="text-[15px] font-medium px-5 py-2 border-2 bg-white/20 backdrop-blur-sm text-white border-white/40"
+                className="text-[17px] font-medium px-7 py-3 border-2 hover:scale-105 transition-transform cursor-default" 
+                style={{ 
+                  color: '#00C4B4',
+                  borderColor: '#00C4B4',
+                  background: 'rgba(255,255,255,0.15)',
+                  backdropFilter: 'blur(20px)'
+                }}
               >
                 ✨ השדרוג שהשיווק שלך חיכה לו
               </Badge>
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-4xl md:text-[56px] font-bold leading-[1.2] text-white drop-shadow-lg">
-              מוכן לראות מה זה שיווק שעובד באמת?
+            <h1 className="text-5xl md:text-[64px] font-bold leading-[1.15] animate-fade-in text-white drop-shadow-2xl">
+              מוכן לראות מה זה שיווק
+              <br />
+              שעובד באמת?
             </h1>
 
             {/* Subheading */}
-            <p className="text-xl leading-[1.5] mx-auto max-w-3xl text-white/90">
-              AI חכם שמביא את המספרים הנכונים, בזמן הנכון, לקהל הנכון.
+            <p className="text-2xl leading-[1.6] mx-auto max-w-4xl animate-slide-up text-white/95 drop-shadow-lg" style={{ animationDelay: '0.2s' }}>
+              🤖 AI חכם שמביא את המספרים הנכונים, בזמן הנכון, לקהל הנכון.
             </p>
 
-            {/* Closing Line */}
-            <p className="text-xl font-medium leading-relaxed mx-auto max-w-3xl pt-2 text-white">
-              תן ל-<span className="font-bold">AdSync</span> להרים את הביצועים שלך —
+            {/* Second Subheading */}
+            <p className="text-xl leading-[1.6] mx-auto max-w-3xl text-white/90 font-medium">
+              תן ל-<span className="font-bold text-cyan-300">AdSync</span> להרים את הביצועים שלך —
               <br />
               ותראה איך השיווק שלך סוף סוף עובד בשבילך, לא להפך.
             </p>
 
-            {/* CTA Button */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
+            {/* Value Props */}
+            <div className="flex flex-wrap gap-4 justify-center pt-4 animate-slide-up" style={{ animationDelay: '0.4s' }}>
+              <Badge 
+                className="text-sm px-5 py-2.5 font-medium border-0"
+                style={{
+                  background: 'rgba(0, 196, 180, 0.2)',
+                  backdropFilter: 'blur(10px)',
+                  color: 'white'
+                }}
+              >
+                📊 כל הפלטפורמות
+              </Badge>
+              <Badge 
+                className="text-sm px-5 py-2.5 font-medium border-0"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  backdropFilter: 'blur(10px)',
+                  color: 'white'
+                }}
+              >
+                🎯 קריאטיבים מותאמים אישית
+              </Badge>
+              <Badge 
+                className="text-sm px-5 py-2.5 font-medium border-0"
+                style={{
+                  background: 'rgba(122, 62, 250, 0.2)',
+                  backdropFilter: 'blur(10px)',
+                  color: 'white'
+                }}
+              >
+                ⚡ תוצאות תוך 3 דקות
+              </Badge>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-5 justify-center pt-8 animate-scale-in" style={{ animationDelay: '0.6s' }}>
               <Button
                 size="lg"
                 onClick={() => navigate('/brief')}
-                className="text-lg px-9 py-6 rounded-[14px] font-medium bg-white text-purple-600 hover:bg-white/90 transition-all hover:scale-105 shadow-2xl shadow-white/30 border-0"
+                className="text-xl px-14 py-8 rounded-[20px] font-bold border-0 hover:opacity-95 transition-all hover:scale-105 shadow-2xl group relative overflow-hidden"
+                style={{ 
+                  background: 'linear-gradient(135deg, #00C4B4 0%, #7A3EFA 100%)',
+                  color: 'white'
+                }}
               >
-                יצור קמפיין עכשיו! 🚀
+                <span className="relative z-10 flex items-center gap-3">
+                  🚀 יצור קמפיין עכשיו!
+                </span>
               </Button>
               <Button
                 size="lg"
-                variant="outline"
                 onClick={() => navigate('/how-it-works')}
-                className="text-lg px-9 py-6 rounded-[14px] font-medium border-2 border-white/40 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 hover:scale-105 transition-all"
+                className="text-lg px-12 py-8 rounded-[20px] font-semibold border-2 hover:scale-105 transition-all"
+                style={{
+                  background: 'rgba(255,255,255,0.15)',
+                  backdropFilter: 'blur(10px)',
+                  borderColor: 'rgba(255,255,255,0.3)',
+                  color: 'white'
+                }}
               >
-                איך זה עובד? 🎯
+                🎯 איך זה עובד?
               </Button>
             </div>
 
@@ -186,26 +249,14 @@ const HomeAlt = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-12">
               {stats.map((stat, index) => {
                 const Icon = stat.icon;
-                const gradients = [
-                  'from-purple-500 to-pink-500',
-                  'from-blue-500 to-cyan-500',
-                  'from-orange-500 to-red-500',
-                  'from-green-500 to-teal-500'
-                ];
-                const shadows = [
-                  'shadow-purple-500/30',
-                  'shadow-blue-500/30',
-                  'shadow-orange-500/30',
-                  'shadow-green-500/30'
-                ];
                 return (
                   <div
                     key={index}
-                    className={`text-center p-6 rounded-xl bg-gradient-to-br ${gradients[index]} text-white hover:scale-105 transition-all shadow-lg ${shadows[index]}`}
+                    className="text-center p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all"
                   >
-                    <Icon className="w-8 h-8 mx-auto mb-3" />
+                    <Icon className="w-8 h-8 mx-auto mb-3 text-primary" />
                     <div className="text-3xl font-bold mb-1">{stat.value}</div>
-                    <div className="text-sm opacity-90">{stat.label}</div>
+                    <div className="text-sm text-muted-foreground">{stat.label}</div>
                   </div>
                 );
               })}
@@ -214,11 +265,40 @@ const HomeAlt = () => {
         </div>
       </section>
 
+      {/* Landing Page Builder CTA */}
+      <section className="py-16 px-4 bg-gradient-to-br from-accent/10 to-primary/10">
+        <div className="container mx-auto max-w-4xl">
+          <Card className="p-8 md:p-12 bg-card/90 backdrop-blur-sm border-2 border-primary/20 hover:border-primary/40 transition-all hover-lift">
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              <div className="flex-1 text-center md:text-right">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                  אין לך אתר? בנה דף נחיתה תוך 5 דקות! 🚀
+                </h2>
+                <p className="text-lg text-muted-foreground mb-6">
+                  סוכן AI חכם שיוצר דפי נחיתה מקצועיים + תמונות ייחודיות עם AI!
+                </p>
+                <Button
+                  size="lg"
+                  onClick={() => navigate('/landing-page-builder')}
+                  className="gradient-boosti-cta text-white hover:scale-105 transition-transform shadow-lg text-lg px-8 py-6 group"
+                >
+                  <Wand2 className="w-5 h-5 ml-2 group-hover:rotate-12 transition-transform" />
+                  🎨 בנה דף נחיתה עם AI
+                </Button>
+              </div>
+              <div className="w-48 h-48 rounded-2xl gradient-boosti-hero flex items-center justify-center shadow-2xl">
+                <Layout className="w-24 h-24 text-white opacity-50" />
+              </div>
+            </div>
+          </Card>
+        </div>
+      </section>
+
       {/* Features Section - Grid Layout */}
       <section className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">למה AdSync?</h2>
+            <h2 className="text-4xl font-bold mb-4">למה אדסינק?</h2>
             <p className="text-xl text-muted-foreground">
               כל מה שצריך כדי להצליח בשיווק דיגיטלי
             </p>
@@ -227,49 +307,22 @@ const HomeAlt = () => {
           <div className="grid md:grid-cols-2 gap-8">
             {features.map((feature, index) => {
               const Icon = feature.icon;
-              const colors = [
-                { bg: 'bg-purple-100', icon: 'text-purple-600', border: 'border-purple-200', gradient: 'from-purple-600 to-purple-800' },
-                { bg: 'bg-blue-100', icon: 'text-blue-600', border: 'border-blue-200', gradient: 'from-blue-600 to-blue-800' },
-                { bg: 'bg-green-100', icon: 'text-green-600', border: 'border-green-200', gradient: 'from-green-600 to-green-800' },
-                { bg: 'bg-orange-100', icon: 'text-orange-600', border: 'border-orange-200', gradient: 'from-orange-600 to-orange-800' }
-              ];
-              const color = colors[index % colors.length];
               return (
                 <Card
                   key={index}
-                  className={`p-8 hover:shadow-xl transition-all hover:scale-105 border-2 ${color.border} ${
-                    feature.highlight ? 'ring-2 ring-yellow-400 relative overflow-hidden' : ''
-                  } ${feature.link ? 'cursor-pointer' : ''}`}
-                  onClick={feature.link ? () => navigate(feature.link) : undefined}
+                  className="p-8 hover:shadow-lg transition-shadow"
                 >
-                  {feature.highlight && (
-                    <div className="absolute top-0 left-0 right-0">
-                      <Badge className="rounded-t-lg rounded-b-none w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black border-0 justify-center">
-                        ⭐ חדש! פיצ'ר מיוחד
-                      </Badge>
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 rounded-lg bg-primary/10">
+                      <Icon className="w-6 h-6 text-primary" />
                     </div>
-                  )}
-                  <div className={`flex items-start gap-4 ${feature.highlight ? 'mt-6' : ''}`}>
-                    <div className={`p-4 rounded-xl ${color.bg}`}>
-                      <Icon className={`w-7 h-7 ${color.icon}`} />
-                    </div>
-                    <div className="flex-1">
+                    <div>
                       <h3 className="text-xl font-semibold mb-2">
                         {feature.title}
                       </h3>
-                      <p className="text-muted-foreground mb-3">
+                      <p className="text-muted-foreground">
                         {feature.description}
                       </p>
-                      {feature.link && (
-                        <Button
-                          size="sm"
-                          className={`bg-gradient-to-r ${color.gradient} hover:opacity-90`}
-                          onClick={() => navigate(feature.link)}
-                        >
-                          בנה דף נחיתה עכשיו
-                          <ArrowRight className="w-4 h-4 mr-2" />
-                        </Button>
-                      )}
                     </div>
                   </div>
                 </Card>
@@ -291,34 +344,27 @@ const HomeAlt = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => {
-              const gradients = [
-                'from-blue-50 to-cyan-50 border-blue-200',
-                'from-purple-50 to-pink-50 border-purple-200',
-                'from-green-50 to-teal-50 border-green-200'
-              ];
-              return (
-                <Card key={index} className={`p-6 hover:scale-105 transition-all shadow-lg bg-gradient-to-br ${gradients[index]} border-2`}>
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className="w-5 h-5 fill-yellow-400 text-yellow-400"
-                      />
-                    ))}
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className="p-6">
+                <div className="flex gap-1 mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                    />
+                  ))}
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  "{testimonial.text}"
+                </p>
+                <div className="border-t pt-4">
+                  <div className="font-semibold">{testimonial.name}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {testimonial.role} • {testimonial.company}
                   </div>
-                  <p className="text-gray-700 mb-4 font-medium">
-                    "{testimonial.text}"
-                  </p>
-                  <div className="border-t border-gray-200 pt-4">
-                    <div className="font-bold text-gray-900">{testimonial.name}</div>
-                    <div className="text-sm text-gray-600">
-                      {testimonial.role} • {testimonial.company}
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
+                </div>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -337,34 +383,34 @@ const HomeAlt = () => {
             {pricingPlans.map((plan, index) => (
               <Card
                 key={index}
-                className={`p-8 hover:scale-105 transition-all ${
+                className={`p-8 ${
                   plan.popular
-                    ? 'border-purple-500 border-2 shadow-2xl shadow-purple-500/30 bg-gradient-to-br from-purple-50 to-pink-50'
-                    : 'border-2'
+                    ? 'border-primary border-2 shadow-lg scale-105'
+                    : ''
                 }`}
               >
                 {plan.popular && (
-                  <Badge className="mb-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white">✨ הכי פופולרי</Badge>
+                  <Badge className="mb-4">הכי פופולרי</Badge>
                 )}
                 <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">{plan.price}</span>
+                  <span className="text-4xl font-bold">{plan.price}</span>
                   <span className="text-muted-foreground"> {plan.period}</span>
                 </div>
                 <ul className="space-y-3 mb-6">
                   {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-start gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                      <CheckCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                       <span>{feature}</span>
                     </li>
                   ))}
                 </ul>
                 <Button
-                  className={`w-full ${plan.popular ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white' : ''}`}
+                  className="w-full"
                   variant={plan.popular ? 'default' : 'outline'}
                   onClick={() => navigate('/brief')}
                 >
-                  התחל עכשיו 🚀
+                  התחל עכשיו
                 </Button>
               </Card>
             ))}
@@ -373,23 +419,23 @@ const HomeAlt = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+      <section className="py-20 px-4">
         <div className="container mx-auto max-w-4xl">
-          <Card className="p-12 text-center bg-white/10 backdrop-blur-md border-white/20 text-white">
-            <MessageSquare className="w-16 h-16 mx-auto mb-6" />
+          <Card className="p-12 text-center bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
+            <MessageSquare className="w-16 h-16 mx-auto mb-6 text-primary" />
             <h2 className="text-3xl font-bold mb-4">
-              מוכנים להתחיל? 🎉
+              מוכנים להתחיל?
             </h2>
-            <p className="text-xl mb-8 text-white/90">
+            <p className="text-xl text-muted-foreground mb-8">
               צור את הקמפיין הראשון שלך בפחות מדקה. ללא כרטיס אשראי.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 size="lg"
                 onClick={() => navigate('/brief')}
-                className="text-lg px-8 bg-white text-purple-600 hover:bg-white/90 shadow-xl"
+                className="text-lg px-8"
               >
-                יצירת קמפיין חינם 🚀
+                יצירת קמפיין חינם
                 <ArrowRight className="mr-2 h-5 w-5" />
               </Button>
             </div>
