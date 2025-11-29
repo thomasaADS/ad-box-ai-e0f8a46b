@@ -18,6 +18,8 @@ import {
   Globe,
   Shield,
   Rocket,
+  BookOpen,
+  BarChart3,
 } from 'lucide-react';
 
 export default function About() {
@@ -74,7 +76,7 @@ export default function About() {
             <Rocket className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-5xl md:text-6xl font-bold gradient-text mb-6">
-            מי אנחנו? 🚀
+            מי אנחנו?
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             <span className="font-bold text-2xl text-primary">AdSync</span> היא פלטפורמת AI מתקדמת שמהפכת את עולם השיווק הדיגיטלי
@@ -85,7 +87,10 @@ export default function About() {
         <Card className="p-10 mb-16 bg-gradient-to-br from-purple-50/50 to-blue-50/50 border-2 border-primary/20">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
-              <h2 className="text-4xl font-bold mb-6 gradient-text">הסיפור שלנו 📖</h2>
+              <h2 className="text-4xl font-bold mb-6 gradient-text flex items-center gap-3">
+              <BookOpen className="w-10 h-10" />
+              הסיפור שלנו
+            </h2>
               <p className="text-lg text-muted-foreground leading-relaxed mb-4">
                 כשהקמנו את <span className="font-bold text-primary">AdSync</span> ב-2024, היה לנו חזון ברור: 
                 <span className="font-bold"> להפוך שיווק מורכב לפשוט וזמין לכולם.</span>
@@ -132,7 +137,7 @@ export default function About() {
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           <Card className="p-8 bg-gradient-to-br from-blue-50/50 to-cyan-50/50">
             <Globe className="w-12 h-12 text-blue-600 mb-4" />
-            <h3 className="text-3xl font-bold mb-4">החזון שלנו 🌍</h3>
+            <h3 className="text-3xl font-bold mb-4">החזון שלנו</h3>
             <p className="text-lg text-muted-foreground leading-relaxed">
               להפוך את AdSync לפלטפורמת השיווק המובילה בעולם, 
               שבה כל עסק - קטן כגדול - יכול ליצור קמפיינים מקצועיים ומנצחים בקלות ובמהירות.
@@ -141,7 +146,7 @@ export default function About() {
 
           <Card className="p-8 bg-gradient-to-br from-purple-50/50 to-pink-50/50">
             <Shield className="w-12 h-12 text-purple-600 mb-4" />
-            <h3 className="text-3xl font-bold mb-4">המשימה שלנו 🎯</h3>
+            <h3 className="text-3xl font-bold mb-4">המשימה שלנו</h3>
             <p className="text-lg text-muted-foreground leading-relaxed">
               לספק לעסקים כלי AI חכמים ומתקדמים שמאפשרים להם להתמקד במה שהם עושים הכי טוב - 
               להוביל את העסק שלהם - בזמן שאנחנו דואגים לשיווק.
@@ -152,7 +157,7 @@ export default function About() {
         {/* Values */}
         <div className="mb-16">
           <h2 className="text-4xl font-bold text-center mb-12 gradient-text">
-            הערכים שמנחים אותנו ⭐
+            הערכים שמנחים אותנו
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((value) => {
@@ -172,8 +177,9 @@ export default function About() {
 
         {/* Timeline */}
         <div className="mb-16">
-          <h2 className="text-4xl font-bold text-center mb-12 gradient-text">
-            המסע שלנו 🛤️
+          <h2 className="text-4xl font-bold text-center mb-12 gradient-text flex items-center justify-center gap-3">
+            <TrendingUp className="w-10 h-10" />
+            המסע שלנו
           </h2>
           <div className="max-w-4xl mx-auto">
             {milestones.map((milestone, idx) => (
@@ -198,8 +204,9 @@ export default function About() {
 
         {/* Stats */}
         <div className="mb-16">
-          <h2 className="text-4xl font-bold text-center mb-12 gradient-text">
-            המספרים מדברים בעד עצמם 📊
+          <h2 className="text-4xl font-bold text-center mb-12 gradient-text flex items-center justify-center gap-3">
+            <BarChart3 className="w-10 h-10" />
+            המספרים מדברים בעד עצמם
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
@@ -225,7 +232,7 @@ export default function About() {
         <Card className="p-12 text-center bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-2 border-primary/20">
           <Sparkles className="h-16 w-16 text-primary mx-auto mb-6" />
           <h2 className="text-4xl font-bold mb-4 gradient-text">
-            רוצים להצטרף למהפכה? 🚀
+            רוצים להצטרף למהפכה?
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             צור את הקמפיין הראשון שלך עכשיו וגלה איך AdSync משנה את חוקי המשחק

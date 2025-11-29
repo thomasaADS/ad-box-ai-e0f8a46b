@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChatWidget } from '@/components/ChatWidget';
-import { Wand2, Layout, Palette, Sparkles, ArrowRight, CheckCircle2, Eye, Image as ImageIcon } from 'lucide-react';
+import { Wand2, Layout, Palette, Sparkles, ArrowRight, CheckCircle2, Eye, Image as ImageIcon, Target, Zap, Clock } from 'lucide-react';
 
 interface PageData {
   businessName?: string;
@@ -160,7 +160,7 @@ export default function LandingPageBuilder() {
               חדש! AI Image Generator
             </Badge>
             <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              🚀 בונה דפי נחיתה AI
+              בונה דפי נחיתה AI
             </h1>
             <p className="text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
               צור דף נחיתה מקצועי בדקות עם סוכן AI חכם
@@ -197,28 +197,36 @@ export default function LandingPageBuilder() {
                 <Sparkles className="w-7 h-7 mr-3 animate-pulse" />
                 יאללה, בואו ניצור דף נחיתה!
               </Button>
-              <p className="text-gray-500 mt-4 text-lg">⏱️ לוקח בערך 2-3 דקות</p>
+              <p className="text-gray-500 mt-4 text-lg flex items-center justify-center gap-2">
+                <Clock className="w-4 h-4" />
+                לוקח בערך 2-3 דקות
+              </p>
             </div>
           </Card>
 
           {/* Features List */}
           <div className="grid md:grid-cols-2 gap-6">
             {[
-              { icon: '🎨', title: 'יצירת תמונות AI', desc: 'תאר מה שאתה רוצה והAI יצור תמונה מושלמת' },
-              { icon: '🎯', title: 'ממוקד בתוצאות', desc: 'כל דף מותאם להשגת המטרה שלך' },
-              { icon: '📱', title: 'רספונסיבי לחלוטין', desc: 'נראה מעולה בכל מכשיר' },
-              { icon: '⚡', title: 'מהיר וקל', desc: 'מענה לשאלות פשוטות ודף מוכן תוך דקות' }
-            ].map((feature, idx) => (
-              <Card key={idx} className="p-6 hover:shadow-lg transition-shadow">
-                <div className="flex items-start gap-4">
-                  <div className="text-5xl">{feature.icon}</div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                    <p className="text-gray-600">{feature.desc}</p>
+              { icon: ImageIcon, title: 'יצירת תמונות AI', desc: 'תאר מה שאתה רוצה והAI יצור תמונה מושלמת', color: 'text-blue-600' },
+              { icon: Target, title: 'ממוקד בתוצאות', desc: 'כל דף מותאם להשגת המטרה שלך', color: 'text-purple-600' },
+              { icon: Layout, title: 'רספונסיבי לחלוטין', desc: 'נראה מעולה בכל מכשיר', color: 'text-green-600' },
+              { icon: Zap, title: 'מהיר וקל', desc: 'מענה לשאלות פשוטות ודף מוכן תוך דקות', color: 'text-orange-600' }
+            ].map((feature, idx) => {
+              const Icon = feature.icon;
+              return (
+                <Card key={idx} className="p-6 hover:shadow-lg transition-shadow">
+                  <div className="flex items-start gap-4">
+                    <div className={`w-12 h-12 rounded-lg bg-gradient-to-br from-${feature.color.split('-')[1]}-50 to-${feature.color.split('-')[1]}-100 flex items-center justify-center`}>
+                      <Icon className={`w-6 h-6 ${feature.color}`} />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                      <p className="text-gray-600">{feature.desc}</p>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         </div>
       </div>
