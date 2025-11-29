@@ -59,6 +59,11 @@ export default function FreeChatBrief() {
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       
+      // Skip API if no key or demo key
+      if (!apiKey || apiKey.includes('demo') || apiKey.includes('Demo')) {
+        throw new Error('No API key - using fallback');
+      }
+      
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
         {

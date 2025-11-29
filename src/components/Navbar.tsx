@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Menu, X, LogOut, User } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+// import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +16,9 @@ export const Navbar = () => {
   const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  // const { user, signOut } = useAuth();
+  const user = null; // Temporary - no auth
+  const signOut = async () => {}; // Temporary
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems = [

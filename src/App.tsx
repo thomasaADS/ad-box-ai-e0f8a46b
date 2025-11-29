@@ -12,6 +12,7 @@ import Brief from "./pages/Brief";
 import Generate from "./pages/Generate";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
+import MyCampaigns from "./pages/MyCampaigns";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Auth from "./pages/Auth";
@@ -41,30 +42,10 @@ const App = () => (
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/brief" element={<Brief />} />
-              <Route
-                path="/generate"
-                element={
-                  <ProtectedRoute>
-                    <Generate />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/settings"
-                element={
-                  <ProtectedRoute>
-                    <Settings />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/generate" element={<Generate />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/my-campaigns" element={<MyCampaigns />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
