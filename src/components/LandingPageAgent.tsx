@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -91,6 +91,12 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
   const [pageData, setPageData] = useState<PageData>({});
   const [userInput, setUserInput] = useState('');
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new message arrives
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages]);
 
   const generateAIImage = async (prompt: string): Promise<string> => {
     setIsGeneratingImage(true);
@@ -101,29 +107,53 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
       // Translate Hebrew to English for better results
       const englishPrompt = await translateToEnglish(prompt);
       
-      // Enhance the prompt for better quality
-      const enhancedPrompt = `${englishPrompt}, professional photo, high quality, detailed, 4k, modern, clean, beautiful lighting, trending on artstation`;
+      // Add variety with random artistic styles and unique details
+      const styles = [
+        'cinematic lighting, 8k uhd, professional photography',
+        'vibrant colors, dynamic composition, award winning',
+        'soft natural lighting, ultra detailed, masterpiece',
+        'dramatic lighting, sharp focus, highly detailed',
+        'studio lighting, commercial photography, pristine',
+      ];
+      const randomStyle = styles[Math.floor(Math.random() * styles.length)];
+      
+      // Add random seed for variety
+      const seed = Math.floor(Math.random() * 1000000);
+      
+      // Enhance the prompt for better quality and UNIQUENESS
+      const enhancedPrompt = `${englishPrompt}, ${randomStyle}, unique perspective, original composition`;
       
       // Encode the prompt for URL
       const encodedPrompt = encodeURIComponent(enhancedPrompt);
       
-      // Pollinations.ai URL structure
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1200&height=800&nologo=true&enhance=true`;
+      // Pollinations.ai URL with SEED for variety + timestamp
+      const timestamp = Date.now();
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1200&height=800&seed=${seed}&nologo=true&enhance=true&model=flux&t=${timestamp}`;
+      
+      console.log('🎨 Generating image with prompt:', enhancedPrompt);
+      console.log('🎲 Using seed:', seed);
       
       // Preload the image to ensure it's generated
       await new Promise<void>((resolve, reject) => {
         const img = document.createElement('img');
-        img.onload = () => resolve();
-        img.onerror = () => reject(new Error('Failed to load image'));
+        img.onload = () => {
+          console.log('✅ Image loaded successfully!');
+          resolve();
+        };
+        img.onerror = () => {
+          console.error('❌ Image failed to load');
+          reject(new Error('Failed to load image'));
+        };
         img.src = imageUrl;
       });
       
       return imageUrl;
     } catch (error) {
       console.error('Error generating image:', error);
-      // Fallback to Unsplash with relevant search
+      // Fallback to Unsplash with relevant search + timestamp for variety
       const searchQuery = prompt.split(' ').slice(0, 3).join(',');
-      return `https://source.unsplash.com/1200x800/?${searchQuery},business,modern,professional`;
+      const timestamp = Date.now();
+      return `https://source.unsplash.com/1200x800/?${searchQuery},business,modern,professional&sig=${timestamp}`;
     } finally {
       setIsGeneratingImage(false);
     }
@@ -398,6 +428,9 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
                 </div>
               </div>
             )}
+            
+            {/* Invisible element for auto-scroll */}
+            <div ref={messagesEndRef} />
           </div>
         </Card>
 
