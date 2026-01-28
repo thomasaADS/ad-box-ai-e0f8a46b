@@ -647,8 +647,14 @@ export async function generateCampaign(data: GenerateRequest): Promise<{ objecti
   };
 }
 
+interface MetaAdEntity {
+  id: string;
+  name: string;
+  status?: string;
+}
+
 // Mock publish to Meta
-export async function publishToMeta(variant: AdVariant): Promise<{ success: boolean; adset: any; creative: any; ad: any }> {
+export async function publishToMeta(_variant: AdVariant): Promise<{ success: boolean; adset: MetaAdEntity; creative: MetaAdEntity; ad: MetaAdEntity }> {
   await new Promise(resolve => setTimeout(resolve, 1500));
 
   return {
@@ -671,7 +677,7 @@ export async function publishToMeta(variant: AdVariant): Promise<{ success: bool
 }
 
 // Mock image generation
-export async function generateImage(prompt: string, aspect: string = "1:1"): Promise<{ url: string }> {
+export async function generateImage(_prompt: string, aspect: string = "1:1"): Promise<{ url: string }> {
   await new Promise(resolve => setTimeout(resolve, 1000));
 
   // Return Unsplash placeholder matching the prompt theme

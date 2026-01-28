@@ -86,19 +86,19 @@ export default function MyCampaigns() {
   });
 
   const getStatusBadge = (status: Campaign['status']) => {
-    const variants = {
+    const variants: Record<Campaign['status'], 'default' | 'secondary' | 'outline' | 'destructive'> = {
       active: 'default',
       draft: 'secondary',
       completed: 'outline',
       paused: 'destructive',
     };
-    const labels = {
+    const labels: Record<Campaign['status'], string> = {
       active: 'פעיל',
       draft: 'טיוטה',
       completed: 'הושלם',
       paused: 'מושהה',
     };
-    return <Badge variant={variants[status] as any}>{labels[status]}</Badge>;
+    return <Badge variant={variants[status]}>{labels[status]}</Badge>;
   };
 
   return (

@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Sparkles, Image, Wand2, Send, Bot, Building2, Target, Users, Eye, Palette } from 'lucide-react';
+import { Loader2, Image, Wand2, Send, Bot, Building2, Target, Users, Eye, Palette } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Message {
@@ -137,26 +137,20 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
       const timestamp = Date.now();
       const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1200&height=800&seed=${seed}&nologo=true&enhance=true&model=flux&t=${timestamp}`;
       
-      console.log('Generating image with prompt:', enhancedPrompt);
-      console.log('Using seed:', seed);
-      
       // Preload the image to ensure it's generated
       await new Promise<void>((resolve, reject) => {
         const img = document.createElement('img');
         img.onload = () => {
-          console.log('Image loaded successfully!');
           resolve();
         };
         img.onerror = () => {
-          console.error('Image failed to load');
           reject(new Error('Failed to load image'));
         };
         img.src = imageUrl;
       });
       
       return imageUrl;
-    } catch (error) {
-      console.error('Error generating image:', error);
+    } catch {
       // Fallback to Unsplash with relevant search + timestamp for variety
       const searchQuery = prompt.split(' ').slice(0, 3).join(',');
       const timestamp = Date.now();

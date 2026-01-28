@@ -3,7 +3,6 @@ import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { ScrollArea } from './ui/scroll-area';
-import { useTranslation } from '@/hooks/useTranslation';
 import { MessageSquare, X, Send, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -13,7 +12,6 @@ interface Message {
 }
 
 export const ChatWidget = () => {
-  const { t } = useTranslation();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -147,7 +145,6 @@ export const ChatWidget = () => {
     try {
       await streamChat([...messages, userMessage]);
     } catch (error) {
-      console.error('Chat error:', error);
       toast({
         title: 'שגיאה',
         description: error instanceof Error ? error.message : 'משהו השתבש',

@@ -20,8 +20,19 @@ import {
   CreditCard,
 } from 'lucide-react';
 
+import type { LucideIcon } from 'lucide-react';
+
+interface StepData {
+  number: number;
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  duration: string;
+  features: string[];
+}
+
 // Individual step component with scroll animation
-function StepSection({ step, index }: { step: any; index: number }) {
+function StepSection({ step, index }: { step: StepData; index: number }) {
   const { ref, inView } = useScrollAnimation({ threshold: 0.3 });
   const isEven = index % 2 === 0;
   const [parallaxOffset, setParallaxOffset] = useState(0);
@@ -111,7 +122,7 @@ function StepSection({ step, index }: { step: any; index: number }) {
                   }?w=900&h=700&fit=crop&q=90`}
                   alt={step.title}
                   className="w-full h-full object-cover parallax-image"
-                  style={{ '--parallax-offset': `${parallaxOffset}px` } as any}
+                  style={{ '--parallax-offset': `${parallaxOffset}px` } as React.CSSProperties}
                 />
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-600/30 via-purple-600/30 to-pink-500/30"></div>
                 

@@ -60,8 +60,8 @@ export function CampaignDetailsDrawer({
 
       setCampaign(campaignData);
       setDailyStats(statsData);
-    } catch (error) {
-      console.error('Error loading campaign details:', error);
+    } catch {
+      /* silently ignored */
     } finally {
       setLoading(false);
     }

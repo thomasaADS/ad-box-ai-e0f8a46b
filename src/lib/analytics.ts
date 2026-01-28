@@ -73,26 +73,31 @@ export interface AnalyticsFilters {
   search?: string;
 }
 
+// The analytics tables (ad_accounts, campaign_metrics, campaign_stats_daily, campaigns_analytics)
+// are not yet in the auto-generated Supabase type definitions.
+// Using an untyped wrapper for these queries until types are regenerated.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const analyticsDb = supabase as unknown as { from: (table: string) => any; rpc: (fn: string) => any };
+
 // Fetch all ad accounts for the current user
 export async function fetchAdAccounts(): Promise<AdAccount[]> {
-  const { data, error } = await supabase
+  const { data, error } = await analyticsDb
     .from('ad_accounts')
     .select('*')
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching ad accounts:', error);
     throw error;
   }
 
-  return data || [];
+  return (data as AdAccount[]) || [];
 }
 
 // Fetch campaigns with aggregated metrics for a date range
 export async function fetchCampaignsWithMetrics(
   filters: AnalyticsFilters = {}
 ): Promise<CampaignMetrics[]> {
-  let query = supabase
+  let query = analyticsDb
     .from('campaign_metrics')
     .select('*');
 
@@ -113,29 +118,27 @@ export async function fetchCampaignsWithMetrics(
     query = query.ilike('name', `%${filters.search}%`);
   }
 
-  // Date range filtering is handled by the stats aggregation
-  // We'll filter the daily stats separately
-
   const { data, error } = await query.order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching campaigns with metrics:', error);
     throw error;
   }
 
+  const records = (data || []) as Record<string, unknown>[];
+
   // If date range is specified, we need to recalculate metrics for that range
   if (filters.dateRange) {
-    const campaignIds = (data || []).map(c => c.id);
+    const campaignIds = records.map(c => c.id as string);
     const dailyStats = await fetchDailyStatsForCampaigns(campaignIds, filters.dateRange);
-    
+
     // Recalculate metrics based on filtered daily stats
-    return (data || []).map(campaign => {
+    return records.map(campaign => {
       const stats = dailyStats.filter(s => s.campaign_id === campaign.id);
       return recalculateMetrics(campaign, stats);
     });
   }
 
-  return (data || []).map(c => ({
+  return records.map(c => ({
     ...c,
     total_impressions: Number(c.total_impressions) || 0,
     total_clicks: Number(c.total_clicks) || 0,
@@ -157,7 +160,7 @@ export async function fetchDailyStatsForCampaigns(
 ): Promise<CampaignStatsDaily[]> {
   if (campaignIds.length === 0) return [];
 
-  const { data, error } = await supabase
+  const { data, error } = await analyticsDb
     .from('campaign_stats_daily')
     .select('*')
     .in('campaign_id', campaignIds)
@@ -166,11 +169,10 @@ export async function fetchDailyStatsForCampaigns(
     .order('date', { ascending: true });
 
   if (error) {
-    console.error('Error fetching daily stats:', error);
     throw error;
   }
 
-  return (data || []).map(s => ({
+  return ((data || []) as Record<string, unknown>[]).map(s => ({
     ...s,
     impressions: Number(s.impressions) || 0,
     clicks: Number(s.clicks) || 0,
@@ -178,7 +180,7 @@ export async function fetchDailyStatsForCampaigns(
     leads: Number(s.leads) || 0,
     purchases: s.purchases ? Number(s.purchases) : undefined,
     revenue: s.revenue ? Number(s.revenue) : undefined,
-  }));
+  })) as CampaignStatsDaily[];
 }
 
 // Fetch daily stats for a single campaign
@@ -186,7 +188,7 @@ export async function fetchCampaignDailyStats(
   campaignId: string,
   dateRange?: DateRange
 ): Promise<CampaignStatsDaily[]> {
-  let query = supabase
+  let query = analyticsDb
     .from('campaign_stats_daily')
     .select('*')
     .eq('campaign_id', campaignId)
@@ -201,11 +203,10 @@ export async function fetchCampaignDailyStats(
   const { data, error } = await query;
 
   if (error) {
-    console.error('Error fetching campaign daily stats:', error);
     throw error;
   }
 
-  return (data || []).map(s => ({
+  return ((data || []) as Record<string, unknown>[]).map(s => ({
     ...s,
     impressions: Number(s.impressions) || 0,
     clicks: Number(s.clicks) || 0,
@@ -213,12 +214,12 @@ export async function fetchCampaignDailyStats(
     leads: Number(s.leads) || 0,
     purchases: s.purchases ? Number(s.purchases) : undefined,
     revenue: s.revenue ? Number(s.revenue) : undefined,
-  }));
+  })) as CampaignStatsDaily[];
 }
 
 // Fetch a single campaign with full details
 export async function fetchCampaignById(campaignId: string): Promise<CampaignAnalytics | null> {
-  const { data, error } = await supabase
+  const { data, error } = await analyticsDb
     .from('campaigns_analytics')
     .select(`
       *,
@@ -233,22 +234,24 @@ export async function fetchCampaignById(campaignId: string): Promise<CampaignAna
     .single();
 
   if (error) {
-    console.error('Error fetching campaign:', error);
     throw error;
   }
 
   if (!data) return null;
 
+  const record = data as Record<string, unknown>;
+  const adAccounts = record.ad_accounts as Record<string, unknown> | null;
+
   return {
-    ...data,
-    platform: (data.ad_accounts as any)?.platform,
-    account_name: (data.ad_accounts as any)?.name,
-  };
+    ...record,
+    platform: adAccounts?.platform,
+    account_name: adAccounts?.name,
+  } as CampaignAnalytics;
 }
 
 // Recalculate metrics from daily stats
 function recalculateMetrics(
-  campaign: any,
+  campaign: Record<string, unknown>,
   dailyStats: CampaignStatsDaily[]
 ): CampaignMetrics {
   const totals = dailyStats.reduce(
@@ -263,18 +266,18 @@ function recalculateMetrics(
     { impressions: 0, clicks: 0, spend: 0, leads: 0, purchases: 0, revenue: 0 }
   );
 
-  const ctr = totals.impressions > 0 
-    ? (totals.clicks / totals.impressions) * 100 
+  const ctr = totals.impressions > 0
+    ? (totals.clicks / totals.impressions) * 100
     : 0;
-  
-  const cpc = totals.clicks > 0 
-    ? totals.spend / totals.clicks 
+
+  const cpc = totals.clicks > 0
+    ? totals.spend / totals.clicks
     : 0;
-  
-  const cpl = totals.leads > 0 
-    ? totals.spend / totals.leads 
+
+  const cpl = totals.leads > 0
+    ? totals.spend / totals.leads
     : 0;
-  
+
   const roas = totals.spend > 0 && totals.revenue > 0
     ? totals.revenue / totals.spend
     : 0;
@@ -291,7 +294,7 @@ function recalculateMetrics(
     cpc: Math.round(cpc * 100) / 100,
     cpl: Math.round(cpl * 100) / 100,
     roas: Math.round(roas * 100) / 100,
-  };
+  } as CampaignMetrics;
 }
 
 // Calculate aggregated KPIs for all campaigns
@@ -341,11 +344,9 @@ export async function calculateAggregatedKPIs(
 
 // Seed demo data (calls the Supabase function)
 export async function seedDemoData(): Promise<void> {
-  const { error } = await supabase.rpc('seed_analytics_demo_data');
+  const { error } = await analyticsDb.rpc('seed_analytics_demo_data');
 
   if (error) {
-    console.error('Error seeding demo data:', error);
     throw error;
   }
 }
-

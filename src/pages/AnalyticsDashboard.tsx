@@ -25,7 +25,7 @@ import { ChatWidget } from '@/components/ChatWidget';
 export default function AnalyticsDashboard() {
   const { user } = useAuth();
   const [campaigns, setCampaigns] = useState<CampaignMetrics[]>([]);
-  const [kpis, setKpis] = useState<any>(null);
+  const [kpis, setKpis] = useState<Awaited<ReturnType<typeof calculateAggregatedKPIs>> | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -69,8 +69,7 @@ export default function AnalyticsDashboard() {
 
       setCampaigns(campaignsData);
       setKpis(kpisData);
-    } catch (error) {
-      console.error('Error loading analytics data:', error);
+    } catch {
       toast.error('שגיאה בטעינת נתונים');
     } finally {
       setLoading(false);
@@ -87,14 +86,13 @@ export default function AnalyticsDashboard() {
       await seedDemoData();
       toast.success('נתוני דמו נוצרו בהצלחה!');
       await loadData();
-    } catch (error) {
-      console.error('Error seeding data:', error);
+    } catch {
       toast.error('שגיאה ביצירת נתוני דמו');
     }
   };
 
   // Get aggregated daily stats for all campaigns (for main chart)
-  const [aggregatedDailyStats, setAggregatedDailyStats] = useState<any[]>([]);
+  const [aggregatedDailyStats, setAggregatedDailyStats] = useState<{ date: string; impressions: number; clicks: number; spend: number; leads: number; revenue: number }[]>([]);
   const [chartLoading, setChartLoading] = useState(false);
 
   useEffect(() => {
@@ -134,11 +132,11 @@ export default function AnalyticsDashboard() {
         }
 
         return acc;
-      }, [] as any[]);
+      }, [] as { date: string; impressions: number; clicks: number; spend: number; leads: number; revenue: number }[]);
 
       setAggregatedDailyStats(aggregated.sort((a, b) => a.date.localeCompare(b.date)));
-    } catch (error) {
-      console.error('Error loading aggregated stats:', error);
+    } catch {
+      // Error loading aggregated stats
     } finally {
       setChartLoading(false);
     }

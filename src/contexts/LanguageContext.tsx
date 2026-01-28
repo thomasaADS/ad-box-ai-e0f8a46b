@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useEffect, ReactNode } from 'react';
 
 export type Language = 'he' | 'en' | 'ar' | 'ru';
 
@@ -10,7 +10,8 @@ interface LanguageContextType {
 }
 
 // Import translations directly
-const translations: Record<Language, Record<string, any>> = {
+type TranslationValue = string | Record<string, string>;
+const translations: Record<Language, Record<string, TranslationValue>> = {
   he: {
     "nav.home": "בית",
     "nav.platforms": "פלטפורמות",
@@ -198,16 +199,16 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     
     // Then try nested lookup (for backwards compatibility)
     const keys = key.split('.');
-    let value: any = translations[language];
-    
+    let value: TranslationValue | Record<string, TranslationValue> | undefined = translations[language];
+
     for (const k of keys) {
       if (value && typeof value === 'object') {
-        value = value[k];
+        value = (value as Record<string, TranslationValue>)[k];
       } else {
         return key;
       }
     }
-    
+
     return typeof value === 'string' ? value : key;
   };
 

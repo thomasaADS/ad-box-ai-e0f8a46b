@@ -25,7 +25,7 @@ export const PlatformModal = ({ isOpen, onClose, platform }: PlatformModalProps)
   const IconComponent = config ? iconMap[config.iconName] : Users;
 
   const getPlatformData = (platformId: string) => {
-    const data: Record<string, any> = {
+    const data: Record<string, { gradient: string; formats: string[]; sizes: string[]; steps: string[] }> = {
       meta: {
         gradient: 'gradient-purple-blue',
         formats: ['פיד', 'סטורי', 'ריל', 'קרוסלה'],

@@ -13,9 +13,9 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 interface Campaign {
   id: string;
   brand_name: string;
-  platforms: string[];
-  objective: string;
-  budget: number;
+  platforms: string[] | null;
+  objective: string | null;
+  budget: number | null;
   created_at: string;
 }
 
@@ -41,7 +41,7 @@ export default function Dashboard() {
       if (error) throw error;
       setCampaigns(data || []);
     } catch (error) {
-      console.error('Error loading campaigns:', error);
+      // silently ignore campaign loading errors
     } finally {
       setLoading(false);
     }

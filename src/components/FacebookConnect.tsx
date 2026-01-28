@@ -50,10 +50,10 @@ export default function FacebookConnect() {
           description: 'וודא שיש לך הרשאות לחשבונות פרסום בפייסבוק',
         });
       }
-    } catch (error: any) {
-      console.error('Error loading ad accounts:', error);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'שגיאה לא ידועה';
       toast.error('שגיאה בטעינת חשבונות פרסום', {
-        description: error.message,
+        description: message,
       });
     } finally {
       setIsLoadingAccounts(false);
@@ -69,10 +69,10 @@ export default function FacebookConnect() {
       
       // Load ad accounts after connection
       await loadAdAccounts();
-    } catch (error: any) {
-      console.error('Facebook login error:', error);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'שגיאה לא ידועה';
       toast.error('שגיאה בהתחברות לפייסבוק', {
-        description: error.message,
+        description: message,
       });
     } finally {
       setIsConnecting(false);
@@ -86,10 +86,10 @@ export default function FacebookConnect() {
       setAdAccounts([]);
       setSelectedAccount('');
       toast.info('התנתקת מפייסבוק');
-    } catch (error: any) {
-      console.error('Facebook logout error:', error);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'שגיאה לא ידועה';
       toast.error('שגיאה בהתנתקות', {
-        description: error.message,
+        description: message,
       });
     }
   };

@@ -108,8 +108,7 @@ export default function FreeChatBrief() {
       const parsed = JSON.parse(jsonText);
       
       return parsed;
-    } catch (error) {
-      console.error('Error parsing input:', error);
+    } catch {
       // Fallback: Simple keyword extraction
       return {
         businessName: text.match(/עסק ל?(.+?)[,\.]/) ? text.match(/עסק ל?(.+?)[,\.]/)?.[1] : undefined,
@@ -150,8 +149,7 @@ export default function FreeChatBrief() {
         setMessages((prev) => [...prev, aiResponse]);
         setIsProcessing(false);
       }, 1500);
-    } catch (error) {
-      console.error('Error processing message:', error);
+    } catch {
       setIsProcessing(false);
       toast.error('אופס! משהו השתבש. נסה שוב.');
     }

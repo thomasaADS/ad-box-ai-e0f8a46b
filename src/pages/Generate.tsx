@@ -4,7 +4,7 @@ import { TopNav } from "@/components/TopNav";
 import { VariantCard } from "@/components/VariantCard";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, ArrowLeft, Sparkles, Wand2 } from "lucide-react";
+import { Loader2, ArrowLeft, Sparkles, Wand2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { generateCampaign, publishToMeta, type AdVariant, type Platform } from "@/lib/api";
 import { generateCampaignWithAI } from "@/lib/gemini";
@@ -25,7 +25,7 @@ export default function Generate() {
     generateVariants(JSON.parse(briefData));
   }, [navigate]);
 
-  const generateVariants = async (briefData: any) => {
+  const generateVariants = async (briefData: Record<string, string | string[]>) => {
     try {
       setLoading(true);
 
@@ -44,7 +44,7 @@ export default function Generate() {
         });
 
         // Add platform and final URL to each variant
-        const enhancedVariants = aiResult.variants.map((v: any) => ({
+        const enhancedVariants = aiResult.variants.map((v: Record<string, string>) => ({
           ...v,
           final_url: briefData.website || briefData.whatsapp || '#',
           utm: {
@@ -60,8 +60,6 @@ export default function Generate() {
           description: 'המודעות נוצרו על ידי Gemini AI',
         });
       } catch (aiError) {
-        console.warn('AI generation failed, using fallback:', aiError);
-        
         // Fallback to mock generation
         result = await generateCampaign({
           brand: {
@@ -86,7 +84,6 @@ export default function Generate() {
         });
       }
     } catch (error) {
-      console.error("Generation error:", error);
       toast.error("יצירת הוריאנטים נכשלה. אנא נסה שוב.");
     } finally {
       setLoading(false);
@@ -98,11 +95,9 @@ export default function Generate() {
     const loadingToast = toast.loading(`מפרסם ל-${platformName}...`);
     
     try {
-      const result = await publishToMeta(variant);
+      await publishToMeta(variant);
       toast.success(`המודעה נוצרה כטיוטה ב-${platformName}!`, { id: loadingToast });
-      console.log("Publish result:", result);
     } catch (error) {
-      console.error("Publish error:", error);
       toast.error("הפרסום נכשל. בדוק את הקונסול לפרטים נוספים.", { id: loadingToast });
     }
   };

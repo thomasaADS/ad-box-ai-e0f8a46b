@@ -68,9 +68,21 @@ export async function callGemini(messages: ChatMessage[]): Promise<string> {
     const data = await response.json();
     return data.candidates[0]?.content?.parts[0]?.text || 'לא הצלחתי לקבל תשובה';
   } catch (error) {
-    console.error('Gemini API error:', error);
     throw error;
   }
+}
+
+export interface AIGeneratedVariant {
+  platform: string;
+  primary_text: string;
+  headline: string;
+  description: string;
+  cta: string;
+  audience_suggestion?: string;
+}
+
+export interface AIGeneratedCampaign {
+  variants: AIGeneratedVariant[];
 }
 
 // Generate campaign content using Gemini
@@ -83,7 +95,7 @@ export async function generateCampaignWithAI(briefData: {
   platforms: string[];
   objective: string;
   language: string;
-}): Promise<any> {
+}): Promise<AIGeneratedCampaign> {
   const systemPrompt = `אתה מומחה בשיווק דיגיטלי וכתיבה קריאטיבית לפרסומות.
 תפקידך ליצור ${briefData.platforms.length} וריאציות מודעות מקצועיות וקריאטיביות עבור כל פלטפורמה.
 
@@ -139,7 +151,6 @@ export async function generateCampaignWithAI(briefData: {
     const result = JSON.parse(jsonText);
     return result;
   } catch (error) {
-    console.error('Error generating campaign with AI:', error);
     throw error;
   }
 }

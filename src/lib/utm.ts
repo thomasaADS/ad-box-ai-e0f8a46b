@@ -20,7 +20,6 @@ export function buildUTMUrl(baseUrl: string, params: UTMParams): string {
     
     return url.toString();
   } catch (error) {
-    console.error('Invalid URL for UTM building:', baseUrl);
     return baseUrl;
   }
 }

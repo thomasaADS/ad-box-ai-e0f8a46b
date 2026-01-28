@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, HelpCircle, CheckCircle2, Plus, Minus, Clock, Smartphone, DollarSign, Rocket } from 'lucide-react';
+import { ChevronDown, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface FAQItem {
@@ -13,8 +13,6 @@ interface FAQProps {
 
 export const FAQ = ({ items }: FAQProps) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  const icons = [Clock, Smartphone, DollarSign, Rocket];
 
   const getGradientBorder = (index: number) => {
     const gradients = [

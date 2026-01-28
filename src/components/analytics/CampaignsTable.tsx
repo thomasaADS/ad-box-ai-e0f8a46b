@@ -36,8 +36,8 @@ export function CampaignsTable({ campaigns, loading = false, onCampaignClick }: 
   };
 
   const sortedCampaigns = [...campaigns].sort((a, b) => {
-    let aValue: any;
-    let bValue: any;
+    let aValue: string | number;
+    let bValue: string | number;
 
     switch (sortField) {
       case 'name':

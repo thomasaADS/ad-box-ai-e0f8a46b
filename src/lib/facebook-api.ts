@@ -1,12 +1,49 @@
 /**
  * Facebook Marketing API Integration
- * 
+ *
  * This service handles all Facebook/Meta API interactions:
  * - OAuth authentication
  * - Ad Accounts management
  * - Campaign creation
  * - Ad creation and publishing
  */
+
+// Facebook SDK type definitions
+interface FacebookAuthResponse {
+  accessToken: string;
+  expiresIn: number;
+  signedRequest: string;
+  userID: string;
+}
+
+interface FacebookLoginResponse {
+  authResponse: FacebookAuthResponse | null;
+  status: string;
+}
+
+interface FacebookSDK {
+  init(params: { appId: string; cookie: boolean; xfbml: boolean; version: string }): void;
+  login(callback: (response: FacebookLoginResponse) => void, options: { scope: string }): void;
+  logout(callback: () => void): void;
+}
+
+interface FacebookTargeting {
+  geo_locations?: {
+    countries?: string[];
+    cities?: { key: string; radius?: number; distance_unit?: string }[];
+  };
+  age_min?: number;
+  age_max?: number;
+  interests?: { id: string; name: string }[];
+  [key: string]: unknown;
+}
+
+declare global {
+  interface Window {
+    FB?: FacebookSDK;
+    fbAsyncInit?: () => void;
+  }
+}
 
 export interface FacebookAdAccount {
   id: string;
@@ -34,7 +71,7 @@ export interface FacebookAdSet {
   billing_event: string;
   optimization_goal: string;
   bid_amount?: number;
-  targeting: any;
+  targeting: FacebookTargeting;
   status: 'ACTIVE' | 'PAUSED';
   start_time?: string;
   end_time?: string;
@@ -70,7 +107,8 @@ class FacebookAPIService {
   private accessToken: string | null = null;
   private adAccountId: string | null = null;
   private appId: string = import.meta.env.VITE_FACEBOOK_APP_ID || '';
-  private appSecret: string = import.meta.env.VITE_FACEBOOK_APP_SECRET || '';
+  // Note: appSecret should never be exposed in client-side code.
+  // It should only be used in server-side/edge functions.
   private apiVersion: string = 'v18.0';
   private baseUrl: string = 'https://graph.facebook.com';
 
@@ -80,13 +118,13 @@ class FacebookAPIService {
   initFacebookSDK(): Promise<void> {
     return new Promise((resolve) => {
       // Load Facebook SDK
-      if ((window as any).FB) {
+      if (window.FB) {
         resolve();
         return;
       }
 
-      (window as any).fbAsyncInit = () => {
-        (window as any).FB.init({
+      window.fbAsyncInit = () => {
+        window.FB.init({
           appId: this.appId,
           cookie: true,
           xfbml: true,
@@ -111,8 +149,8 @@ class FacebookAPIService {
     await this.initFacebookSDK();
 
     return new Promise((resolve, reject) => {
-      (window as any).FB.login(
-        (response: any) => {
+      window.FB.login(
+        (response: FacebookLoginResponse) => {
           if (response.authResponse) {
             this.accessToken = response.authResponse.accessToken;
             // Save to localStorage for persistence
@@ -134,8 +172,8 @@ class FacebookAPIService {
    */
   async logout(): Promise<void> {
     return new Promise((resolve) => {
-      if ((window as any).FB) {
-        (window as any).FB.logout(() => {
+      if (window.FB) {
+        window.FB.logout(() => {
           this.accessToken = null;
           this.adAccountId = null;
           localStorage.removeItem('fb_access_token');
@@ -203,7 +241,7 @@ class FacebookAPIService {
   /**
    * Make API request to Facebook
    */
-  private async apiRequest(endpoint: string, method: string = 'GET', data?: any): Promise<any> {
+  private async apiRequest(endpoint: string, method: string = 'GET', data?: Record<string, unknown>): Promise<Record<string, unknown>> {
     const token = this.getAccessToken();
     if (!token) {
       throw new Error('Not authenticated with Facebook');
@@ -235,7 +273,7 @@ class FacebookAPIService {
   /**
    * Handle API response
    */
-  private async handleResponse(response: Response): Promise<any> {
+  private async handleResponse(response: Response): Promise<Record<string, unknown>> {
     const data = await response.json();
     
     if (!response.ok) {
@@ -255,7 +293,6 @@ class FacebookAPIService {
       });
       return response.data || [];
     } catch (error) {
-      console.error('Error fetching ad accounts:', error);
       throw error;
     }
   }
@@ -279,7 +316,6 @@ class FacebookAPIService {
       
       return response.id;
     } catch (error) {
-      console.error('Error creating campaign:', error);
       throw error;
     }
   }
@@ -297,7 +333,6 @@ class FacebookAPIService {
       const response = await this.apiRequest(`/${accountId}/adsets`, 'POST', adSet);
       return response.id;
     } catch (error) {
-      console.error('Error creating ad set:', error);
       throw error;
     }
   }
@@ -330,7 +365,6 @@ class FacebookAPIService {
       
       return response.images[Object.keys(response.images)[0]].hash;
     } catch (error) {
-      console.error('Error uploading image:', error);
       throw error;
     }
   }
@@ -348,7 +382,6 @@ class FacebookAPIService {
       const response = await this.apiRequest(`/${accountId}/ads`, 'POST', ad);
       return response.id;
     } catch (error) {
-      console.error('Error creating ad:', error);
       throw error;
     }
   }
@@ -364,7 +397,7 @@ class FacebookAPIService {
     imageUrl: string;
     targetUrl: string;
     dailyBudget: number;
-    targeting: any;
+    targeting: FacebookTargeting;
     objective?: string;
   }): Promise<{ campaignId: string; adSetId: string; adId: string }> {
     try {
@@ -417,7 +450,6 @@ class FacebookAPIService {
 
       return { campaignId, adSetId, adId };
     } catch (error) {
-      console.error('Error publishing campaign:', error);
       throw error;
     }
   }

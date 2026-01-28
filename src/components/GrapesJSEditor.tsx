@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import grapesjs from 'grapesjs';
+import grapesjs, { type Editor } from 'grapesjs';
 import 'grapesjs/dist/css/grapes.min.css';
 import gjsPresetWebpage from 'grapesjs-preset-webpage';
 
@@ -11,10 +11,12 @@ interface GrapesJSEditorProps {
 
 export default function GrapesJSEditor({ onSave, initialHtml = '', initialCss = '' }: GrapesJSEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
-  const grapesjsRef = useRef<any>(null);
+  const grapesjsRef = useRef<Editor | null>(null);
 
   useEffect(() => {
     if (!editorRef.current) return;
+
+    const pluginKey = gjsPresetWebpage as unknown as string;
 
     // Initialize GrapesJS
     const editor = grapesjs.init({
@@ -24,7 +26,7 @@ export default function GrapesJSEditor({ onSave, initialHtml = '', initialCss = 
       storageManager: false,
       plugins: [gjsPresetWebpage],
       pluginsOpts: {
-        [gjsPresetWebpage]: {
+        [pluginKey]: {
           blocksBasicOpts: {
             blocks: ['column1', 'column2', 'column3', 'column3-7', 'text', 'link', 'image', 'video', 'map'],
             flexGrid: 1,
@@ -32,7 +34,7 @@ export default function GrapesJSEditor({ onSave, initialHtml = '', initialCss = 
           blocks: ['link-block', 'quote', 'text-basic'],
           modalImportTitle: 'Import',
           modalImportLabel: '<div style="margin-bottom: 10px; font-size: 13px;">Paste here your HTML/CSS and click Import</div>',
-          modalImportContent: (editor: any) => editor.getHtml() + '<style>' + editor.getCss() + '</style>',
+          modalImportContent: (ed: Editor) => ed.getHtml() + '<style>' + ed.getCss() + '</style>',
           importPlaceholder: '<table class="table"><tr><td class="cell">Content here</td></tr></table>',
         },
       },
@@ -85,47 +87,7 @@ export default function GrapesJSEditor({ onSave, initialHtml = '', initialCss = 
                 className: 'btn-show-json',
                 label: '<i class="fa fa-download"></i>',
                 context: 'show-json',
-                command(editor: any) {
-                  const html = editor.getHtml();
-                  const css = editor.getCss();
-                  
-                  // Create downloadable file
-                  const fullHtml = `
-<!DOCTYPE html>
-<html dir="rtl" lang="he">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>דף נחיתה</title>
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; }
-    body { 
-      margin: 0; 
-      font-family: 'Heebo', sans-serif; 
-      direction: rtl;
-    }
-    ${css}
-  </style>
-</head>
-<body>
-  ${html}
-</body>
-</html>
-                  `;
-                  
-                  const blob = new Blob([fullHtml], { type: 'text/html' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = 'landing-page.html';
-                  a.click();
-                  URL.revokeObjectURL(url);
-                  
-                  if (onSave) {
-                    onSave(html, css);
-                  }
-                },
+                command: 'download-html',
               },
             ],
           },
@@ -165,7 +127,7 @@ export default function GrapesJSEditor({ onSave, initialHtml = '', initialCss = 
         <p style="font-size: 24px; margin-bottom: 30px;">הפתרון המושלם לצרכים שלכם</p>
         <a href="#" style="display: inline-block; padding: 15px 40px; background: white; color: #667eea; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 18px;">צור קשר עכשיו</a>
       </div>
-      
+
       <div style="padding: 60px 20px; text-align: center; direction: rtl; font-family: 'Heebo', sans-serif;">
         <h2 style="font-size: 36px; margin-bottom: 40px; color: #333; font-weight: 600;">למה לבחור בנו?</h2>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto;">
@@ -203,14 +165,57 @@ export default function GrapesJSEditor({ onSave, initialHtml = '', initialCss = 
     }
 
     // Commands
+    editor.Commands.add('download-html', {
+      run: (ed: Editor) => {
+        const html = ed.getHtml();
+        const css = ed.getCss();
+
+        const fullHtml = `
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>דף נחיתה</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Heebo', sans-serif;
+      direction: rtl;
+    }
+    ${css}
+  </style>
+</head>
+<body>
+  ${html}
+</body>
+</html>
+        `;
+
+        const blob = new Blob([fullHtml], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'landing-page.html';
+        a.click();
+        URL.revokeObjectURL(url);
+
+        if (onSave) {
+          onSave(html, css);
+        }
+      },
+    });
+
     editor.Commands.add('set-device-desktop', {
-      run: (ed: any) => ed.setDevice('Desktop'),
+      run: (ed: Editor) => ed.setDevice('Desktop'),
     });
     editor.Commands.add('set-device-tablet', {
-      run: (ed: any) => ed.setDevice('Tablet'),
+      run: (ed: Editor) => ed.setDevice('Tablet'),
     });
     editor.Commands.add('set-device-mobile', {
-      run: (ed: any) => ed.setDevice('Mobile'),
+      run: (ed: Editor) => ed.setDevice('Mobile'),
     });
 
     grapesjsRef.current = editor;
@@ -230,4 +235,3 @@ export default function GrapesJSEditor({ onSave, initialHtml = '', initialCss = 
     </div>
   );
 }
-

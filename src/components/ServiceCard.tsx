@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
-import { ChevronDown, ChevronUp, Target, TrendingUp, Zap, Rocket, Sparkles, FileText, Workflow, Bot, BarChart4, LineChart } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 
 interface ServiceCardProps {

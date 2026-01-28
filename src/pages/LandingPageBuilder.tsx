@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import LandingPageAgent from '@/components/LandingPageAgent';
@@ -7,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChatWidget } from '@/components/ChatWidget';
-import { Wand2, Layout, Palette, Sparkles, ArrowRight, CheckCircle2, Eye, Image as ImageIcon, Target, Zap, Clock } from 'lucide-react';
+import { Wand2, Layout, Palette, Sparkles, ArrowRight, CheckCircle2, Shield, Image as ImageIcon, Target, Zap, Clock } from 'lucide-react';
 
 interface PageData {
   businessName?: string;
@@ -21,7 +20,6 @@ interface PageData {
 }
 
 export default function LandingPageBuilder() {
-  const navigate = useNavigate();
   const [showAgent, setShowAgent] = useState(false);
   const [generatedPage, setGeneratedPage] = useState<PageData | null>(null);
 
@@ -100,14 +98,17 @@ export default function LandingPageBuilder() {
                 {[
                   { icon: Zap, title: 'מהיר ויעיל', desc: 'תוצאות מיידיות שחוסכות לך זמן' },
                   { icon: Target, title: 'מדויק ומקצועי', desc: 'פתרונות מותאמים אישית לצרכים שלך' },
-                  { icon: '💪', title: 'אמין ובטוח', desc: 'השירות הכי מהימן בשוק' }
-                ].map((feature, idx) => (
+                  { icon: Shield, title: 'אמין ובטוח', desc: 'השירות הכי מהימן בשוק' }
+                ].map((feature, idx) => {
+                  const Icon = feature.icon;
+                  return (
                   <Card key={idx} className="p-8 text-center hover:shadow-xl transition-shadow">
-                    <div className="text-6xl mb-4">{feature.icon}</div>
+                    <div className="text-6xl mb-4"><Icon className="w-16 h-16 mx-auto" /></div>
                     <h3 className="text-2xl font-bold mb-3">{feature.title}</h3>
                     <p className="text-gray-600 text-lg">{feature.desc}</p>
                   </Card>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </section>
