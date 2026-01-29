@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_accounts: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          platform: Database["public"]["Enums"]["ad_platform"]
+          currency: string
+          external_account_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          platform: Database["public"]["Enums"]["ad_platform"]
+          currency?: string
+          external_account_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          platform?: Database["public"]["Enums"]["ad_platform"]
+          currency?: string
+          external_account_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       campaigns: {
         Row: {
           brand_name: string
@@ -65,6 +98,109 @@ export type Database = {
         }
         Relationships: []
       }
+      campaigns_analytics: {
+        Row: {
+          id: string
+          ad_account_id: string
+          user_id: string
+          name: string
+          objective: string | null
+          status: Database["public"]["Enums"]["campaign_status"] | null
+          country: string | null
+          created_at: string
+          start_date: string | null
+          end_date: string | null
+          updated_at: string
+          external_campaign_id: string | null
+        }
+        Insert: {
+          id?: string
+          ad_account_id: string
+          user_id: string
+          name: string
+          objective?: string | null
+          status?: Database["public"]["Enums"]["campaign_status"] | null
+          country?: string | null
+          created_at?: string
+          start_date?: string | null
+          end_date?: string | null
+          updated_at?: string
+          external_campaign_id?: string | null
+        }
+        Update: {
+          id?: string
+          ad_account_id?: string
+          user_id?: string
+          name?: string
+          objective?: string | null
+          status?: Database["public"]["Enums"]["campaign_status"] | null
+          country?: string | null
+          created_at?: string
+          start_date?: string | null
+          end_date?: string | null
+          updated_at?: string
+          external_campaign_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaigns_analytics_ad_account_id_fkey"
+            columns: ["ad_account_id"]
+            isOneToOne: false
+            referencedRelation: "ad_accounts"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      campaign_stats_daily: {
+        Row: {
+          id: string
+          campaign_id: string
+          date: string
+          impressions: number
+          clicks: number
+          spend: number
+          leads: number
+          purchases: number | null
+          revenue: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          campaign_id: string
+          date: string
+          impressions?: number
+          clicks?: number
+          spend?: number
+          leads?: number
+          purchases?: number | null
+          revenue?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          campaign_id?: string
+          date?: string
+          impressions?: number
+          clicks?: number
+          spend?: number
+          leads?: number
+          purchases?: number | null
+          revenue?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_stats_daily_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns_analytics"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -100,13 +236,42 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      campaign_metrics: {
+        Row: {
+          id: string
+          name: string
+          ad_account_id: string
+          user_id: string
+          objective: string | null
+          status: Database["public"]["Enums"]["campaign_status"] | null
+          country: string | null
+          start_date: string | null
+          end_date: string | null
+          platform: Database["public"]["Enums"]["ad_platform"] | null
+          account_name: string | null
+          total_impressions: number
+          total_clicks: number
+          total_spend: number
+          total_leads: number
+          total_purchases: number
+          total_revenue: number
+          ctr: number
+          cpc: number
+          cpl: number
+          roas: number
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      seed_analytics_demo_data: {
+        Args: Record<string, never>
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      ad_platform: "facebook" | "google" | "tiktok" | "taboola" | "outbrain" | "linkedin" | "other"
+      campaign_status: "active" | "paused" | "deleted" | "completed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -233,6 +398,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      ad_platform: ["facebook", "google", "tiktok", "taboola", "outbrain", "linkedin", "other"],
+      campaign_status: ["active", "paused", "deleted", "completed"],
+    },
   },
 } as const
