@@ -626,19 +626,9 @@ export async function generateCampaign(data: GenerateRequest): Promise<{ objecti
     }
   });
 
-  // Add placeholder images (platform-specific sizes)
-  variants.forEach((variant) => {
-    if (variant.platform === 'meta') {
-      variant.image_urls = {
-        square: `https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1024&h=1024&fit=crop&q=80`,
-        portrait: `https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1024&h=1280&fit=crop&q=80`
-      };
-    } else if (variant.platform === 'google' || variant.platform === 'taboola' || variant.platform === 'outbrain') {
-      variant.image_urls = {
-        landscape: `https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=628&fit=crop&q=80`,
-        square: `https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1024&h=1024&fit=crop&q=80`
-      };
-    }
+  // Generate unique AI images for each variant using Pollinations.ai
+  variants.forEach((variant, index) => {
+    variant.image_urls = generateImageUrl(industry, variant.platform, index);
   });
 
   return {
@@ -670,15 +660,113 @@ export async function publishToMeta(variant: AdVariant): Promise<{ success: bool
   };
 }
 
-// Mock image generation
-export async function generateImage(prompt: string, aspect: string = "1:1"): Promise<{ url: string }> {
-  await new Promise(resolve => setTimeout(resolve, 1000));
+// Hebrew-to-English translation map for image prompts
+const hebrewToEnglishMap: Record<string, string> = {
+  'שרברבות': 'plumbing plumber',
+  'חשמלאות': 'electrician electrical',
+  'מסעדה': 'restaurant food dining',
+  'קפה': 'coffee cafe',
+  'מספרה': 'hair salon barbershop',
+  'עורך דין': 'lawyer attorney legal',
+  'רואה חשבון': 'accountant finance',
+  'שיפוצים': 'renovation home improvement',
+  'נדלן': 'real estate property',
+  'ביטוח': 'insurance',
+  'רפואה': 'medical healthcare',
+  'יופי': 'beauty cosmetics',
+  'אופנה': 'fashion clothing style',
+  'טכנולוגיה': 'technology tech digital',
+  'הייטק': 'high tech startup',
+  'מכירות': 'sales commerce',
+  'שיווק': 'marketing advertising',
+  'עיצוב': 'design creative',
+  'צילום': 'photography camera',
+  'אימון': 'coaching training fitness',
+  'פיטנס': 'fitness gym workout',
+  'יוגה': 'yoga wellness mindfulness',
+  'בריאות': 'health wellness',
+  'חינוך': 'education learning',
+  'מזון': 'food culinary',
+  'רכב': 'automotive car',
+  'תיירות': 'travel tourism',
+  'מלון': 'hotel hospitality',
+  'ניקיון': 'cleaning service',
+  'גינון': 'gardening landscaping',
+  'חיות': 'pets animals veterinary',
+  'ספורט': 'sports athletic',
+  'מוזיקה': 'music entertainment',
+  'תכשיטים': 'jewelry accessories',
+  'ריהוט': 'furniture interior',
+  'שירותים': 'professional services business',
+};
 
-  // Return Unsplash placeholder matching the prompt theme
-  const width = aspect === "4:5" ? 1024 : 1024;
-  const height = aspect === "4:5" ? 1280 : 1024;
-  
+function translateIndustryToEnglish(hebrewIndustry: string): string {
+  // Check direct map
+  for (const [heb, eng] of Object.entries(hebrewToEnglishMap)) {
+    if (hebrewIndustry.includes(heb)) return eng;
+  }
+  // If still Hebrew, return generic business
+  if (/[\u0590-\u05FF]/.test(hebrewIndustry)) {
+    return 'professional business service';
+  }
+  return hebrewIndustry;
+}
+
+// AI Image generation using Pollinations.ai (free, no API key needed)
+export function generateImageUrl(industry: string, platform: Platform, variantIndex: number): { square?: string; portrait?: string; landscape?: string } {
+  const englishIndustry = translateIndustryToEnglish(industry);
+  const seed = Math.floor(Math.random() * 1000000) + variantIndex * 100;
+  const timestamp = Date.now();
+
+  const styles = [
+    'professional commercial photography, clean modern',
+    'vibrant advertising photo, eye-catching colors',
+    'cinematic commercial shot, studio lighting',
+    'modern minimalist, professional brand imagery',
+    'warm inviting atmosphere, lifestyle photography',
+  ];
+  const style = styles[(variantIndex + seed) % styles.length];
+
+  const basePrompt = `${englishIndustry}, ${style}, high quality, no text, no watermark`;
+  const encoded = encodeURIComponent(basePrompt);
+
+  if (platform === 'meta') {
+    return {
+      square: `https://image.pollinations.ai/prompt/${encoded}?width=1080&height=1080&seed=${seed}&nologo=true&enhance=true&model=flux&t=${timestamp}`,
+      portrait: `https://image.pollinations.ai/prompt/${encoded}?width=1080&height=1350&seed=${seed + 1}&nologo=true&enhance=true&model=flux&t=${timestamp}`,
+    };
+  } else if (platform === 'tiktok') {
+    return {
+      portrait: `https://image.pollinations.ai/prompt/${encoded}?width=1080&height=1920&seed=${seed}&nologo=true&enhance=true&model=flux&t=${timestamp}`,
+    };
+  } else {
+    // Google, Taboola, Outbrain, LinkedIn, Twitter - landscape
+    return {
+      landscape: `https://image.pollinations.ai/prompt/${encoded}?width=1200&height=628&seed=${seed}&nologo=true&enhance=true&model=flux&t=${timestamp}`,
+      square: `https://image.pollinations.ai/prompt/${encoded}?width=1080&height=1080&seed=${seed + 2}&nologo=true&enhance=true&model=flux&t=${timestamp}`,
+    };
+  }
+}
+
+// Legacy image generation function
+export async function generateImage(prompt: string, aspect: string = "1:1"): Promise<{ url: string }> {
+  const width = aspect === "4:5" ? 1080 : aspect === "16:9" ? 1200 : 1080;
+  const height = aspect === "4:5" ? 1350 : aspect === "16:9" ? 628 : 1080;
+  const seed = Math.floor(Math.random() * 1000000);
+  const timestamp = Date.now();
+
+  // Translate if Hebrew
+  let englishPrompt = prompt;
+  for (const [heb, eng] of Object.entries(hebrewToEnglishMap)) {
+    englishPrompt = englishPrompt.replace(new RegExp(heb, 'g'), eng);
+  }
+  if (/[\u0590-\u05FF]/.test(englishPrompt)) {
+    englishPrompt = 'professional business, modern office, clean design';
+  }
+
+  const encoded = encodeURIComponent(`${englishPrompt}, professional commercial photography, high quality, no text`);
+
   return {
-    url: `https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=${width}&h=${height}&fit=crop&q=80`
+    url: `https://image.pollinations.ai/prompt/${encoded}?width=${width}&height=${height}&seed=${seed}&nologo=true&enhance=true&model=flux&t=${timestamp}`
   };
 }

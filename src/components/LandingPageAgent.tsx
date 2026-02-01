@@ -166,43 +166,86 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
     }
   };
 
-  // Helper function to translate Hebrew to English for better AI image results
+  // Comprehensive Hebrew-to-English translation for AI image prompts
   const translateToEnglish = async (hebrewText: string): Promise<string> => {
-    // Simple keyword mapping for common Hebrew terms
-    const hebrewToEnglish: { [key: string]: string } = {
-      'צוות': 'team',
-      'עובד': 'working',
-      'יחד': 'together',
-      'משרד': 'office',
-      'מודרני': 'modern',
-      'מחשבים': 'computers',
-      'טכנולוגי': 'technology tech',
-      'חדשני': 'innovative',
-      'מוצר': 'product',
-      'אנשים': 'people',
-      'מאושרים': 'happy',
-      'שירות': 'service',
-      'נוף': 'landscape',
-      'עירוני': 'urban city',
-      'צבעוני': 'colorful',
-      'אבסטרקטי': 'abstract',
-      'עסק': 'business',
-      'לקוחות': 'customers',
-      'פגישה': 'meeting',
-      'מצגת': 'presentation',
+    const hebrewToEnglish: Record<string, string> = {
+      // People & Work
+      'צוות': 'team', 'עובד': 'working', 'עובדים': 'workers employees', 'יחד': 'together',
+      'אנשים': 'people', 'מאושרים': 'happy smiling', 'לקוחות': 'customers clients',
+      'גבר': 'man', 'אישה': 'woman', 'ילדים': 'children', 'משפחה': 'family',
+      'צעירים': 'young people', 'מקצועי': 'professional', 'מנהל': 'manager',
+
+      // Places
+      'משרד': 'office workspace', 'חנות': 'store shop', 'מסעדה': 'restaurant',
+      'קפה': 'cafe coffee shop', 'בית': 'home house', 'דירה': 'apartment',
+      'חדר': 'room', 'רחוב': 'street', 'עיר': 'city', 'טבע': 'nature',
+      'ים': 'sea ocean beach', 'גן': 'garden park', 'מלון': 'hotel',
+
+      // Style & Design
+      'מודרני': 'modern contemporary', 'חדשני': 'innovative futuristic', 'קלאסי': 'classic elegant',
+      'צבעוני': 'colorful vibrant', 'אבסטרקטי': 'abstract artistic', 'מינימליסטי': 'minimalist clean',
+      'יוקרתי': 'luxury premium', 'פשוט': 'simple clean', 'אלגנטי': 'elegant sophisticated',
+      'חם': 'warm cozy', 'קר': 'cool blue tones', 'בהיר': 'bright light',
+      'כהה': 'dark moody',
+
+      // Technology
+      'מחשב': 'computer', 'מחשבים': 'computers technology', 'טכנולוגי': 'technology digital',
+      'טלפון': 'smartphone phone', 'אפליקציה': 'mobile app', 'אינטרנט': 'internet digital',
+      'דיגיטלי': 'digital', 'סטארטאפ': 'startup tech',
+
+      // Business
+      'עסק': 'business', 'חברה': 'company corporate', 'מותג': 'brand',
+      'מוצר': 'product', 'שירות': 'service', 'פגישה': 'meeting conference',
+      'מצגת': 'presentation', 'גרף': 'chart graph analytics', 'הצלחה': 'success growth',
+      'כסף': 'money finance', 'השקעה': 'investment', 'צמיחה': 'growth',
+
+      // Industry
+      'שרברבות': 'plumbing tools pipes', 'חשמלאות': 'electrician wiring',
+      'מספרה': 'hair salon beauty', 'רפואה': 'medical healthcare',
+      'בריאות': 'health wellness', 'אוכל': 'food culinary', 'מזון': 'food gourmet',
+      'אופנה': 'fashion style', 'יופי': 'beauty cosmetics', 'כושר': 'fitness gym',
+      'ספורט': 'sports athletic', 'חינוך': 'education learning', 'נדלן': 'real estate property',
+      'רכב': 'car automotive', 'ביטוח': 'insurance security', 'משפט': 'legal law',
+      'עיצוב': 'design creative', 'צילום': 'photography camera', 'מוזיקה': 'music',
+      'תיירות': 'travel tourism', 'ניקיון': 'cleaning', 'גינון': 'garden landscaping',
+      'חיות': 'pets animals', 'שיפוצים': 'renovation construction', 'בנייה': 'construction building',
+
+      // Nature & Objects
+      'נוף': 'landscape scenery', 'עירוני': 'urban cityscape', 'שמיים': 'sky clouds',
+      'פרחים': 'flowers floral', 'עצים': 'trees forest', 'הרים': 'mountains',
+      'שולחן': 'table desk', 'כיסא': 'chair', 'ספה': 'sofa couch',
+      'חלון': 'window', 'דלת': 'door', 'גדול': 'large spacious', 'קטן': 'small cozy',
+
+      // Actions
+      'עובדת': 'working', 'יושב': 'sitting', 'עומד': 'standing',
+      'מדבר': 'talking speaking', 'חושב': 'thinking', 'לומד': 'learning studying',
+      'מבשל': 'cooking', 'רץ': 'running', 'רוקד': 'dancing',
+      'משחק': 'playing', 'קונה': 'shopping buying',
+
+      // Descriptors
+      'יפה': 'beautiful', 'חדש': 'new', 'ישן': 'old vintage', 'גדולים': 'large big',
+      'מיוחד': 'special unique', 'מושלם': 'perfect', 'נקי': 'clean pristine',
+      'מסודר': 'organized tidy', 'תמונה': 'image photo',
     };
 
     let englishPrompt = hebrewText;
-    
-    // Replace Hebrew keywords with English
-    Object.entries(hebrewToEnglish).forEach(([hebrew, english]) => {
-      const regex = new RegExp(hebrew, 'g');
-      englishPrompt = englishPrompt.replace(regex, english);
-    });
 
-    // If still has Hebrew characters, use a default professional prompt
+    // Replace Hebrew keywords with English - sort by length (longest first) to avoid partial matches
+    const sortedEntries = Object.entries(hebrewToEnglish).sort(([a], [b]) => b.length - a.length);
+    for (const [hebrew, english] of sortedEntries) {
+      englishPrompt = englishPrompt.replace(new RegExp(hebrew, 'g'), english);
+    }
+
+    // If still has Hebrew characters, create a context-aware fallback based on pageData
     if (/[\u0590-\u05FF]/.test(englishPrompt)) {
-      return 'professional business team working together in modern office with computers, high quality, detailed';
+      const industry = pageData.industry || '';
+      const businessName = pageData.businessName || '';
+      // Try to translate industry
+      let industryEn = 'business';
+      for (const [heb, eng] of sortedEntries) {
+        if (industry.includes(heb)) { industryEn = eng; break; }
+      }
+      return `professional ${industryEn} scene, modern workspace, happy people, high quality commercial photography`;
     }
 
     return englishPrompt;
@@ -347,38 +390,38 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-6 sm:py-12 px-3 sm:px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <Badge className="mb-4 text-base px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white inline-flex items-center gap-2">
+        <div className="text-center mb-6 sm:mb-8">
+          <Badge className="mb-3 sm:mb-4 text-sm sm:text-base px-4 sm:px-6 py-1.5 sm:py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white inline-flex items-center gap-2">
             <Wand2 className="w-4 h-4" />
             בונה דפי נחיתה AI
           </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
             בואו ניצור דף נחיתה מושלם ביחד
           </h1>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-600 text-sm sm:text-lg">
             ענה על מספר שאלות פשוטות ותקבל דף נחיתה מקצועי
           </p>
         </div>
 
         {/* Chat Messages */}
-        <Card className="p-6 mb-4 max-h-[600px] overflow-y-auto">
-          <div className="space-y-6">
+        <Card className="p-3 sm:p-6 mb-4 max-h-[500px] sm:max-h-[600px] overflow-y-auto rounded-2xl">
+          <div className="space-y-4 sm:space-y-6">
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div className={`max-w-[80%] ${message.sender === 'user' ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white' : 'bg-white border-2 border-purple-200'} rounded-2xl p-5 shadow-lg`}>
+                <div className={`max-w-[90%] sm:max-w-[80%] ${message.sender === 'user' ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white' : 'bg-white border-2 border-purple-200'} rounded-2xl p-3 sm:p-5 shadow-lg`}>
                   {message.sender === 'ai' && (
-                    <div className="flex items-center gap-2 mb-3">
-                      <Bot className="w-5 h-5 text-purple-600" />
-                      <span className="font-semibold text-purple-600">סוכן AI חכם</span>
+                    <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                      <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+                      <span className="font-semibold text-purple-600 text-sm sm:text-base">סוכן AI חכם</span>
                     </div>
                   )}
-                  
-                  <p className={`text-lg whitespace-pre-line ${message.sender === 'user' ? 'text-white' : 'text-gray-800'}`}>
+
+                  <p className={`text-sm sm:text-lg whitespace-pre-line ${message.sender === 'user' ? 'text-white' : 'text-gray-800'}`}>
                     {message.text}
                   </p>
 
@@ -394,7 +437,7 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
 
                   {/* Options */}
                   {message.options && message.sender === 'ai' && (
-                    <div className="mt-5 flex flex-wrap gap-3">
+                    <div className="mt-3 sm:mt-5 flex flex-wrap gap-2 sm:gap-3">
                       {message.options.map((option, idx) => (
                         <Button
                           key={idx}
@@ -410,7 +453,8 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
                             }
                           }}
                           disabled={isGeneratingImage}
-                          className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-medium shadow-md hover:shadow-lg transition-all"
+                          size="sm"
+                          className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-medium shadow-md hover:shadow-lg transition-all text-sm sm:text-base px-3 sm:px-4 py-2 sm:py-2.5"
                         >
                           {option}
                         </Button>
@@ -439,12 +483,12 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
           </div>
         </Card>
 
-        {/* Input Area */}
-        {currentQuestionIndex >= 0 && 
-         questions[currentQuestionIndex]?.type === 'text' && (
+        {/* Input Area - show for text AND image type questions */}
+        {currentQuestionIndex >= 0 &&
+         (questions[currentQuestionIndex]?.type === 'text' || questions[currentQuestionIndex]?.type === 'image') && (
           <Card className="p-4">
             <form onSubmit={handleTextSubmit} className="flex gap-3">
-              {questions[currentQuestionIndex]?.id === 'heroImage' ? (
+              {questions[currentQuestionIndex]?.type === 'image' ? (
                 <Textarea
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
@@ -462,13 +506,13 @@ export default function LandingPageAgent({ onComplete }: { onComplete: (data: Pa
                   disabled={isGeneratingImage}
                 />
               )}
-              <Button 
-                type="submit" 
-                size="lg" 
-                disabled={isGeneratingImage}
+              <Button
+                type="submit"
+                size="lg"
+                disabled={isGeneratingImage || !userInput.trim()}
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
               >
-                {questions[currentQuestionIndex]?.id === 'heroImage' ? (
+                {questions[currentQuestionIndex]?.type === 'image' ? (
                   <Image className="w-5 h-5" />
                 ) : (
                   <Send className="w-5 h-5" />

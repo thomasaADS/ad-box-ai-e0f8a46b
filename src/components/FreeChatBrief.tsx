@@ -110,11 +110,33 @@ export default function FreeChatBrief() {
       return parsed;
     } catch (error) {
       console.error('Error parsing input:', error);
-      // Fallback: Simple keyword extraction
+      // Fallback: Enhanced keyword extraction
+      const businessNameMatch = text.match(/(?:עסק ל?|חברת |חנות |מסעדת |מספרת |מכון |סטודיו |קליניקת )(.+?)(?:[,\.\s]|$)/);
+      const locationMatch = text.match(/(?:ב|מ)(תל[- ]?אביב|ירושלים|חיפה|באר[- ]?שבע|ראשון לציון|פתח תקווה|נתניה|אשדוד|רמת[- ]?גן|הרצליה|כפר סבא|רחובות|בת ים|הוד השרון|גבעתיים|רעננה|[א-ת\s]{2,15})/);
+      const budgetMatch = text.match(/(\d+[,\d]*)\s*(₪|שקל)/);
+      const platformsMatch: string[] = [];
+      if (/פייסבוק|facebook|מטא|meta/i.test(text)) platformsMatch.push('meta');
+      if (/גוגל|google/i.test(text)) platformsMatch.push('google');
+      if (/טיקטוק|tiktok/i.test(text)) platformsMatch.push('tiktok');
+      if (/אינסטגרם|instagram/i.test(text)) platformsMatch.push('meta');
+      if (/לינקדאין|linkedin/i.test(text)) platformsMatch.push('linkedin');
+
+      // Try to extract business type
+      const businessTypes = ['שרברבות', 'חשמלאות', 'מסעדה', 'קפה', 'מספרה', 'עורך דין', 'רואה חשבון', 'שיפוצים', 'נדלן', 'ביטוח', 'רפואה', 'יופי', 'אופנה', 'טכנולוגיה', 'הייטק', 'מכירות', 'שיווק', 'עיצוב', 'צילום', 'אימון', 'פיטנס', 'יוגה'];
+      const foundType = businessTypes.find(t => text.includes(t));
+
+      // Extract target audience
+      const ageMatch = text.match(/(\d{2})\s*[-–]\s*(\d{2})/);
+
       return {
-        businessName: text.match(/עסק ל?(.+?)[,\.]/) ? text.match(/עסק ל?(.+?)[,\.]/)?.[1] : undefined,
-        location: text.match(/(ב|מ)(תל אביב|ירושלים|חיפה|באר שבע|[א-ת\s]+)/)?.[0],
-        budget: text.match(/(\d+[,\d]*)\s*(₪|שקל)/)?.[0],
+        businessName: businessNameMatch?.[1]?.trim(),
+        businessType: foundType,
+        targetAudience: text.match(/(?:לקוחות|אנשים|נשים|גברים|צעירים|מבוגרים|בני נוער|משפחות|עסקים|בעלי עסקים).{0,30}/)?.[0],
+        location: locationMatch?.[0],
+        ageRange: ageMatch ? `${ageMatch[1]}-${ageMatch[2]}` : undefined,
+        goals: text.match(/(?:רוצה |מטרה |להגיע |להגדיל |לקבל |למכור ).{0,40}/)?.[0],
+        budget: budgetMatch?.[0],
+        platforms: platformsMatch.length > 0 ? [...new Set(platformsMatch)] : undefined,
       };
     }
   };
@@ -187,12 +209,30 @@ export default function FreeChatBrief() {
       return;
     }
 
-    // Save to localStorage for the Generate page
+    // Map ParsedBrief fields to the format Generate page expects
+    const briefData = {
+      brandName: parsedBrief.businessName || 'העסק שלי',
+      industry: parsedBrief.businessType || 'שירותים',
+      city: parsedBrief.location || 'ישראל',
+      offer: parsedBrief.specialOffers || parsedBrief.goals || 'שירות מקצועי',
+      tone: parsedBrief.tone || 'professional',
+      platforms: parsedBrief.platforms || ['meta', 'google'],
+      objective: parsedBrief.goals || 'TRAFFIC',
+      language: 'he',
+      targetAudience: parsedBrief.targetAudience || '',
+      ageRange: parsedBrief.ageRange || '',
+      budget: parsedBrief.budget || '',
+    };
+
+    // Save to sessionStorage for the Generate page (Generate reads from sessionStorage)
+    sessionStorage.setItem('briefData', JSON.stringify(briefData));
+
+    // Also save to localStorage for persistence
     localStorage.setItem('campaignBrief', JSON.stringify(parsedBrief));
     localStorage.setItem('campaignBriefText', messages.filter(m => m.role === 'user').map(m => m.content).join('\n\n'));
 
     toast.success('מעולה! יוצר את הקמפיינים שלך...');
-    
+
     // Navigate to generate page
     setTimeout(() => {
       navigate('/generate');
@@ -201,57 +241,57 @@ export default function FreeChatBrief() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-200px)] max-w-4xl mx-auto">
-      <Card className="flex-1 flex flex-col overflow-hidden shadow-2xl border-2 border-purple-100">
+      <Card className="flex-1 flex flex-col overflow-hidden shadow-2xl border-2 border-purple-100 rounded-2xl">
         {/* Chat Header */}
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 flex items-center gap-4">
-          <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center">
-            <Bot className="w-8 h-8" />
+        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 sm:p-6 flex items-center gap-3 sm:gap-4">
+          <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center flex-shrink-0">
+            <Bot className="w-6 h-6 sm:w-8 sm:h-8" />
           </div>
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold">סוכן AI חכם</h2>
-            <p className="text-white/90">פשוט ספר לי מה אתה רוצה ואני אעשה את השאר</p>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg sm:text-2xl font-bold">סוכן AI חכם</h2>
+            <p className="text-white/90 text-sm sm:text-base truncate">ספר לי מה אתה רוצה ואני אעשה את השאר</p>
           </div>
-          <Badge className="bg-white/20 backdrop-blur-md border-white/30 text-lg px-4 py-2">
-            <Sparkles className="w-5 h-5 mr-2 inline animate-pulse" />
+          <Badge className="hidden sm:flex bg-white/20 backdrop-blur-md border-white/30 text-sm px-3 py-1.5">
+            <Sparkles className="w-4 h-4 mr-1.5 inline animate-pulse" />
             פעיל
           </Badge>
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6 bg-gradient-to-br from-gray-50 to-blue-50">
           {messages.map((message) => (
             <div
               key={message.id}
               className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className={`flex gap-3 max-w-[80%] ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex gap-2 sm:gap-3 max-w-[90%] sm:max-w-[80%] ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
                 {/* Avatar */}
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                     message.role === 'user'
                       ? 'bg-gradient-to-br from-purple-500 to-blue-500'
                       : 'bg-gradient-to-br from-blue-500 to-cyan-500'
                   }`}
                 >
                   {message.role === 'user' ? (
-                    <User className="w-6 h-6 text-white" />
+                    <User className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                   ) : (
-                    <Bot className="w-6 h-6 text-white" />
+                    <Bot className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                   )}
                 </div>
 
                 {/* Message Bubble */}
                 <div
-                  className={`rounded-2xl p-5 shadow-md ${
+                  className={`rounded-2xl p-3 sm:p-5 shadow-md ${
                     message.role === 'user'
                       ? 'bg-gradient-to-br from-purple-600 to-blue-600 text-white'
                       : 'bg-white border-2 border-purple-100'
                   }`}
                 >
-                  <p className={`text-lg whitespace-pre-wrap leading-relaxed ${
+                  <p className={`text-sm sm:text-lg whitespace-pre-wrap leading-relaxed ${
                     message.role === 'user' ? 'text-white' : 'text-gray-800'
                   }`}>
-                    {message.content.split('**').map((part, i) => 
+                    {message.content.split('**').map((part, i) =>
                       i % 2 === 1 ? <strong key={i}>{part}</strong> : part
                     )}
                   </p>
@@ -282,22 +322,22 @@ export default function FreeChatBrief() {
         </div>
 
         {/* Input Area */}
-        <div className="p-6 bg-white border-t-2 border-purple-100">
+        <div className="p-3 sm:p-6 bg-white border-t-2 border-purple-100">
           {parsedBrief && Object.keys(parsedBrief).length > 2 && (
-            <div className="mb-4">
+            <div className="mb-3 sm:mb-4">
               <Button
                 onClick={handleCreateCampaign}
                 size="lg"
-                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-xl py-7 rounded-xl shadow-xl hover:scale-105 transition-all"
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-base sm:text-xl py-5 sm:py-7 rounded-xl shadow-xl hover:scale-[1.02] transition-all gap-2"
               >
-                <CheckCircle className="w-6 h-6 mr-3" />
-                <Sparkles className="w-5 h-5 ml-2" />
+                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
                 צור קמפיין עכשיו
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
               </Button>
             </div>
           )}
 
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -308,25 +348,25 @@ export default function FreeChatBrief() {
                 }
               }}
               placeholder="ספר לי על העסק שלך... (לחץ Enter לשליחה)"
-              className="flex-1 resize-none text-lg border-2 border-purple-200 focus:border-purple-400 rounded-xl p-4"
-              rows={3}
+              className="flex-1 resize-none text-sm sm:text-lg border-2 border-purple-200 focus:border-purple-400 rounded-xl p-3 sm:p-4"
+              rows={2}
               disabled={isProcessing}
             />
             <Button
               onClick={handleSend}
               disabled={!input.trim() || isProcessing}
               size="lg"
-              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 rounded-xl"
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 sm:px-8 rounded-xl"
             >
               {isProcessing ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
+                <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
               ) : (
-                <Send className="w-6 h-6" />
+                <Send className="w-5 h-5 sm:w-6 sm:h-6" />
               )}
             </Button>
           </div>
-          <p className="text-sm text-gray-500 mt-3 text-center">
-            <Lightbulb className="w-4 h-4 inline ml-1" />
+          <p className="text-xs sm:text-sm text-gray-500 mt-2 sm:mt-3 text-center">
+            <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 inline ml-1" />
             טיפ: ספר לי הכל בצורה חופשית - אני אבין ואסדר את זה לקמפיין מנצח!
           </p>
         </div>

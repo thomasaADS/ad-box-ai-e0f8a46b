@@ -21,6 +21,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface Campaign {
   id: string;
@@ -43,39 +44,26 @@ export default function MyCampaigns() {
   const [filter, setFilter] = useState<'all' | 'active' | 'draft' | 'completed' | 'paused'>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Mock data - replace with real data from Supabase later
+  // Load real saved campaigns from localStorage
   useEffect(() => {
-    const mockCampaigns: Campaign[] = [
-      {
-        id: '1',
-        name: 'קמפיין קיץ 2025',
-        brand: 'העסק שלי',
-        status: 'active',
-        budget: '5000₪',
-        spent: '2340₪',
-        impressions: 45000,
-        clicks: 1200,
-        conversions: 85,
-        platform: ['Facebook', 'Google'],
-        createdAt: new Date('2025-01-15'),
-        objective: 'הגעה ללקוחות חדשים',
-      },
-      {
-        id: '2',
-        name: 'מבצע מיוחד',
-        brand: 'שרברבות תל אביב',
-        status: 'draft',
-        budget: '3000₪',
-        spent: '0₪',
-        impressions: 0,
-        clicks: 0,
-        conversions: 0,
-        platform: ['Meta'],
-        createdAt: new Date('2025-01-20'),
-        objective: 'מכירות',
-      },
-    ];
-    setCampaigns(mockCampaigns);
+    const saved = JSON.parse(localStorage.getItem('savedCampaigns') || '[]');
+    if (saved.length > 0) {
+      const loadedCampaigns: Campaign[] = saved.map((c: any) => ({
+        id: c.id,
+        name: c.name || 'קמפיין ללא שם',
+        brand: c.brand || 'העסק שלי',
+        status: c.status || 'draft',
+        budget: c.budget || '-',
+        spent: c.spent || '0₪',
+        impressions: c.impressions || 0,
+        clicks: c.clicks || 0,
+        conversions: c.conversions || 0,
+        platform: Array.isArray(c.platform) ? c.platform : ['meta'],
+        createdAt: new Date(c.createdAt || Date.now()),
+        objective: c.objective || '',
+      }));
+      setCampaigns(loadedCampaigns);
+    }
   }, []);
 
   const filteredCampaigns = campaigns.filter(c => {
@@ -84,6 +72,14 @@ export default function MyCampaigns() {
                          c.brand.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
+
+  const handleDeleteCampaign = (id: string) => {
+    const saved = JSON.parse(localStorage.getItem('savedCampaigns') || '[]');
+    const updated = saved.filter((c: any) => c.id !== id);
+    localStorage.setItem('savedCampaigns', JSON.stringify(updated));
+    setCampaigns(prev => prev.filter(c => c.id !== id));
+    toast.success('הקמפיין נמחק');
+  };
 
   const getStatusBadge = (status: Campaign['status']) => {
     const variants = {
@@ -231,7 +227,12 @@ export default function MyCampaigns() {
                     <Edit className="h-4 w-4" />
                     ערוך
                   </Button>
-                  <Button variant="outline" size="sm" className="gap-2 text-destructive hover:text-destructive">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 text-destructive hover:text-destructive"
+                    onClick={() => handleDeleteCampaign(campaign.id)}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>

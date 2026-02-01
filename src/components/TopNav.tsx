@@ -1,22 +1,22 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Sparkles, FileText, BarChart3, Settings } from "lucide-react";
+import { Sparkles, FileText, BarChart3, Settings, Menu, X, Wand2, FolderOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTranslation } from "@/hooks/useTranslation";
 
 export function TopNav() {
   const location = useLocation();
-  const { t } = useTranslation();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const links = [
-    { href: "/", label: "ברייף", icon: FileText },
-    { href: "/generate", label: "יצירה", icon: Sparkles },
+    { href: "/brief", label: "צור קמפיין", icon: FileText },
+    { href: "/landing-page-builder", label: "בניית דף נחיתה", icon: Wand2 },
+    { href: "/my-campaigns", label: "הקמפיינים שלי", icon: FolderOpen },
     { href: "/dashboard", label: "לוח בקרה", icon: BarChart3 },
-    { href: "/analytics", label: "אנליטיקס", icon: BarChart3 },
     { href: "/settings", label: "הגדרות", icon: Settings },
   ];
 
   return (
-    <nav className="border-b border-border bg-card/50 backdrop-blur-xl sticky top-0 z-50">
+    <nav className="border-b border-border bg-card/80 backdrop-blur-xl sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2">
@@ -24,11 +24,12 @@ export function TopNav() {
               <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              {t('brand.name')}
+              AdSync
             </span>
           </Link>
 
-          <div className="flex items-center gap-1">
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-1">
             {links.map((link) => {
               const Icon = link.icon;
               const isActive = location.pathname === link.href;
@@ -37,9 +38,9 @@ export function TopNav() {
                   key={link.href}
                   to={link.href}
                   className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg transition-all",
+                    "flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-sm",
                     isActive
-                      ? "bg-primary/10 text-primary"
+                      ? "bg-primary/10 text-primary font-semibold"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   )}
                 >
@@ -49,7 +50,44 @@ export function TopNav() {
               );
             })}
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden p-2 rounded-lg hover:bg-muted/50 transition-colors"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="תפריט"
+          >
+            {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
+
+        {/* Mobile Nav */}
+        {mobileOpen && (
+          <div className="md:hidden pb-4 pt-2 border-t border-border/50">
+            <div className="flex flex-col gap-1">
+              {links.map((link) => {
+                const Icon = link.icon;
+                const isActive = location.pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3 rounded-lg transition-all",
+                      isActive
+                        ? "bg-primary/10 text-primary font-semibold"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    )}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span className="font-medium">{link.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
