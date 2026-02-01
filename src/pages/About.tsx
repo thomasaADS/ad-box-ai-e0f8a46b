@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useNavigate } from 'react-router-dom';
 import { ChatWidget } from '@/components/ChatWidget';
+import { SEOHead } from '@/components/SEOHead';
 import {
   Target,
   Heart,
@@ -62,6 +63,12 @@ export default function About() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
+      <SEOHead
+        title="אודות AdSync - הסיפור שלנו"
+        description="AdSync היא פלטפורמת AI מתקדמת שמהפכת את עולם השיווק הדיגיטלי. הקמנו ב-2024 עם חזון ברור: להפוך שיווק מורכב לפשוט וזמין לכולם."
+        keywords="אודות AdSync, מי אנחנו, חברת שיווק, AI שיווק, סיפור AdSync"
+        canonicalUrl="/about"
+      />
       {/* Star Background - same as home */}
       <div className="stars-layer-1"></div>
       <div className="stars-layer-2"></div>
