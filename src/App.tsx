@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 import Index from "./pages/Index";
 import Brief from "./pages/Brief";
@@ -23,6 +23,12 @@ import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import LandingPageBuilder from "./pages/LandingPageBuilder";
 
+// SEO Service Pages
+import FacebookAds from "./pages/services/FacebookAds";
+import GoogleAds from "./pages/services/GoogleAds";
+import TikTokAds from "./pages/services/TikTokAds";
+import LandingPages from "./pages/services/LandingPages";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -33,7 +39,9 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
+              {/* Main Pages */}
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/how-it-works" element={<HowItWorks />} />
@@ -42,12 +50,22 @@ const App = () => (
               <Route path="/landing-page-builder" element={<LandingPageBuilder />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
+
+              {/* App Pages */}
               <Route path="/brief" element={<Brief />} />
               <Route path="/generate" element={<Generate />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/analytics" element={<AnalyticsDashboard />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/my-campaigns" element={<MyCampaigns />} />
+
+              {/* SEO Service Pages */}
+              <Route path="/services/facebook-ads" element={<FacebookAds />} />
+              <Route path="/services/google-ads" element={<GoogleAds />} />
+              <Route path="/services/tiktok-ads" element={<TikTokAds />} />
+              <Route path="/services/landing-pages" element={<LandingPages />} />
+
+              {/* 404 */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

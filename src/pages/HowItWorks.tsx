@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { ChatWidget } from '@/components/ChatWidget';
+import { SEOHead } from '@/components/SEOHead';
 import { useScrollAnimation, useScrollProgress } from '@/hooks/useScrollAnimation';
 import {
   CheckCircle,
@@ -187,6 +188,12 @@ export default function HowItWorks() {
 
   return (
     <div className="min-h-screen bg-white relative overflow-x-hidden">
+      <SEOHead
+        title="איך AdSync עובד - מקמפיין לתוצאות ב-3 צעדים"
+        description="גלה איך AdSync הופך רעיונות לקמפיינים מנצחים תוך דקות. 3 צעדים פשוטים: ספר על העסק, AI יוצר, קבל קמפיינים מוכנים."
+        keywords="איך זה עובד, יצירת קמפיין, AI שיווק, AdSync, תהליך יצירת קמפיין"
+        canonicalUrl="/how-it-works"
+      />
       {/* Progress Bar */}
       <div 
         className="scroll-progress-bar" 

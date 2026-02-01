@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useNavigate } from 'react-router-dom';
 import { ChatWidget } from '@/components/ChatWidget';
+import { SEOHead } from '@/components/SEOHead';
 import {
   Check,
   Sparkles,
@@ -73,6 +74,22 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
+      <SEOHead
+        title="תמחור - בחר את התוכנית שמתאימה לך"
+        description="תמחור שקוף וגמיש של AdSync. סטרטר $99/חודש, פרו $299/חודש, אנטרפרייז מותאם אישית. התחל חינם, שדרג כשאתה מוכן."
+        keywords="תמחור AdSync, מחירים, חבילות פרסום, תוכנית שיווק, מחיר קמפיין"
+        canonicalUrl="/pricing"
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: 'AdSync',
+          description: 'פלטפורמת AI ליצירת קמפיינים פרסומיים',
+          offers: [
+            { '@type': 'Offer', name: 'Starter', price: '99', priceCurrency: 'USD' },
+            { '@type': 'Offer', name: 'Pro', price: '299', priceCurrency: 'USD' },
+          ],
+        }}
+      />
       {/* Star Background - same as home */}
       <div className="stars-layer-1"></div>
       <div className="stars-layer-2"></div>

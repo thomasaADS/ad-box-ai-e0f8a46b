@@ -119,16 +119,33 @@ All colors MUST be HSL.
 
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Heebo', system-ui, -apple-system, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold;
+    @apply font-bold;
+    line-height: 1.2;
+  }
+
+  /* Better tap targets on mobile */
+  @media (max-width: 768px) {
+    button, a, [role="button"] {
+      min-height: 44px;
+    }
+  }
+
+  /* Improve focus visibility */
+  :focus-visible {
+    @apply ring-2 ring-primary ring-offset-2 outline-none;
   }
 }
 
