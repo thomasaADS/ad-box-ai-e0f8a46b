@@ -19,7 +19,7 @@ import {
   Target,
   Zap,
   Clock,
-  Download,
+
   Copy,
   Eye,
   Loader2,
@@ -488,111 +488,7 @@ export default function LandingPageBuilder() {
     setIsGenerating(false);
     setStep('preview');
 
-    // Save to localStorage
-    const savedPages = JSON.parse(localStorage.getItem('savedLandingPages') || '[]');
-    savedPages.unshift({
-      ...config,
-      heroImage,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-    });
-    localStorage.setItem('savedLandingPages', JSON.stringify(savedPages));
-
-    toast.success('דף הנחיתה נוצר בהצלחה!');
-  };
-
-  // ============================================================
-  // Download HTML
-  // ============================================================
-
-  const handleDownload = () => {
-    if (!generatedPage) return;
-
-    const html = `<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${generatedPage.businessName || 'דף נחיתה'}</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Heebo','Segoe UI',sans-serif;direction:rtl;color:#1a1a2e}
-.hero{min-height:90vh;display:flex;align-items:center;justify-content:center;background:${generatedPage.gradient};position:relative;text-align:center;color:#fff;padding:60px 24px;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.25)}
-.hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.35}
-.hero-content{position:relative;z-index:2;max-width:720px}
-.hero h1{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;margin-bottom:24px;line-height:1.1}
-.hero p{font-size:clamp(1.1rem,2.5vw,1.5rem);margin-bottom:32px;opacity:0.9}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:18px 48px;background:#fff;color:${colorSchemes.find((c) => c.id === config.colorScheme)?.colors[0] || '#7c3aed'};border-radius:16px;font-size:1.2rem;font-weight:700;text-decoration:none;box-shadow:0 8px 32px rgba(0,0,0,0.2);transition:transform 0.2s}
-.btn:hover{transform:scale(1.05)}
-.badge{display:inline-block;padding:10px 24px;background:rgba(255,255,255,0.15);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.2);border-radius:50px;font-size:0.95rem;margin-bottom:24px}
-.features{padding:100px 24px;background:#fff;text-align:center}
-.features h2{font-size:clamp(2rem,4vw,3rem);font-weight:800;margin-bottom:16px}
-.features .sub{font-size:1.15rem;color:#666;margin-bottom:60px;max-width:600px;margin-left:auto;margin-right:auto}
-.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;max-width:1100px;margin:0 auto}
-.f-card{padding:36px 28px;border-radius:20px;background:#f8f9fc;border:1px solid #eee;text-align:center;transition:transform 0.3s,box-shadow 0.3s}
-.f-card:hover{transform:translateY(-8px);box-shadow:0 12px 40px rgba(0,0,0,0.08)}
-.f-card .icon{width:64px;height:64px;border-radius:16px;background:${generatedPage.gradient};display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;color:#fff}
-.f-card h3{font-size:1.3rem;font-weight:700;margin-bottom:10px}
-.f-card p{color:#666;line-height:1.7}
-.stats{padding:80px 24px;background:#f8f9fc}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;max-width:900px;margin:0 auto;text-align:center}
-.stat-num{font-size:2.5rem;font-weight:900;background:${generatedPage.gradient};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.stat-label{font-size:0.95rem;color:#666;margin-top:4px}
-.cta{padding:100px 24px;background:${generatedPage.gradient};text-align:center;color:#fff;position:relative;overflow:hidden}
-.cta h2{font-size:clamp(2rem,4vw,3rem);font-weight:800;margin-bottom:20px}
-.cta p{font-size:1.2rem;margin-bottom:32px;opacity:0.9}
-.footer{padding:32px 24px;text-align:center;color:#666;font-size:0.9rem;border-top:1px solid #eee}
-</style>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800;900&display=swap" rel="stylesheet">
-</head>
-<body>
-<section class="hero">
-${generatedPage.heroImage ? `<img class="bg" src="${generatedPage.heroImage}" alt="">` : ''}
-<div class="hero-content">
-<div class="badge">${generatedPage.industry || 'פתרון מקצועי'}</div>
-<h1>${generatedPage.businessName || 'העסק שלך'}</h1>
-<p>${generatedPage.additionalInfo || `הפתרון המושלם ל${generatedPage.targetAudience || 'הלקוחות שלך'}`}</p>
-<a href="#" class="btn">${generatedPage.ctaText || 'התחל עכשיו'} &larr;</a>
-</div>
-</section>
-<section class="features">
-<h2>למה לבחור בנו?</h2>
-<p class="sub">אנחנו מספקים את הפתרון המושלם עבורך</p>
-<div class="features-grid">
-<div class="f-card"><div class="icon">⚡</div><h3>מהיר ויעיל</h3><p>תוצאות מיידיות שחוסכות לך זמן יקר</p></div>
-<div class="f-card"><div class="icon">🎯</div><h3>מדויק ומקצועי</h3><p>פתרונות מותאמים אישית לצרכים שלך</p></div>
-<div class="f-card"><div class="icon">🛡️</div><h3>אמין ובטוח</h3><p>השירות הכי מהימן ומקצועי בשוק</p></div>
-</div>
-</section>
-<section class="stats">
-<div class="stats-grid">
-<div><div class="stat-num">3,200+</div><div class="stat-label">לקוחות מרוצים</div></div>
-<div><div class="stat-num">98%</div><div class="stat-label">שביעות רצון</div></div>
-<div><div class="stat-num">24/7</div><div class="stat-label">זמינות מלאה</div></div>
-<div><div class="stat-num">5⭐</div><div class="stat-label">דירוג ממוצע</div></div>
-</div>
-</section>
-<section class="cta">
-<h2>מוכנים להתחיל?</h2>
-<p>הצטרפו אלינו עוד היום וגלו את ההבדל!</p>
-<a href="#" class="btn" style="color:${colorSchemes.find((c) => c.id === config.colorScheme)?.colors[0] || '#7c3aed'}">${generatedPage.ctaText || 'התחל'} עכשיו! &larr;</a>
-</section>
-<div class="footer">&copy; ${new Date().getFullYear()} ${generatedPage.businessName || ''} | נבנה ע"י AdSync AI</div>
-</body>
-</html>`;
-
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${generatedPage.businessName || 'landing-page'}.html`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    toast.success('דף הנחיתה הורד בהצלחה!');
+    toast.success('הקמפיין נוצר בהצלחה!');
   };
 
   // ============================================================
@@ -1122,7 +1018,7 @@ ${generatedPage.heroImage ? `<img class="bg" src="${generatedPage.heroImage}" al
                 style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)', color: 'white' }}
               >
                 <Sparkles className="w-5 h-5 ml-2" />
-                צור דף נחיתה + קמפיין
+                צור קמפיין
               </Button>
             </div>
           </div>
@@ -1136,16 +1032,15 @@ ${generatedPage.heroImage ? `<img class="bg" src="${generatedPage.heroImage}" al
                 <Sparkles className="w-10 h-10 text-white animate-pulse" />
               </div>
               <h2 className="text-2xl font-extrabold mb-3">יוצר את הקמפיין שלך...</h2>
-              <p className="text-muted-foreground mb-8">ה-AI בונה דף נחיתה, מודעות ותוכן מותאם</p>
+              <p className="text-muted-foreground mb-8">ה-AI בונה מודעות ותוכן מותאם לקמפיין שלך</p>
 
               <div className="flex flex-col gap-3 max-w-sm mx-auto text-right">
                 {[
                   'מנתח מותג ותוכן...',
                   `מתאים לפלטפורמת ${platformOptions.find((p) => p.id === config.platform)?.name || ''}...`,
-                  'יוצר עיצוב דף נחיתה...',
                   'מייצר תמונות AI...',
                   'כותב טקסטים שיווקיים...',
-                  'מסיים ומייצא...',
+                  'מסיים ומכין תצוגה מקדימה...',
                 ].map((text, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground animate-slide-up" style={{ animationDelay: `${i * 0.4}s` }}>
                     <Loader2 className="w-3.5 h-3.5 animate-spin text-primary shrink-0" />
@@ -1224,14 +1119,6 @@ ${generatedPage.heroImage ? `<img class="bg" src="${generatedPage.heroImage}" al
 
                 {/* Action buttons */}
                 <div className="flex flex-wrap gap-3">
-                  <Button
-                    onClick={handleDownload}
-                    className="flex-1 min-w-[180px] h-12 rounded-xl font-bold shadow-lg"
-                    style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)', color: 'white' }}
-                  >
-                    <Download className="w-5 h-5 ml-2" />
-                    הורד דף נחיתה HTML
-                  </Button>
                   <Button
                     variant="outline"
                     onClick={() => {
@@ -1390,35 +1277,6 @@ ${generatedPage.heroImage ? `<img class="bg" src="${generatedPage.heroImage}" al
               צור קמפיין כזה עכשיו
             </Button>
           </div>
-        </div>
-      </section>
-
-      {/* Link to Page Builder */}
-      <section className="py-12 sm:py-16 px-4 bg-gradient-to-r from-purple-600/5 via-blue-600/5 to-cyan-500/5">
-        <div className="container mx-auto max-w-4xl">
-          <Card className="p-8 sm:p-10 border-2 border-primary/10 hover:border-primary/20 transition-all shadow-lg">
-            <div className="flex flex-col sm:flex-row items-center gap-6">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg shrink-0">
-                <Layout className="w-8 h-8 text-white" />
-              </div>
-              <div className="flex-1 text-center sm:text-right">
-                <h3 className="text-xl sm:text-2xl font-extrabold mb-2">מחפש לבנות דף נחיתה מאפס?</h3>
-                <p className="text-muted-foreground text-sm sm:text-base">
-                  בונה דפי הנחיתה שלנו מאפשר לך לעצב ולבנות דפי נחיתה מקצועיים בסגנון drag & drop - ללא צורך בידע טכני
-                </p>
-              </div>
-              <Button
-                onClick={() => navigate('/page-builder')}
-                size="lg"
-                className="rounded-xl font-bold shadow-lg shrink-0"
-                style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #ec4899 100%)', color: 'white' }}
-              >
-                <Wand2 className="w-5 h-5 ml-2" />
-                בונה דפי נחיתה
-                <ArrowLeft className="w-4 h-4 mr-1" />
-              </Button>
-            </div>
-          </Card>
         </div>
       </section>
 
