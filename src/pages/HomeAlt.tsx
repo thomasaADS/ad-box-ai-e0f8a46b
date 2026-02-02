@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { ChatWidget } from '@/components/ChatWidget';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -11,329 +12,327 @@ import {
   Zap,
   Target,
   TrendingUp,
-  Users,
   Globe,
   BarChart3,
-  Clock,
   CheckCircle,
   Star,
   MessageSquare,
   Layout,
-  Wand2,
   Shield,
   Play,
-  ChevronLeft,
   ChevronDown,
-  Layers,
-  Monitor,
-  Smartphone,
-  MousePointerClick,
-  Image,
-  Video,
-  FileText,
-  Palette,
-  Brain,
-  Rocket,
   Award,
   Check,
-  X as XIcon,
   ArrowLeft,
   Eye,
-  PenTool,
-  LineChart,
-  CircleDot,
   Bot,
   Search,
-  type LucideIcon,
+  Link2,
+  Layers,
 } from 'lucide-react';
 
-// Counter animation hook
-function useCountUp(target: number, duration = 2000, startOnView = true) {
-  const [count, setCount] = useState(0);
-  const [hasStarted, setHasStarted] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+/* ─── hooks ─── */
 
-  useEffect(() => {
-    if (!startOnView) {
-      setHasStarted(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasStarted) {
-          setHasStarted(true);
-        }
-      },
-      { threshold: 0.3 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [hasStarted, startOnView]);
-
-  useEffect(() => {
-    if (!hasStarted) return;
-    let start = 0;
-    const increment = target / (duration / 16);
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= target) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(start));
-      }
-    }, 16);
-    return () => clearInterval(timer);
-  }, [hasStarted, target, duration]);
-
-  return { count, ref };
-}
-
-// Scroll animation hook
 function useScrollReveal() {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
-
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
+      ([entry]) => { if (entry.isIntersecting) setIsVisible(true); },
+      { threshold: 0.1 },
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
-
   return { ref, isVisible };
 }
 
-// Text rotator hook for hero
-function useTextRotator(words: string[], interval = 3000) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
+function useCountUp(target: number, duration = 2000) {
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting && !started) setStarted(true); },
+      { threshold: 0.3 },
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [started]);
+
+  useEffect(() => {
+    if (!started) return;
+    let cur = 0;
+    const inc = target / (duration / 16);
+    const id = setInterval(() => {
+      cur += inc;
+      if (cur >= target) { setCount(target); clearInterval(id); }
+      else setCount(Math.floor(cur));
+    }, 16);
+    return () => clearInterval(id);
+  }, [started, target, duration]);
+
+  return { count, ref };
+}
+
+function useTextRotator(words: string[], interval = 3000) {
+  const [idx, setIdx] = useState(0);
+  const [animating, setAnimating] = useState(false);
+  useEffect(() => {
     const timer = setInterval(() => {
-      setIsAnimating(true);
-      setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % words.length);
-        setIsAnimating(false);
-      }, 500);
+      setAnimating(true);
+      setTimeout(() => { setIdx(p => (p + 1) % words.length); setAnimating(false); }, 500);
     }, interval);
     return () => clearInterval(timer);
   }, [words.length, interval]);
-
-  return { currentWord: words[currentIndex], isAnimating };
+  return { currentWord: words[idx], isAnimating: animating };
 }
+
+/* ─── data ─── */
+
+const heroWords = [
+  'מודעות AI מנצחות',
+  'דפי נחיתה ממירים',
+  'וידאו פרסומי מקצועי',
+  'קמפיינים אוטומטיים',
+  'ציון ביצועים חכם',
+];
+
+const platforms = [
+  { name: 'Meta', icon: '📘' },
+  { name: 'Google', icon: '🔍' },
+  { name: 'TikTok', icon: '🎵' },
+  { name: 'LinkedIn', icon: '💼' },
+  { name: 'Taboola', icon: '📰' },
+  { name: 'Outbrain', icon: '🌐' },
+  { name: 'Email', icon: '📧' },
+  { name: 'SMS', icon: '💬' },
+];
+
+const kpis = [
+  { label: 'מהיר יותר', value: '30X', sub: 'יצירת קמפיין מול עבודה ידנית', icon: Zap, color: 'from-purple-600 to-blue-600' },
+  { label: 'זול יותר', value: '6X', sub: 'בהשוואה לסוכנות פרסום', icon: TrendingUp, color: 'from-blue-600 to-cyan-500' },
+  { label: 'ROAS ממוצע', value: '10.8X', sub: 'החזר על השקעה בפרסום', icon: Target, color: 'from-cyan-500 to-teal-500' },
+  { label: 'קמפיינים נוצרו', value: '50K+', sub: 'על ידי 3,200+ עסקים', icon: BarChart3, color: 'from-teal-500 to-green-500' },
+];
+
+const productFlow = [
+  {
+    step: '01',
+    tag: 'ייבוא מהיר',
+    title: 'הכנס כתובת אתר — וה-AI עושה את השאר',
+    desc: 'פשוט הדבק את ה-URL של העסק שלך. המערכת סורקת את האתר, מבינה את המותג, מזהה צבעים, לוגו ותוכן — ומכינה הכל בשנייה.',
+    icon: Link2,
+    mockUI: 'url-scan',
+    gradient: 'from-purple-600 to-blue-600',
+  },
+  {
+    step: '02',
+    tag: 'יצירת קריאייטיב',
+    title: 'עשרות מודעות מקצועיות — בלחיצת כפתור',
+    desc: 'ה-AI יוצר באנרים, וידאו, טקסטים ופוסטים מותאמים לכל פלטפורמה. כל הווריאציות ממוטבות לשוק הישראלי ולקהל היעד שלך.',
+    icon: Sparkles,
+    mockUI: 'creatives',
+    gradient: 'from-blue-600 to-cyan-500',
+  },
+  {
+    step: '03',
+    tag: 'ציון ביצועים',
+    title: 'ציון AI חכם — לדעת מה יעבוד לפני שמוציאים שקל',
+    desc: 'כל קריאייטיב מקבל ציון ביצועים מבוסס מיליארדי דאטה פוינטים. תדע בדיוק איזו מודעה תביא את התוצאות הטובות ביותר.',
+    icon: Eye,
+    mockUI: 'score',
+    gradient: 'from-cyan-500 to-teal-500',
+  },
+  {
+    step: '04',
+    tag: 'דפי נחיתה',
+    title: 'דף נחיתה ממיר — נבנה אוטומטית לכל קמפיין',
+    desc: 'סוכן AI שבונה דפי נחיתה מקצועיים עם תוכן, תמונות ו-CTA מותאמים. מותאם למובייל ולדסקטופ, מוכן לפרסום.',
+    icon: Layout,
+    mockUI: 'landing',
+    gradient: 'from-teal-500 to-green-500',
+  },
+];
+
+const testimonials = [
+  { name: 'דנה לוי', role: 'VP Marketing', company: 'FreshMarket', text: 'עברנו מסוכנות פרסום שעלתה ₪15,000 בחודש ל-AdSync. התוצאות השתפרו פי 3 והחיסכון הוא מטורף.', rating: 5, metric: '+340% ROI', avatar: 'ד' },
+  { name: 'רון כהן', role: 'מייסד ומנכ"ל', company: 'TechFlow', text: 'ב-4 דקות קיבלתי 20 וריאציות של מודעות שהיו לוקחות למעצב שבוע. המערכת פשוט מבינה מה עובד.', rating: 5, metric: '85% חיסכון בזמן', avatar: 'ר' },
+  { name: 'מיכל אברהם', role: 'מנהלת שיווק', company: 'StyleHome', text: 'כל הקמפיינים שלנו עוברים דרך AdSync. הציון החכם של AI חסך לנו אלפי שקלים בתקציב מבוזבז.', rating: 5, metric: '-60% עלות לליד', avatar: 'מ' },
+  { name: 'יואב שלום', role: 'בעל עסק', company: 'YS Consulting', text: 'בתור עסק קטן, לא היה לי תקציב לסוכנות. AdSync נתן לי כלים ברמה של סוכנות גדולה במחיר של קפה ביום.', rating: 5, metric: 'x12 יותר לידים', avatar: 'י' },
+];
+
+const pricingPlans = [
+  {
+    name: 'סטרטר',
+    price: '₪99',
+    originalPrice: '₪149',
+    period: 'לחודש',
+    save: 'חסכון 33%',
+    description: 'מושלם לעסקים קטנים שרוצים להתחיל עם AI',
+    features: ['10 קמפיינים בחודש', '3 פלטפורמות פרסום', 'ציון ביצועים בסיסי', 'תמיכה במייל', 'אנליטיקס בסיסי'],
+    popular: false,
+    cta: 'התחל ניסיון חינם',
+  },
+  {
+    name: 'פרו',
+    price: '₪349',
+    originalPrice: '₪499',
+    period: 'לחודש',
+    save: 'חסכון 30%',
+    description: 'לעסקים שרוצים למקסם תוצאות',
+    features: ['קמפיינים ללא הגבלה', 'כל הפלטפורמות', 'ציון ביצועים מתקדם', 'דפי נחיתה AI', 'וידאו AI', 'סוכני AI מתקדמים', 'תמיכה 24/7', 'A/B Testing מתקדם'],
+    popular: true,
+    cta: 'התחל ניסיון חינם',
+  },
+  {
+    name: 'אנטרפרייז',
+    price: 'מותאם',
+    period: 'מחיר אישי',
+    description: 'לארגונים עם צרכים מורכבים',
+    features: ['הכל מ-Pro', 'מנהל חשבון ייעודי', 'API מלא', 'הכשרות צוות', 'SLA מובטח', 'אופטימיזציה ידנית + AI', 'דוחות מותאמים'],
+    popular: false,
+    cta: 'דבר איתנו',
+  },
+];
+
+const faqData = [
+  { q: 'האם צריך ניסיון בפרסום כדי להשתמש ב-AdSync?', a: 'בכלל לא! AdSync נבנה כדי שכל אחד יוכל ליצור קמפיינים מקצועיים. ה-AI עושה את כל העבודה הקשה — מהקופי ועד העיצוב, אתה רק צריך לספר על העסק שלך.' },
+  { q: 'איך AdSync שונה מסוכנות פרסום רגילה?', a: 'AdSync מספק תוצאות מהירות פי 30 בעלות נמוכה פי 6. עשרות וריאציות של מודעות תוך שניות, ציון ביצועים AI שמנבא הצלחה, ואופטימיזציה 24/7.' },
+  { q: 'לאילו פלטפורמות AdSync תומך?', a: 'אנחנו תומכים בכל הפלטפורמות המובילות: Meta (פייסבוק ואינסטגרם), Google Ads, TikTok, LinkedIn, Taboola, Outbrain, וגם Email ו-SMS marketing.' },
+  { q: 'מה כולל הניסיון החינמי?', a: 'הניסיון החינמי ל-7 ימים כולל גישה מלאה לכל היכולות של תוכנית ה-Pro — קמפיינים ללא הגבלה, כל הפלטפורמות, ציון ביצועים, דפי נחיתה AI ועוד. ללא כרטיס אשראי.' },
+  { q: 'האם הקמפיינים מותאמים לשוק הישראלי?', a: 'בהחלט. AdSync אומן ספציפית על נתוני השוק הישראלי — טקסטים בעברית טבעית, עיצוב מותאם, והמערכת מבינה את ההעדפות והטרנדים של הצרכן הישראלי.' },
+  { q: 'אפשר לבטל בכל עת?', a: 'כמובן. אין התחייבות כלל. ביטול בלחיצת כפתור, בלי שאלות ובלי עמלות.' },
+];
+
+/* ─── Mock UI Components for Product Flow ─── */
+
+function MockURLScan() {
+  return (
+    <div className="rounded-2xl border border-border/60 bg-card shadow-xl p-5 sm:p-6 space-y-4">
+      <div className="flex items-center gap-3 rounded-xl bg-muted/50 px-4 py-3 border border-border/40">
+        <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+        <span className="text-sm text-muted-foreground">https://example.co.il</span>
+        <Button size="sm" className="mr-auto rounded-lg text-xs px-3" style={{ background: 'linear-gradient(135deg,#7c3aed,#2563eb)', color: '#fff' }}>סרוק</Button>
+      </div>
+      <div className="grid grid-cols-3 gap-2.5">
+        {['לוגו', 'צבעים', 'תוכן'].map((l, i) => (
+          <div key={i} className="rounded-lg bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 p-3 text-center">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 mx-auto mb-1.5 flex items-center justify-center">
+              <Check className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-[11px] font-medium text-muted-foreground">{l}</span>
+          </div>
+        ))}
+      </div>
+      <div className="h-2 rounded-full bg-muted overflow-hidden">
+        <div className="h-full w-[85%] rounded-full bg-gradient-to-r from-purple-600 to-blue-500 animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
+function MockCreatives() {
+  return (
+    <div className="rounded-2xl border border-border/60 bg-card shadow-xl p-5 sm:p-6">
+      <div className="grid grid-cols-2 gap-3 mb-3">
+        {[
+          { label: 'באנר פייסבוק', color: 'from-blue-500 to-purple-500' },
+          { label: 'סטורי אינסטגרם', color: 'from-pink-500 to-orange-500' },
+          { label: 'באנר Google', color: 'from-green-500 to-teal-500' },
+          { label: 'וידאו TikTok', color: 'from-gray-800 to-pink-600' },
+        ].map((c, i) => (
+          <div key={i} className={`rounded-xl bg-gradient-to-br ${c.color} p-3 sm:p-4 text-white aspect-[4/3] flex flex-col justify-end`}>
+            <span className="text-[10px] sm:text-xs font-bold opacity-90">{c.label}</span>
+          </div>
+        ))}
+      </div>
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <span className="font-medium">24 וריאציות נוצרו</span>
+        <Badge className="text-[10px] bg-green-500/10 text-green-600 border-green-500/20">מוכן</Badge>
+      </div>
+    </div>
+  );
+}
+
+function MockScore() {
+  return (
+    <div className="rounded-2xl border border-border/60 bg-card shadow-xl p-5 sm:p-6 space-y-4">
+      <div className="flex items-center justify-center">
+        <div className="relative w-28 h-28 sm:w-32 sm:h-32">
+          <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" strokeWidth="8" className="text-muted/20" />
+            <circle cx="50" cy="50" r="42" fill="none" stroke="url(#scoreGrad)" strokeWidth="8" strokeLinecap="round" strokeDasharray="264" strokeDashoffset="40" />
+            <defs><linearGradient id="scoreGrad"><stop offset="0%" stopColor="#7c3aed" /><stop offset="100%" stopColor="#06b6d4" /></linearGradient></defs>
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-purple-600 to-cyan-500 bg-clip-text text-transparent">92</span>
+            <span className="text-[10px] text-muted-foreground">ציון ביצועים</span>
+          </div>
+        </div>
+      </div>
+      <div className="space-y-2">
+        {[{ l: 'רלוונטיות קהל', p: 95 }, { l: 'איכות קופי', p: 88 }, { l: 'עיצוב ויזואלי', p: 91 }].map((m, i) => (
+          <div key={i}>
+            <div className="flex justify-between text-xs mb-1"><span className="text-muted-foreground">{m.l}</span><span className="font-bold">{m.p}%</span></div>
+            <div className="h-1.5 rounded-full bg-muted overflow-hidden"><div className="h-full rounded-full bg-gradient-to-r from-purple-600 to-cyan-500" style={{ width: `${m.p}%` }} /></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MockLanding() {
+  return (
+    <div className="rounded-2xl border border-border/60 bg-card shadow-xl p-5 sm:p-6 space-y-3">
+      <div className="rounded-xl bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-950/30 dark:to-blue-950/30 p-4 space-y-3">
+        <div className="h-3 w-24 rounded bg-purple-300/50 dark:bg-purple-700/50" />
+        <div className="h-2 w-full rounded bg-muted/50" />
+        <div className="h-2 w-4/5 rounded bg-muted/50" />
+        <div className="h-8 w-28 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600" />
+      </div>
+      <div className="grid grid-cols-2 gap-2.5 text-center">
+        <div className="rounded-lg bg-muted/30 p-2.5">
+          <div className="text-sm font-bold text-green-600">+47%</div>
+          <div className="text-[10px] text-muted-foreground">שיעור המרה</div>
+        </div>
+        <div className="rounded-lg bg-muted/30 p-2.5">
+          <div className="text-sm font-bold text-blue-600">3.2s</div>
+          <div className="text-[10px] text-muted-foreground">זמן טעינה</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const mockComponents: Record<string, () => JSX.Element> = {
+  'url-scan': MockURLScan,
+  'creatives': MockCreatives,
+  'score': MockScore,
+  'landing': MockLanding,
+};
+
+/* ─── Main Component ─── */
 
 const HomeAlt = () => {
   const navigate = useNavigate();
-
-  // Counter animations
-  const campaignsCount = useCountUp(50000);
-  const usersCount = useCountUp(3200);
-  const roiCount = useCountUp(340);
-  const timeCount = useCountUp(4);
-
-  // Hero text rotator
-  const heroRotator = useTextRotator([
-    'מודעות AI מנצחות',
-    'דפי נחיתה ממירים',
-    'וידאו פרסומי מקצועי',
-    'קמפיינים אוטומטיים',
-    'ציון ביצועים חכם',
-  ], 3000);
-
-  // FAQ state
+  const heroRotator = useTextRotator(heroWords, 3000);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  // Section scroll reveals
-  const logosReveal = useScrollReveal();
-  const howItWorksReveal = useScrollReveal();
-  const featuresReveal = useScrollReveal();
-  const comparisonReveal = useScrollReveal();
-  const productsReveal = useScrollReveal();
+  // Section reveals
+  const trustReveal = useScrollReveal();
   const kpiReveal = useScrollReveal();
   const testimonialsReveal = useScrollReveal();
-  const agentsReveal = useScrollReveal();
   const pricingReveal = useScrollReveal();
   const faqReveal = useScrollReveal();
   const ctaReveal = useScrollReveal();
+  const flowReveals = productFlow.map(() => useScrollReveal());
 
-  const features = [
-    {
-      icon: Sparkles,
-      title: 'יצירת מודעות עם AI',
-      description: 'המערכת יוצרת עשרות וריאציות של מודעות מקצועיות - קופי, תמונות ווידאו - תוך שניות בודדות.',
-      gradient: 'from-purple-600 to-blue-600',
-      tag: 'הכי פופולרי',
-    },
-    {
-      icon: Brain,
-      title: 'ציון ביצועים חכם',
-      description: 'AI שמנתח מיליארדי דאטה פויינטים ומדרג כל קריאייטיב לפני שהוא עולה לאוויר - חיסכון עצום בתקציב.',
-      gradient: 'from-blue-600 to-cyan-500',
-      tag: 'חדש',
-    },
-    {
-      icon: Target,
-      title: 'מיקוד קהלים מדויק',
-      description: 'בינה מלאכותית שמזהה את קהל היעד המדויק שלך ומתאימה את המסר לכל סגמנט.',
-      gradient: 'from-cyan-500 to-teal-500',
-    },
-    {
-      icon: Video,
-      title: 'וידאו AI מקצועי',
-      description: 'הפוך תמונת מוצר לסרטון פרסומי מקצועי עם אווטרים, קריינות ואנימציות.',
-      gradient: 'from-teal-500 to-green-500',
-      tag: 'חדש',
-    },
-    {
-      icon: Layout,
-      title: 'דפי נחיתה AI',
-      description: 'סוכן AI שבונה דפי נחיתה ממירים עם תוכן, תמונות ו-CTA מותאמים אישית.',
-      gradient: 'from-orange-500 to-pink-500',
-    },
-    {
-      icon: BarChart3,
-      title: 'אנליטיקס ודיווח',
-      description: 'דשבורד מתקדם שמרכז את כל הנתונים מכל הפלטפורמות - CTR, ROAS, לידים ומכירות.',
-      gradient: 'from-pink-500 to-purple-600',
-    },
-  ];
-
-  const testimonials = [
-    {
-      name: 'דנה לוי',
-      role: 'VP Marketing',
-      company: 'FreshMarket',
-      text: 'עברנו מסוכנות פרסום שעלתה ₪15,000 בחודש ל-AdSync. התוצאות השתפרו פי 3 והחיסכון הוא מטורף. בחיים לא חוזרים אחורה.',
-      rating: 5,
-      metric: '+340% ROI',
-      avatar: 'ד',
-    },
-    {
-      name: 'רון כהן',
-      role: 'מייסד ומנכ"ל',
-      company: 'TechFlow',
-      text: 'ב-4 דקות קיבלתי 20 וריאציות של מודעות שהיו לוקחות למעצב שבוע. המערכת פשוט מבינה מה עובד בשוק הישראלי.',
-      rating: 5,
-      metric: '85% חיסכון בזמן',
-      avatar: 'ר',
-    },
-    {
-      name: 'מיכל אברהם',
-      role: 'מנהלת שיווק',
-      company: 'StyleHome',
-      text: 'כל הקמפיינים שלנו עוברים דרך AdSync. הציון החכם של AI חסך לנו אלפי שקלים בתקציב פרסום מבוזבז.',
-      rating: 5,
-      metric: '-60% עלות לליד',
-      avatar: 'מ',
-    },
-    {
-      name: 'יואב שלום',
-      role: 'בעל עסק',
-      company: 'YS Consulting',
-      text: 'בתור עסק קטן, לא היה לי תקציב לסוכנות. AdSync נתן לי כלים ברמה של סוכנות גדולה במחיר של קפה ביום.',
-      rating: 5,
-      metric: 'x12 יותר לידים',
-      avatar: 'י',
-    },
-  ];
-
-  const platforms = [
-    { name: 'Meta', icon: '📘', color: 'from-blue-500 to-blue-700' },
-    { name: 'Google', icon: '🔍', color: 'from-red-500 to-yellow-500' },
-    { name: 'TikTok', icon: '🎵', color: 'from-gray-900 to-pink-600' },
-    { name: 'LinkedIn', icon: '💼', color: 'from-blue-600 to-blue-800' },
-    { name: 'Taboola', icon: '📰', color: 'from-orange-500 to-orange-700' },
-    { name: 'Outbrain', icon: '🌐', color: 'from-purple-500 to-blue-500' },
-    { name: 'Email', icon: '📧', color: 'from-green-500 to-green-700' },
-    { name: 'SMS', icon: '💬', color: 'from-purple-500 to-purple-700' },
-  ];
-
-  const howItWorks = [
-    {
-      step: '01',
-      title: 'ייבא את המותג שלך',
-      description: 'העלה לוגו, בחר צבעים וספר בקצרה על העסק. ה-AI מבין את המותג שלך תוך שניות.',
-      icon: PenTool,
-      detail: 'הגדרה של 60 שניות',
-    },
-    {
-      step: '02',
-      title: 'AI יוצר את הקמפיין',
-      description: 'המערכת מייצרת עשרות מודעות, טקסטים ואסטרטגיה מותאמת לכל פלטפורמה - אוטומטית.',
-      icon: Sparkles,
-      detail: 'תוצאות מיידיות',
-    },
-    {
-      step: '03',
-      title: 'פרסם וצמח',
-      description: 'קבל קמפיינים מוכנים לפרסום עם ציוני ביצועים חכמים. פשוט בחר ופרסם.',
-      icon: Rocket,
-      detail: '+20 וריאציות',
-    },
-  ];
-
-  const comparisonData = [
-    { feature: 'זמן הקמה', adsync: '60 שניות', agency: '1-2 שבועות', diy: '3-5 שעות' },
-    { feature: 'וריאציות מודעות', adsync: 'עשרות מיידית', agency: '3-5 בשבוע', diy: '1-2 ביום' },
-    { feature: 'עלות חודשית', adsync: 'מ-₪350/חודש', agency: '₪5,000-15,000', diy: 'זמן יקר שלך' },
-    { feature: 'ציון ביצועים AI', adsync: true, agency: false, diy: false },
-    { feature: 'התאמה לשוק הישראלי', adsync: true, agency: 'תלוי', diy: false },
-    { feature: 'דפי נחיתה AI', adsync: true, agency: 'בתוספת תשלום', diy: false },
-    { feature: 'אופטימיזציה אוטומטית', adsync: true, agency: 'ידנית', diy: false },
-    { feature: 'תמיכה 24/7', adsync: true, agency: 'שעות עבודה', diy: false },
-  ];
-
-  const products = [
-    {
-      title: 'מודעות באנר AI',
-      description: 'יצירת באנרים מקצועיים לכל הפלטפורמות עם התאמה אוטומטית לכל גודל ופורמט.',
-      icon: Image,
-      gradient: 'from-purple-600 to-blue-600',
-      size: 'large',
-    },
-    {
-      title: 'וידאו AI',
-      description: 'הפוך תמונת מוצר לסרטון פרסומי עם אווטרים וקריינות.',
-      icon: Video,
-      gradient: 'from-blue-600 to-cyan-500',
-      size: 'small',
-    },
-    {
-      title: 'ציון ביצועים',
-      description: 'ניבוי הצלחה של כל מודעה לפני שמוציאים שקל.',
-      icon: Eye,
-      gradient: 'from-cyan-500 to-teal-500',
-      size: 'small',
-    },
-    {
-      title: 'טקסטים שיווקיים',
-      description: 'קופי מקצועי בעברית שמדבר ללקוחות ומניע לפעולה.',
-      icon: FileText,
-      gradient: 'from-orange-500 to-pink-500',
-      size: 'small',
-    },
-    {
-      title: 'צילומי מוצר AI',
-      description: 'צילומי מוצר מקצועיים עם רקעים מותאמים.',
-      icon: Palette,
-      gradient: 'from-green-500 to-teal-500',
-      size: 'small',
-    },
-    {
-      title: 'דפי נחיתה AI',
-      description: 'דפי נחיתה מקצועיים שנבנים אוטומטית עם תוכן, תמונות ו-CTA ממוטבים לכל קמפיין.',
-      icon: Layout,
-      gradient: 'from-pink-500 to-purple-600',
-      size: 'large',
-    },
-  ];
+  // KPI counters (simplified for the big numbers)
+  const kpiCount1 = useCountUp(30);
+  const kpiCount2 = useCountUp(6);
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -355,506 +354,128 @@ const HomeAlt = () => {
 
       <Navbar />
 
-      {/* ===================== HERO SECTION ===================== */}
-      <section className="relative pt-24 sm:pt-32 md:pt-36 pb-20 sm:pb-28 md:pb-32 px-4 overflow-hidden">
-        {/* Animated mesh gradient background */}
-        <div className="absolute inset-0 animated-mesh-bg" />
+      {/* ═══════════════════ HERO ═══════════════════ */}
+      <section className="relative pt-24 sm:pt-32 lg:pt-40 pb-20 sm:pb-28 lg:pb-36 px-4 overflow-hidden">
+        {/* Subtle gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-50/80 via-blue-50/40 to-transparent dark:from-purple-950/20 dark:via-blue-950/10 dark:to-transparent" />
+        {/* Decorative blurred orbs */}
+        <div className="absolute top-20 right-[15%] w-[350px] h-[350px] bg-purple-400/20 dark:bg-purple-600/10 rounded-full blur-[100px]" />
+        <div className="absolute top-40 left-[10%] w-[300px] h-[300px] bg-blue-400/15 dark:bg-blue-600/8 rounded-full blur-[80px]" />
 
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-          backgroundSize: '60px 60px'
-        }} />
+        <div className="container mx-auto max-w-5xl relative z-10 text-center">
+          {/* Trust Badge */}
+          <div className="inline-block mb-6 animate-fade-in">
+            <Badge
+              variant="secondary"
+              className="text-sm font-medium px-5 py-2.5 rounded-full border border-purple-200 dark:border-purple-800 bg-white/80 dark:bg-white/5 backdrop-blur-sm"
+            >
+              <Sparkles className="w-4 h-4 ml-2 text-purple-500" />
+              3,200+ עסקים ישראליים כבר משתמשים
+            </Badge>
+          </div>
 
-        {/* Morphing gradient orbs */}
-        <div className="absolute top-10 right-[10%] w-[500px] h-[500px] bg-purple-600 mix-blend-screen filter blur-[120px] opacity-25 morph-orb-1" />
-        <div className="absolute top-40 left-[5%] w-[400px] h-[400px] bg-blue-600 mix-blend-screen filter blur-[100px] opacity-20 morph-orb-2" />
-        <div className="absolute bottom-10 right-[30%] w-[350px] h-[350px] bg-pink-500 mix-blend-screen filter blur-[100px] opacity-15 morph-orb-1" style={{ animationDelay: '-5s' }} />
-        <div className="absolute top-[60%] left-[40%] w-[300px] h-[300px] bg-cyan-500 mix-blend-screen filter blur-[80px] opacity-15 morph-orb-2" style={{ animationDelay: '-8s' }} />
-
-        {/* Floating particle dots */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1.5 h-1.5 bg-white/20 rounded-full"
-              style={{
-                left: `${15 + i * 15}%`,
-                top: `${20 + (i % 3) * 25}%`,
-                animation: `particle-float ${4 + i * 0.5}s ease-in-out infinite`,
-                animationDelay: `${i * 0.7}s`,
-              }}
-            />
-          ))}
-        </div>
-
-        <div className="container mx-auto max-w-6xl relative z-10">
-          <div className="text-center space-y-7 sm:space-y-8">
-            {/* Top Badge */}
-            <div className="inline-block animate-bounce-in">
-              <Badge
-                className="text-sm sm:text-base font-medium px-5 sm:px-7 py-2.5 sm:py-3 border hover:scale-105 transition-transform cursor-default rounded-full badge-shine"
-                style={{
-                  color: '#a78bfa',
-                  borderColor: 'rgba(167, 139, 250, 0.3)',
-                  background: 'rgba(167, 139, 250, 0.1)',
-                  backdropFilter: 'blur(20px)'
-                }}
+          {/* Heading */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] mb-6 animate-fade-in">
+            מנוע ה-AI שלך ליצירת
+            <br />
+            <span className="inline-block h-[1.15em] overflow-hidden relative" style={{ perspective: '500px' }}>
+              <span
+                key={heroRotator.currentWord}
+                className={`inline-block hero-gradient-text ${heroRotator.isAnimating ? 'text-rotator-exit' : 'text-rotator-enter'}`}
               >
-                <Sparkles className="w-4 h-4 ml-2 text-purple-400" />
-                3,200+ עסקים ישראליים כבר משתמשים
-              </Badge>
-            </div>
-
-            {/* Main Heading with text rotator */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.08] animate-fade-in text-white">
-              מנוע ה-AI שלך ליצירת
-              <br />
-              <span className="inline-block h-[1.15em] overflow-hidden relative" style={{ perspective: '500px' }}>
-                <span
-                  key={heroRotator.currentWord}
-                  className={`inline-block text-shimmer ${heroRotator.isAnimating ? 'text-rotator-exit' : 'text-rotator-enter'}`}
-                >
-                  {heroRotator.currentWord}
-                </span>
+                {heroRotator.currentWord}
               </span>
-            </h1>
+            </span>
+          </h1>
 
-            {/* Subheading */}
-            <p className="text-lg sm:text-xl md:text-2xl leading-relaxed mx-auto max-w-3xl animate-slide-up text-gray-300" style={{ animationDelay: '0.2s' }}>
-              קבל עד <span className="text-white font-bold">14x יותר המרות</span>. בלי מעצבים. בלי ניחושים.
-              <br className="hidden sm:block" />
-              מודעות, קמפיינים ודפי נחיתה מקצועיים - הכל אוטומטי עם AI.
-            </p>
+          {/* Sub */}
+          <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '0.15s' }}>
+            קבל עד <span className="font-bold text-foreground">14x יותר המרות</span>. בלי מעצבים. בלי ניחושים.
+            <br className="hidden sm:block" />
+            הכנס את ה-URL שלך — וקבל קמפיין מוכן לפרסום תוך דקות.
+          </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 justify-center pt-4 sm:pt-6 animate-scale-in" style={{ animationDelay: '0.4s' }}>
-              <Button
-                size="lg"
-                onClick={() => navigate('/brief')}
-                className="text-lg sm:text-xl px-10 sm:px-14 py-7 sm:py-8 rounded-2xl font-bold border-0 hover:opacity-95 transition-all hover:scale-105 shadow-2xl group relative overflow-hidden neon-glow"
-                style={{
-                  background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 50%, #06b6d4 100%)',
-                  color: 'white'
-                }}
-              >
-                {/* Shine sweep on button */}
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                <span className="relative z-10 flex items-center gap-3">
-                  <Sparkles className="w-5 h-5" />
-                  התחל בחינם עכשיו
-                  <ArrowLeft className="w-5 h-5 group-hover:translate-x-[-4px] transition-transform" />
-                </span>
-              </Button>
-              <Button
-                size="lg"
-                onClick={() => navigate('/how-it-works')}
-                className="text-base sm:text-lg px-8 sm:px-12 py-7 sm:py-8 rounded-2xl font-semibold border hover:scale-105 transition-all group relative overflow-hidden"
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  backdropFilter: 'blur(10px)',
-                  borderColor: 'rgba(255,255,255,0.15)',
-                  color: 'white'
-                }}
-              >
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                <span className="relative z-10 flex items-center gap-2">
-                  <Play className="w-5 h-5 ml-1" />
-                  ראה איך זה עובד
-                </span>
-              </Button>
-            </div>
-
-            {/* Trust Indicators */}
-            <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8 pt-2 text-sm animate-slide-up" style={{ animationDelay: '0.6s' }}>
-              <span className="flex items-center gap-2 text-gray-400">
-                <CheckCircle className="w-4 h-4 text-green-400" />
-                7 ימי ניסיון חינם
+          {/* CTA */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8 animate-scale-in" style={{ animationDelay: '0.3s' }}>
+            <Button
+              size="lg"
+              onClick={() => navigate('/brief')}
+              className="text-lg px-10 py-7 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all group relative overflow-hidden"
+              style={{ background: 'linear-gradient(135deg, #7c3aed, #2563eb)', color: '#fff' }}
+            >
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <span className="relative z-10 flex items-center gap-3">
+                <Sparkles className="w-5 h-5" />
+                התחל בחינם עכשיו
+                <ArrowLeft className="w-5 h-5 group-hover:translate-x-[-4px] transition-transform" />
               </span>
-              <span className="flex items-center gap-2 text-gray-400">
-                <CheckCircle className="w-4 h-4 text-green-400" />
-                ללא כרטיס אשראי
-              </span>
-              <span className="flex items-center gap-2 text-gray-400">
-                <CheckCircle className="w-4 h-4 text-green-400" />
-                ביטול בכל עת
-              </span>
-            </div>
+            </Button>
+            <Button
+              size="lg"
+              onClick={() => navigate('/how-it-works')}
+              variant="outline"
+              className="text-base px-8 py-7 rounded-2xl font-semibold hover:scale-105 transition-all group"
+            >
+              <Play className="w-5 h-5 ml-1" />
+              ראה איך זה עובד
+            </Button>
+          </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 pt-10 sm:pt-14">
-              <div ref={campaignsCount.ref} className="hero-stat-card neon-glow group cursor-default">
-                <Zap className="w-6 h-6 mx-auto mb-2 text-purple-400 group-hover:scale-125 transition-transform duration-300" />
-                <div className="text-2xl sm:text-3xl font-bold text-white">{campaignsCount.count.toLocaleString()}+</div>
-                <div className="text-xs sm:text-sm text-gray-400">קמפיינים נוצרו</div>
-              </div>
-              <div ref={usersCount.ref} className="hero-stat-card group cursor-default" style={{ animationDelay: '0.1s' }}>
-                <Users className="w-6 h-6 mx-auto mb-2 text-blue-400 group-hover:scale-125 transition-transform duration-300" />
-                <div className="text-2xl sm:text-3xl font-bold text-white">{usersCount.count.toLocaleString()}+</div>
-                <div className="text-xs sm:text-sm text-gray-400">משתמשים פעילים</div>
-              </div>
-              <div ref={roiCount.ref} className="hero-stat-card group cursor-default">
-                <TrendingUp className="w-6 h-6 mx-auto mb-2 text-green-400 group-hover:scale-125 transition-transform duration-300" />
-                <div className="text-2xl sm:text-3xl font-bold text-white">{roiCount.count}%</div>
-                <div className="text-xs sm:text-sm text-gray-400">ROI ממוצע</div>
-              </div>
-              <div ref={timeCount.ref} className="hero-stat-card group cursor-default">
-                <Clock className="w-6 h-6 mx-auto mb-2 text-cyan-400 group-hover:scale-125 transition-transform duration-300" />
-                <div className="text-2xl sm:text-3xl font-bold text-white">{timeCount.count} דק'</div>
-                <div className="text-xs sm:text-sm text-gray-400">זמן יצירה ממוצע</div>
-              </div>
-            </div>
+          {/* Trust Indicators */}
+          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground animate-slide-up" style={{ animationDelay: '0.45s' }}>
+            {['7 ימי ניסיון חינם', 'ללא כרטיס אשראי', 'ביטול בכל עת'].map((t, i) => (
+              <span key={i} className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-green-500" />
+                {t}
+              </span>
+            ))}
           </div>
         </div>
-
-        {/* Bottom gradient fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
       </section>
 
-      {/* ===================== SUPPORTED PLATFORMS ===================== */}
-      <section ref={logosReveal.ref} className={`py-14 sm:py-18 px-4 border-b border-border/50 transition-all duration-700 ${logosReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      {/* ═══════════════════ TRUSTED BY / PLATFORMS ═══════════════════ */}
+      <section ref={trustReveal.ref} className={`py-14 px-4 border-y border-border/40 bg-muted/20 section-reveal ${trustReveal.isVisible ? 'is-visible' : ''}`}>
         <div className="container mx-auto max-w-5xl">
           <p className="text-center text-sm text-muted-foreground mb-8 font-medium tracking-wide">
             יוצרים קמפיינים לכל הפלטפורמות המובילות
           </p>
           <div className="grid grid-cols-4 sm:grid-cols-8 gap-4 sm:gap-6">
-            {platforms.map((platform) => (
-              <div
-                key={platform.name}
-                className="flex flex-col items-center gap-2 group cursor-default levitate"
-              >
-                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${platform.color} flex items-center justify-center shadow-lg group-hover:scale-125 group-hover:shadow-xl transition-all duration-300 gradient-shadow`}>
-                  <span className="text-lg sm:text-xl filter drop-shadow-sm">{platform.icon}</span>
+            {platforms.map((p) => (
+              <div key={p.name} className="flex flex-col items-center gap-2 group cursor-default">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-card border border-border/50 flex items-center justify-center shadow-sm group-hover:shadow-lg group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-300">
+                  <span className="text-xl">{p.icon}</span>
                 </div>
-                <span className="text-[11px] sm:text-xs font-medium text-muted-foreground group-hover:text-foreground transition-colors">{platform.name}</span>
+                <span className="text-[11px] font-medium text-muted-foreground group-hover:text-foreground transition-colors">{p.name}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===================== HOW IT WORKS ===================== */}
-      <section ref={howItWorksReveal.ref} className={`py-20 sm:py-28 px-4 bg-gradient-to-b from-background to-muted/20 section-reveal ${howItWorksReveal.isVisible ? 'is-visible' : ''}`}>
+      {/* ═══════════════════ KPI METRICS ═══════════════════ */}
+      <section ref={kpiReveal.ref} className={`py-20 sm:py-28 px-4 section-reveal ${kpiReveal.isVisible ? 'is-visible' : ''}`}>
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-14 sm:mb-18">
-            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full">
-              <Zap className="w-3.5 h-3.5 ml-1.5" />
-              פשוט ומהיר
-            </Badge>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5">
-              מ<span className="gradient-text">קמפיין לתוצאות</span> ב-3 צעדים
-            </h2>
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-              לא צריך ניסיון בפרסום. ה-AI עושה את הכל בשבילך.
-            </p>
-          </div>
-
-          <div className={`grid md:grid-cols-3 gap-6 sm:gap-8 stagger-reveal ${howItWorksReveal.isVisible ? 'is-visible' : ''}`}>
-            {howItWorks.map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <div key={index} className="relative group">
-                  <Card className="p-7 sm:p-9 text-center hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 h-full border-2 border-transparent hover:border-primary/20 bg-card/80 backdrop-blur-sm gradient-border-animated">
-                    {/* Step number */}
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-5 sm:mb-7 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center relative group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
-                      <span className="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white text-sm font-bold flex items-center justify-center shadow-lg neon-glow">
-                        {item.step}
-                      </span>
-                      <Icon className="w-10 sm:w-12 h-10 sm:h-12 text-primary" />
-                    </div>
-                    <h3 className="text-xl sm:text-2xl font-bold mb-3">{item.title}</h3>
-                    <p className="text-muted-foreground text-base sm:text-lg leading-relaxed mb-4">{item.description}</p>
-                    <Badge variant="outline" className="text-xs rounded-full badge-shine">
-                      {item.detail}
-                    </Badge>
-                  </Card>
-                  {/* Arrow between steps */}
-                  {index < 2 && (
-                    <div className="hidden md:flex absolute top-1/2 -left-5 transform -translate-y-1/2 items-center justify-center">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <ChevronLeft className="w-5 h-5 text-primary" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="text-center mt-12 sm:mt-14">
-            <Button
-              size="lg"
-              onClick={() => navigate('/brief')}
-              className="text-base sm:text-lg px-10 py-7 rounded-xl shadow-lg hover:scale-105 transition-all font-bold"
-              style={{
-                background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)',
-                color: 'white'
-              }}
-            >
-              <Sparkles className="w-5 h-5 ml-2" />
-              נסה עכשיו בחינם
-              <ArrowLeft className="w-5 h-5 mr-2" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* ===================== BENTO FEATURES GRID ===================== */}
-      <section ref={featuresReveal.ref} className={`py-20 sm:py-28 px-4 section-reveal ${featuresReveal.isVisible ? 'is-visible' : ''}`}>
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-14 sm:mb-18">
-            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full">
-              <Layers className="w-3.5 h-3.5 ml-1.5" />
-              יכולות הפלטפורמה
-            </Badge>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5">
-              הכל ב<span className="gradient-text">מקום אחד</span>
-            </h2>
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-              כל הכלים שצריך כדי ליצור, לנהל ולמטב קמפיינים מנצחים
-            </p>
-          </div>
-
-          <div className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-7 stagger-reveal ${featuresReveal.isVisible ? 'is-visible' : ''}`}>
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Card
-                  key={index}
-                  className="feature-card gradient-border-animated card-3d p-7 sm:p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-border/50 hover:border-primary/20 group relative overflow-hidden"
-                >
-                  {/* Hover gradient overlay */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-[0.04] transition-opacity duration-500`} />
-
-                  {feature.tag && (
-                    <Badge className="absolute top-4 left-4 text-[10px] bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 shadow-lg badge-shine">
-                      {feature.tag}
-                    </Badge>
-                  )}
-
-                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 group-hover:shadow-xl group-hover:rotate-3 transition-all duration-500`}>
-                    <Icon className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors duration-300">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed text-[15px]">{feature.description}</p>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ===================== COMPARISON TABLE ===================== */}
-      <section ref={comparisonReveal.ref} className={`py-20 sm:py-28 px-4 bg-gradient-to-b from-muted/30 to-background section-reveal ${comparisonReveal.isVisible ? 'is-visible' : ''}`}>
-        <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-14">
             <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full">
-              <LineChart className="w-3.5 h-3.5 ml-1.5" />
-              השוואה
-            </Badge>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5">
-              למה <span className="gradient-text">AdSync</span>?
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              ראה את ההבדל בעצמך - AdSync לעומת סוכנות פרסום ו-DIY
-            </p>
-          </div>
-
-          <Card className="overflow-hidden border-2 border-border/50 shadow-xl">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-2 border-border">
-                    <th className="text-right p-4 sm:p-5 text-sm font-semibold text-muted-foreground w-[35%]">
-                      תכונה
-                    </th>
-                    <th className="p-4 sm:p-5 text-center w-[25%]">
-                      <div className="inline-flex flex-col items-center gap-1">
-                        <span className="text-sm font-bold gradient-text">AdSync AI</span>
-                        <Badge className="text-[10px] bg-green-500/10 text-green-600 border-green-500/20">מומלץ</Badge>
-                      </div>
-                    </th>
-                    <th className="p-4 sm:p-5 text-center text-sm font-semibold text-muted-foreground w-[20%]">
-                      סוכנות
-                    </th>
-                    <th className="p-4 sm:p-5 text-center text-sm font-semibold text-muted-foreground w-[20%]">
-                      עושים לבד
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {comparisonData.map((row, index) => (
-                    <tr key={index} className={`border-b border-border/50 ${index % 2 === 0 ? 'bg-muted/20' : ''}`}>
-                      <td className="p-4 sm:p-5 text-sm font-medium">{row.feature}</td>
-                      <td className="p-4 sm:p-5 text-center">
-                        {typeof row.adsync === 'boolean' ? (
-                          row.adsync ? (
-                            <CheckCircle className="w-5 h-5 text-green-500 mx-auto" />
-                          ) : (
-                            <XIcon className="w-5 h-5 text-red-400 mx-auto" />
-                          )
-                        ) : (
-                          <span className="text-sm font-bold text-primary">{row.adsync}</span>
-                        )}
-                      </td>
-                      <td className="p-4 sm:p-5 text-center">
-                        {typeof row.agency === 'boolean' ? (
-                          row.agency ? (
-                            <CheckCircle className="w-5 h-5 text-green-500 mx-auto" />
-                          ) : (
-                            <XIcon className="w-5 h-5 text-red-400 mx-auto" />
-                          )
-                        ) : (
-                          <span className="text-xs sm:text-sm text-muted-foreground">{row.agency}</span>
-                        )}
-                      </td>
-                      <td className="p-4 sm:p-5 text-center">
-                        {typeof row.diy === 'boolean' ? (
-                          row.diy ? (
-                            <CheckCircle className="w-5 h-5 text-green-500 mx-auto" />
-                          ) : (
-                            <XIcon className="w-5 h-5 text-red-400 mx-auto" />
-                          )
-                        ) : (
-                          <span className="text-xs sm:text-sm text-muted-foreground">{row.diy}</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-
-          <div className="text-center mt-10">
-            <Button
-              size="lg"
-              onClick={() => navigate('/brief')}
-              className="text-base sm:text-lg px-10 py-7 rounded-xl shadow-lg hover:scale-105 transition-all font-bold"
-              style={{
-                background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)',
-                color: 'white'
-              }}
-            >
-              <Sparkles className="w-5 h-5 ml-2" />
-              התחל בחינם - 7 ימי ניסיון
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* ===================== KPI PERFORMANCE DASHBOARD ===================== */}
-      <section ref={kpiReveal.ref} className={`py-20 sm:py-28 px-4 relative overflow-hidden section-reveal ${kpiReveal.isVisible ? 'is-visible' : ''}`}>
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0f0a2e] via-[#1a1145] to-[#0f0a2e]" />
-        <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-purple-600 rounded-full mix-blend-screen filter blur-[150px] opacity-10 morph-orb-1" />
-        <div className="absolute bottom-[20%] right-[10%] w-[300px] h-[300px] bg-cyan-500 rounded-full mix-blend-screen filter blur-[120px] opacity-10 morph-orb-2" />
-
-        <div className="container mx-auto max-w-6xl relative z-10">
-          <div className="text-center mb-14">
-            <Badge className="mb-5 text-sm px-4 py-1.5 rounded-full bg-purple-500/20 text-purple-300 border-purple-500/30 badge-shine">
               <TrendingUp className="w-3.5 h-3.5 ml-1.5" />
-              ביצועים אמיתיים
+              ביצועים
             </Badge>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5 text-white">
-              התוצאות <span className="text-shimmer">מדברות</span> בעד עצמן
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5">
+              מספרים שמדברים <span className="hero-gradient-text">בעד עצמם</span>
             </h2>
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-              הנתונים של הלקוחות שלנו - שיפור משמעותי בכל מדד קמפיין
-            </p>
           </div>
 
           <div className={`grid sm:grid-cols-2 lg:grid-cols-4 gap-5 stagger-reveal ${kpiReveal.isVisible ? 'is-visible' : ''}`}>
-            {[
-              { label: 'CTR ממוצע', value: '4.32%', change: '+23.15%', positive: true, icon: MousePointerClick },
-              { label: 'עלות לקליק', value: '₪2.95', change: '-12.26%', positive: true, icon: Target },
-              { label: 'ROAS ממוצע', value: '10.8x', change: '+340%', positive: true, icon: TrendingUp },
-              { label: 'מהירות יצירה', value: '30x', change: 'מהר יותר', positive: true, icon: Zap },
-            ].map((kpi, i) => {
+            {kpis.map((kpi, i) => {
               const Icon = kpi.icon;
               return (
-                <div key={i} className="relative group">
-                  <div className="p-6 sm:p-7 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-purple-500/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover-glow-card">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <Icon className="w-5 h-5 text-white" />
-                      </div>
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${kpi.positive ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                        {kpi.change}
-                      </span>
-                    </div>
-                    <div className="text-3xl sm:text-4xl font-extrabold text-white mb-1">{kpi.value}</div>
-                    <div className="text-sm text-gray-400">{kpi.label}</div>
-                    {/* Subtle animated bar */}
-                    <div className="mt-4 h-1 rounded-full bg-white/5 overflow-hidden">
-                      <div className="h-full rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 transition-all duration-1000" style={{ width: kpiReveal.isVisible ? `${70 + i * 8}%` : '0%' }} />
-                    </div>
+                <Card key={i} className="p-6 sm:p-7 text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-500 group border border-border/50 hover:border-primary/20">
+                  <div className={`w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br ${kpi.color} flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
+                    <Icon className="w-7 h-7 text-white" />
                   </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Social proof bar */}
-          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mt-12 text-gray-400">
-            <div className="flex items-center gap-2.5">
-              <div className="flex -space-x-2 space-x-reverse">
-                {['ד', 'ר', 'מ', 'י'].map((letter, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white text-xs font-bold border-2 border-[#1a1145]">
-                    {letter}
-                  </div>
-                ))}
-              </div>
-              <span className="text-sm">+3,200 עסקים פעילים</span>
-            </div>
-            <div className="glow-divider w-px h-6 hidden sm:block" />
-            <div className="flex items-center gap-2">
-              <div className="flex gap-0.5">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              <span className="text-sm">4.9/5 דירוג ממוצע</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===================== PRODUCTS BENTO ===================== */}
-      <section ref={productsReveal.ref} className={`py-20 sm:py-28 px-4 section-reveal ${productsReveal.isVisible ? 'is-visible' : ''}`}>
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-14">
-            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full badge-shine">
-              <Wand2 className="w-3.5 h-3.5 ml-1.5" />
-              מוצרי AI
-            </Badge>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5">
-              סוויטת ה-AI <span className="gradient-text">המלאה</span>
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              כל הכלים שצריך כדי ליצור קמפיינים מנצחים - ממודעות ועד דפי נחיתה
-            </p>
-          </div>
-
-          <div className={`bento-grid stagger-reveal ${productsReveal.isVisible ? 'is-visible' : ''}`}>
-            {products.map((product, index) => {
-              const Icon = product.icon;
-              return (
-                <Card
-                  key={index}
-                  className={`bento-item ${product.size === 'large' ? 'bento-large' : 'bento-small'} p-6 sm:p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-border/50 hover:border-primary/20 group relative overflow-hidden cursor-pointer gradient-border-animated card-3d hover-glow-card`}
-                  onClick={() => product.title === 'דפי נחיתה AI' ? navigate('/landing-page-builder') : navigate('/brief')}
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${product.gradient} opacity-0 group-hover:opacity-[0.05] transition-opacity duration-500`} />
-                  <div className={`w-13 h-13 rounded-xl bg-gradient-to-br ${product.gradient} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 gradient-shadow`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-300">{product.title}</h3>
-                  <p className="text-muted-foreground text-sm sm:text-[15px] leading-relaxed">{product.description}</p>
-                  <div className="mt-4 flex items-center gap-1 text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:gap-2.5">
-                    גלה עוד
-                    <ArrowLeft className="w-4 h-4 group-hover:translate-x-[-4px] transition-transform" />
-                  </div>
+                  <div ref={i === 0 ? kpiCount1.ref : i === 1 ? kpiCount2.ref : undefined} className="text-4xl sm:text-5xl font-extrabold mb-1 hero-gradient-text">{kpi.value}</div>
+                  <div className="text-base font-bold mb-1">{kpi.label}</div>
+                  <div className="text-xs text-muted-foreground">{kpi.sub}</div>
                 </Card>
               );
             })}
@@ -862,243 +483,124 @@ const HomeAlt = () => {
         </div>
       </section>
 
-      {/* ===================== LANDING PAGE BUILDER CTA ===================== */}
-      <section className="py-16 sm:py-20 px-4 relative overflow-hidden">
-        {/* Animated mesh background */}
-        <div className="absolute inset-0 animated-mesh-bg" />
-        {/* Morphing orbs */}
-        <div className="absolute top-0 left-[20%] w-[300px] h-[300px] bg-purple-600 rounded-full mix-blend-screen filter blur-[100px] opacity-15 morph-orb-1" />
-        <div className="absolute bottom-0 right-[20%] w-[250px] h-[250px] bg-blue-600 rounded-full mix-blend-screen filter blur-[80px] opacity-15 morph-orb-2" />
+      {/* ═══════════════════ PRODUCT FLOW - Step by Step ═══════════════════ */}
+      {productFlow.map((item, index) => {
+        const reveal = flowReveals[index];
+        const Icon = item.icon;
+        const MockComponent = mockComponents[item.mockUI];
+        const isEven = index % 2 === 0;
 
-        <div className="container mx-auto max-w-5xl relative z-10">
-          <div className="flex flex-col lg:flex-row items-center gap-10 sm:gap-14">
-            <div className="flex-1 text-center lg:text-right">
-              <Badge className="mb-5 bg-purple-500/20 text-purple-300 border-purple-500/30 rounded-full badge-shine">
-                <Wand2 className="w-3.5 h-3.5 ml-1.5" />
-                חדש!
-              </Badge>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-5 text-white">
-                בנה דף נחיתה מקצועי
-                <br />
-                <span className="text-shimmer">עם AI תוך דקות</span>
-              </h2>
-              <p className="text-lg text-gray-300 mb-8 leading-relaxed max-w-xl">
-                סוכן AI חכם שבונה לך דף נחיתה ממיר עם תמונות, טקסטים שיווקיים ו-CTA מותאמים אישית.
-                פשוט ספר על העסק שלך וקבל דף מקצועי מוכן לפרסום.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Button
-                  size="lg"
-                  onClick={() => navigate('/landing-page-builder')}
-                  className="text-lg px-10 py-7 rounded-xl shadow-2xl hover:scale-105 transition-transform group font-bold neon-glow relative overflow-hidden"
-                  style={{
-                    background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)',
-                    color: 'white'
-                  }}
-                >
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  <span className="relative z-10 flex items-center gap-2">
-                    <Wand2 className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                    בנה דף נחיתה עכשיו
-                  </span>
-                </Button>
-                <Button
-                  size="lg"
-                  onClick={() => navigate('/services/landing-pages')}
-                  className="text-lg px-8 py-7 rounded-xl font-semibold group relative overflow-hidden"
-                  style={{
-                    background: 'rgba(255,255,255,0.08)',
-                    backdropFilter: 'blur(10px)',
-                    borderColor: 'rgba(255,255,255,0.15)',
-                    color: 'white'
-                  }}
-                >
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  <span className="relative z-10">למד עוד</span>
-                </Button>
-              </div>
-            </div>
-            <div className="w-56 sm:w-72 h-56 sm:h-72 rounded-3xl bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 flex items-center justify-center shadow-2xl shrink-0 relative group gradient-shadow">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 opacity-50 blur-xl group-hover:blur-2xl transition-all" />
-              <div className="text-center text-white relative z-10">
-                <Layout className="w-16 sm:w-20 h-16 sm:h-20 mx-auto mb-3 opacity-90 group-hover:scale-110 transition-transform duration-500" />
-                <div className="flex items-center gap-2 justify-center text-white/70">
-                  <Monitor className="w-5 h-5" />
-                  <Smartphone className="w-4 h-4" />
+        return (
+          <section
+            key={index}
+            ref={reveal.ref}
+            className={`py-16 sm:py-24 px-4 ${index % 2 === 1 ? 'bg-muted/20' : ''} section-reveal ${reveal.isVisible ? 'is-visible' : ''}`}
+          >
+            <div className="container mx-auto max-w-6xl">
+              <div className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-10 lg:gap-16`}>
+                {/* Text side */}
+                <div className="flex-1 text-center lg:text-right">
+                  <Badge variant="secondary" className="mb-4 text-xs px-3 py-1 rounded-full inline-flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white text-[10px] font-bold flex items-center justify-center">{item.step}</span>
+                    {item.tag}
+                  </Badge>
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-5 leading-tight">
+                    {item.title}
+                  </h2>
+                  <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-7 max-w-xl mx-auto lg:mx-0">
+                    {item.desc}
+                  </p>
+                  <Button
+                    onClick={() => navigate('/brief')}
+                    className="rounded-xl font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all group"
+                    style={{ background: 'linear-gradient(135deg, #7c3aed, #2563eb)', color: '#fff' }}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Icon className="w-4 h-4" />
+                      נסה עכשיו
+                      <ArrowLeft className="w-4 h-4 group-hover:translate-x-[-4px] transition-transform" />
+                    </span>
+                  </Button>
                 </div>
-                <p className="text-xs mt-2 text-white/50">דסקטופ + מובייל</p>
+
+                {/* Mock UI side */}
+                <div className="flex-1 w-full max-w-md lg:max-w-none">
+                  <MockComponent />
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
+          </section>
+        );
+      })}
 
-      {/* ===================== AI AGENTS ===================== */}
-      <section ref={agentsReveal.ref} className={`py-20 sm:py-28 px-4 bg-gradient-to-br from-[#0f0a2e]/5 via-[#1a1145]/5 to-[#2d1b69]/5 section-reveal ${agentsReveal.isVisible ? 'is-visible' : ''}`}>
+      {/* ═══════════════════ TESTIMONIALS MARQUEE ═══════════════════ */}
+      <section ref={testimonialsReveal.ref} className={`py-20 sm:py-28 px-4 bg-gradient-to-b from-muted/30 to-background section-reveal ${testimonialsReveal.isVisible ? 'is-visible' : ''}`}>
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-14">
             <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full">
-              <Bot className="w-3.5 h-3.5 ml-1.5" />
-              סוכני AI מתקדמים
-            </Badge>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5">
-              הצוות <span className="hero-gradient-text">הדיגיטלי</span> שלך
-            </h2>
-            <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
-              6 סוכני AI מומחים שעובדים בשבילך 24/7 - SEO, PPC, תוכן, אנליטיקס, ברנדינג ואסטרטגיה
-            </p>
-          </div>
-
-          <div className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10 stagger-reveal ${agentsReveal.isVisible ? 'is-visible' : ''}`}>
-            {[
-              { id: 'seo', name: 'סוכן SEO', avatar: '🔍', role: 'מומחה קידום אורגני', gradient: 'from-green-500 to-emerald-600', desc: 'שיפור דירוג בגוגל ותנועה אורגנית' },
-              { id: 'ppc', name: 'סוכן PPC', avatar: '🎯', role: 'מומחה פרסום ממומן', gradient: 'from-blue-600 to-purple-600', desc: 'קמפיינים ממומנים עם ROI מקסימלי' },
-              { id: 'content', name: 'סוכן תוכן', avatar: '✍️', role: 'אסטרטג תוכן שיווקי', gradient: 'from-pink-500 to-orange-500', desc: 'קופירייטינג ושיווק תוכן ממיר' },
-              { id: 'analytics', name: 'סוכן אנליטיקס', avatar: '📊', role: 'מומחה ניתוח נתונים', gradient: 'from-cyan-500 to-blue-600', desc: 'ניתוח נתונים והחלטות מבוססות דאטא' },
-              { id: 'branding', name: 'סוכן ברנדינג', avatar: '🎨', role: 'מומחה מיתוג ועיצוב', gradient: 'from-purple-600 to-pink-500', desc: 'בניית מותג חזק וזהות חזותית' },
-              { id: 'strategy', name: 'סוכן אסטרטגיה', avatar: '🧠', role: 'יועץ אסטרטגיה דיגיטלית', gradient: 'from-amber-500 to-red-600', desc: 'תוכניות שיווק ואסטרטגיית צמיחה' },
-            ].map((agent) => (
-              <Card
-                key={agent.id}
-                className="p-5 border border-border/50 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer group gradient-border-animated card-3d"
-                onClick={() => navigate('/ai-agents')}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${agent.gradient} flex items-center justify-center text-xl group-hover:scale-125 group-hover:rotate-6 transition-all duration-500 shadow-lg gradient-shadow`}>
-                    {agent.avatar}
-                  </div>
-                  <div>
-                    <div className="font-bold text-sm group-hover:text-primary transition-colors">{agent.name}</div>
-                    <div className="text-[11px] text-muted-foreground">{agent.role}</div>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground">{agent.desc}</p>
-                <div className="mt-3 flex items-center gap-1.5 text-xs text-primary font-medium group-hover:gap-2.5 transition-all">
-                  התחל שיחה
-                  <ArrowLeft className="w-3 h-3 group-hover:translate-x-[-4px] transition-transform" />
-                </div>
-              </Card>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Button
-              onClick={() => navigate('/ai-agents')}
-              size="lg"
-              className="rounded-xl font-bold shadow-lg px-10 text-base"
-              style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)', color: 'white' }}
-            >
-              <Bot className="w-5 h-5 ml-2" />
-              פתח את צוות ה-AI
-              <ArrowLeft className="w-4 h-4 mr-1" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* ===================== TESTIMONIALS - AUTO-SCROLLING MARQUEE ===================== */}
-      <section ref={testimonialsReveal.ref} className={`py-20 sm:py-28 px-4 section-reveal ${testimonialsReveal.isVisible ? 'is-visible' : ''}`}>
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-14">
-            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full badge-shine">
               <Star className="w-3.5 h-3.5 ml-1.5 fill-yellow-400 text-yellow-400" />
-              עוזרים לעסקים לצמוח
+              מה אומרים עלינו
             </Badge>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5">
-              <span className="gradient-text">אלפי עסקים</span> כבר משתמשים
+              <span className="hero-gradient-text">אלפי עסקים</span> כבר סומכים עלינו
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              מה הלקוחות שלנו אומרים על AdSync
-            </p>
           </div>
 
           {/* Auto-scrolling marquee columns */}
           <div className="marquee-container h-[500px] sm:h-[550px]">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 h-full">
-              {/* Column 1 - scrolls up */}
+              {/* Column 1 */}
               <div className="marquee-column marquee-up" style={{ '--marquee-duration': '22s' } as React.CSSProperties}>
-                {[...testimonials, ...testimonials].map((testimonial, index) => (
-                  <Card key={`col1-${index}`} className="p-5 sm:p-6 hover:shadow-xl transition-all duration-300 border border-border/50 hover:border-primary/20 hover-glow-card shrink-0">
+                {[...testimonials, ...testimonials].map((t, i) => (
+                  <Card key={`c1-${i}`} className="p-5 hover:shadow-lg transition-all duration-300 border border-border/50 shrink-0">
                     <div className="flex items-center gap-2 mb-3">
-                      <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 text-[11px] font-bold px-2 py-0.5">
-                        {testimonial.metric}
-                      </Badge>
-                      <div className="flex gap-0.5 mr-auto">
-                        {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                        ))}
-                      </div>
+                      <Badge className="bg-green-500/10 text-green-600 border-green-500/20 text-[11px] font-bold px-2 py-0.5">{t.metric}</Badge>
+                      <div className="flex gap-0.5 mr-auto">{[...Array(t.rating)].map((_, j) => <Star key={j} className="w-3 h-3 fill-yellow-400 text-yellow-400" />)}</div>
                     </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                      &ldquo;{testimonial.text}&rdquo;
-                    </p>
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">&ldquo;{t.text}&rdquo;</p>
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-lg">
-                        {testimonial.avatar}
-                      </div>
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white text-xs font-bold">{t.avatar}</div>
                       <div>
-                        <div className="font-bold text-sm">{testimonial.name}</div>
-                        <div className="text-xs text-muted-foreground">{testimonial.role} | {testimonial.company}</div>
+                        <div className="font-bold text-sm">{t.name}</div>
+                        <div className="text-xs text-muted-foreground">{t.role} | {t.company}</div>
                       </div>
                     </div>
                   </Card>
                 ))}
               </div>
-
-              {/* Column 2 - scrolls down */}
+              {/* Column 2 */}
               <div className="marquee-column marquee-down hidden sm:flex" style={{ '--marquee-duration': '28s' } as React.CSSProperties}>
-                {[...testimonials.slice(2), ...testimonials.slice(0, 2), ...testimonials.slice(2), ...testimonials.slice(0, 2)].map((testimonial, index) => (
-                  <Card key={`col2-${index}`} className="p-5 sm:p-6 hover:shadow-xl transition-all duration-300 border border-border/50 hover:border-primary/20 hover-glow-card shrink-0">
+                {[...testimonials.slice(2), ...testimonials.slice(0, 2), ...testimonials.slice(2), ...testimonials.slice(0, 2)].map((t, i) => (
+                  <Card key={`c2-${i}`} className="p-5 hover:shadow-lg transition-all duration-300 border border-border/50 shrink-0">
                     <div className="flex items-center gap-2 mb-3">
-                      <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 text-[11px] font-bold px-2 py-0.5">
-                        {testimonial.metric}
-                      </Badge>
-                      <div className="flex gap-0.5 mr-auto">
-                        {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                        ))}
-                      </div>
+                      <Badge className="bg-green-500/10 text-green-600 border-green-500/20 text-[11px] font-bold px-2 py-0.5">{t.metric}</Badge>
+                      <div className="flex gap-0.5 mr-auto">{[...Array(t.rating)].map((_, j) => <Star key={j} className="w-3 h-3 fill-yellow-400 text-yellow-400" />)}</div>
                     </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                      &ldquo;{testimonial.text}&rdquo;
-                    </p>
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">&ldquo;{t.text}&rdquo;</p>
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-lg">
-                        {testimonial.avatar}
-                      </div>
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white text-xs font-bold">{t.avatar}</div>
                       <div>
-                        <div className="font-bold text-sm">{testimonial.name}</div>
-                        <div className="text-xs text-muted-foreground">{testimonial.role} | {testimonial.company}</div>
+                        <div className="font-bold text-sm">{t.name}</div>
+                        <div className="text-xs text-muted-foreground">{t.role} | {t.company}</div>
                       </div>
                     </div>
                   </Card>
                 ))}
               </div>
-
-              {/* Column 3 - scrolls up (hidden on small) */}
+              {/* Column 3 */}
               <div className="marquee-column marquee-up hidden lg:flex" style={{ '--marquee-duration': '25s' } as React.CSSProperties}>
-                {[...testimonials.slice(1), ...testimonials.slice(0, 1), ...testimonials.slice(1), ...testimonials.slice(0, 1)].map((testimonial, index) => (
-                  <Card key={`col3-${index}`} className="p-5 sm:p-6 hover:shadow-xl transition-all duration-300 border border-border/50 hover:border-primary/20 hover-glow-card shrink-0">
+                {[...testimonials.slice(1), ...testimonials.slice(0, 1), ...testimonials.slice(1), ...testimonials.slice(0, 1)].map((t, i) => (
+                  <Card key={`c3-${i}`} className="p-5 hover:shadow-lg transition-all duration-300 border border-border/50 shrink-0">
                     <div className="flex items-center gap-2 mb-3">
-                      <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 text-[11px] font-bold px-2 py-0.5">
-                        {testimonial.metric}
-                      </Badge>
-                      <div className="flex gap-0.5 mr-auto">
-                        {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                        ))}
-                      </div>
+                      <Badge className="bg-green-500/10 text-green-600 border-green-500/20 text-[11px] font-bold px-2 py-0.5">{t.metric}</Badge>
+                      <div className="flex gap-0.5 mr-auto">{[...Array(t.rating)].map((_, j) => <Star key={j} className="w-3 h-3 fill-yellow-400 text-yellow-400" />)}</div>
                     </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                      &ldquo;{testimonial.text}&rdquo;
-                    </p>
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">&ldquo;{t.text}&rdquo;</p>
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-lg">
-                        {testimonial.avatar}
-                      </div>
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white text-xs font-bold">{t.avatar}</div>
                       <div>
-                        <div className="font-bold text-sm">{testimonial.name}</div>
-                        <div className="text-xs text-muted-foreground">{testimonial.role} | {testimonial.company}</div>
+                        <div className="font-bold text-sm">{t.name}</div>
+                        <div className="text-xs text-muted-foreground">{t.role} | {t.company}</div>
                       </div>
                     </div>
                   </Card>
@@ -1109,36 +611,34 @@ const HomeAlt = () => {
 
           {/* Trust badges */}
           <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mt-12 pt-8 border-t border-border/50">
-            <div className="flex items-center gap-2">
-              <Award className="w-6 h-6 text-yellow-500" />
-              <span className="text-sm font-medium text-muted-foreground">דירוג 4.9/5</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Shield className="w-6 h-6 text-green-500" />
-              <span className="text-sm font-medium text-muted-foreground">אבטחת מידע מלאה</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Globe className="w-6 h-6 text-blue-500" />
-              <span className="text-sm font-medium text-muted-foreground">מותאם לשוק הישראלי</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Zap className="w-6 h-6 text-purple-500" />
-              <span className="text-sm font-medium text-muted-foreground">50,000+ קמפיינים נוצרו</span>
-            </div>
+            {[
+              { icon: Award, label: 'דירוג 4.9/5', color: 'text-yellow-500' },
+              { icon: Shield, label: 'אבטחת מידע מלאה', color: 'text-green-500' },
+              { icon: Globe, label: 'מותאם לשוק הישראלי', color: 'text-blue-500' },
+              { icon: Zap, label: '50,000+ קמפיינים', color: 'text-purple-500' },
+            ].map((b, i) => {
+              const BIcon = b.icon;
+              return (
+                <div key={i} className="flex items-center gap-2">
+                  <BIcon className={`w-5 h-5 ${b.color}`} />
+                  <span className="text-sm font-medium text-muted-foreground">{b.label}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* ===================== PRICING ===================== */}
-      <section ref={pricingReveal.ref} className={`py-20 sm:py-28 px-4 bg-muted/20 section-reveal ${pricingReveal.isVisible ? 'is-visible' : ''}`}>
+      {/* ═══════════════════ PRICING ═══════════════════ */}
+      <section ref={pricingReveal.ref} className={`py-20 sm:py-28 px-4 section-reveal ${pricingReveal.isVisible ? 'is-visible' : ''}`}>
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-14">
-            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full badge-shine">
-              <CircleDot className="w-3.5 h-3.5 ml-1.5" />
+            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full">
+              <Layers className="w-3.5 h-3.5 ml-1.5" />
               תמחור
             </Badge>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5">
-              תמחור <span className="gradient-text">פשוט ושקוף</span>
+              תמחור <span className="hero-gradient-text">פשוט ושקוף</span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               7 ימי ניסיון חינם לכל התוכניות. ללא התחייבות.
@@ -1146,110 +646,46 @@ const HomeAlt = () => {
           </div>
 
           <div className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 stagger-reveal ${pricingReveal.isVisible ? 'is-visible' : ''}`}>
-            {[
-              {
-                name: 'סטרטר',
-                price: '₪99',
-                originalPrice: '₪149',
-                period: 'לחודש',
-                save: 'חסכון 33%',
-                description: 'מושלם לעסקים קטנים שרוצים להתחיל עם AI',
-                features: [
-                  '10 קמפיינים בחודש',
-                  '3 פלטפורמות פרסום',
-                  'ציון ביצועים בסיסי',
-                  'תמיכה במייל',
-                  'אנליטיקס בסיסי',
-                ],
-                popular: false,
-                cta: 'התחל ניסיון חינם',
-              },
-              {
-                name: 'פרו',
-                price: '₪349',
-                originalPrice: '₪499',
-                period: 'לחודש',
-                save: 'חסכון 30%',
-                description: 'לעסקים שרוצים למקסם תוצאות',
-                features: [
-                  'קמפיינים ללא הגבלה',
-                  'כל הפלטפורמות',
-                  'ציון ביצועים מתקדם',
-                  'דפי נחיתה AI',
-                  'וידאו AI',
-                  'סוכני AI מתקדמים',
-                  'תמיכה 24/7',
-                  'A/B Testing מתקדם',
-                ],
-                popular: true,
-                cta: 'התחל ניסיון חינם',
-              },
-              {
-                name: 'אנטרפרייז',
-                price: 'מותאם',
-                period: 'מחיר אישי',
-                description: 'לארגונים עם צרכים מורכבים',
-                features: [
-                  'הכל מ-Pro',
-                  'מנהל חשבון ייעודי',
-                  'API מלא',
-                  'הכשרות צוות',
-                  'SLA מובטח',
-                  'אופטימיזציה ידנית + AI',
-                  'דוחות מותאמים',
-                ],
-                popular: false,
-                cta: 'דבר איתנו',
-              },
-            ].map((plan, index) => (
+            {pricingPlans.map((plan, index) => (
               <Card
                 key={index}
-                className={`pricing-card p-7 sm:p-9 relative hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 hover-glow-card ${
+                className={`p-7 sm:p-9 relative hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 ${
                   plan.popular
-                    ? 'border-2 border-primary shadow-xl ring-4 ring-primary/10 bg-card scale-[1.02] shimmer-border'
-                    : 'border border-border/50 gradient-border-animated'
+                    ? 'border-2 border-primary shadow-xl ring-4 ring-primary/10 scale-[1.02]'
+                    : 'border border-border/50'
                 }`}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <Badge className="shadow-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 text-sm px-4 py-1.5 rounded-full badge-shine">
+                    <Badge className="shadow-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 text-sm px-4 py-1.5 rounded-full">
                       <Sparkles className="w-3 h-3 ml-1" />
                       הכי פופולרי
                     </Badge>
                   </div>
                 )}
-                {'save' in plan && plan.save && (
-                  <Badge className="absolute top-4 left-4 bg-green-500/10 text-green-600 border-green-500/20 text-[11px]">
-                    {plan.save}
-                  </Badge>
+                {plan.save && (
+                  <Badge className="absolute top-4 left-4 bg-green-500/10 text-green-600 border-green-500/20 text-[11px]">{plan.save}</Badge>
                 )}
                 <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
                 <p className="text-sm text-muted-foreground mb-5">{plan.description}</p>
                 <div className="mb-6">
-                  {plan.originalPrice && (
-                    <span className="text-lg text-muted-foreground line-through ml-2">{plan.originalPrice}</span>
-                  )}
-                  <span className="text-4xl sm:text-5xl font-extrabold gradient-text">{plan.price}</span>
+                  {plan.originalPrice && <span className="text-lg text-muted-foreground line-through ml-2">{plan.originalPrice}</span>}
+                  <span className="text-4xl sm:text-5xl font-extrabold hero-gradient-text">{plan.price}</span>
                   <span className="text-muted-foreground text-sm mr-2"> {plan.period}</span>
                 </div>
                 <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, i) => (
+                  {plan.features.map((f, i) => (
                     <li key={i} className="flex items-start gap-2.5">
                       <Check className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
-                      <span className="text-sm sm:text-[15px]">{feature}</span>
+                      <span className="text-sm sm:text-[15px]">{f}</span>
                     </li>
                   ))}
                 </ul>
                 <Button
-                  className={`w-full py-6 text-base font-bold rounded-xl group relative overflow-hidden ${
-                    plan.popular ? 'neon-glow' : ''
-                  }`}
+                  className={`w-full py-6 text-base font-bold rounded-xl group relative overflow-hidden`}
                   variant={plan.popular ? 'default' : 'outline'}
                   onClick={() => navigate('/brief')}
-                  style={plan.popular ? {
-                    background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)',
-                    color: 'white'
-                  } : {}}
+                  style={plan.popular ? { background: 'linear-gradient(135deg, #7c3aed, #2563eb)', color: '#fff' } : {}}
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                   <span className="relative z-10 flex items-center gap-2">
@@ -1260,69 +696,28 @@ const HomeAlt = () => {
               </Card>
             ))}
           </div>
-
-          <div className="text-center mt-8">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/pricing')}
-              className="text-base animated-underline"
-            >
-              ראה את כל החבילות בפירוט
-              <ArrowLeft className="w-4 h-4 mr-2" />
-            </Button>
-          </div>
         </div>
       </section>
 
-      {/* ===================== FAQ ACCORDION ===================== */}
-      <section ref={faqReveal.ref} className={`py-20 sm:py-28 px-4 section-reveal ${faqReveal.isVisible ? 'is-visible' : ''}`}>
+      {/* ═══════════════════ FAQ ═══════════════════ */}
+      <section ref={faqReveal.ref} className={`py-20 sm:py-28 px-4 bg-muted/20 section-reveal ${faqReveal.isVisible ? 'is-visible' : ''}`}>
         <div className="container mx-auto max-w-3xl">
           <div className="text-center mb-14">
-            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full badge-shine">
+            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full">
               <MessageSquare className="w-3.5 h-3.5 ml-1.5" />
               שאלות נפוצות
             </Badge>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5">
-              יש <span className="gradient-text">שאלות?</span>
+              יש <span className="hero-gradient-text">שאלות?</span>
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              הנה תשובות לשאלות הנפוצות ביותר
-            </p>
           </div>
 
           <div className="space-y-3">
-            {[
-              {
-                q: 'האם צריך ניסיון בפרסום כדי להשתמש ב-AdSync?',
-                a: 'בכלל לא! AdSync נבנה כדי שכל אחד יוכל ליצור קמפיינים מקצועיים. ה-AI עושה את כל העבודה הקשה - מהקופי ועד העיצוב, אתה רק צריך לספר על העסק שלך.',
-              },
-              {
-                q: 'איך AdSync שונה מסוכנות פרסום רגילה?',
-                a: 'AdSync מספק תוצאות מהירות פי 30 בעלות נמוכה פי 6. אתה מקבל עשרות וריאציות של מודעות תוך שניות, ציון ביצועים AI שמנבא הצלחה, ואופטימיזציה אוטומטית 24/7 - דברים שסוכנות רגילה לא יכולה להציע.',
-              },
-              {
-                q: 'לאילו פלטפורמות AdSync תומך?',
-                a: 'אנחנו תומכים בכל הפלטפורמות המובילות: Meta (פייסבוק ואינסטגרם), Google Ads, TikTok, LinkedIn, Taboola, Outbrain, וגם Email ו-SMS marketing.',
-              },
-              {
-                q: 'מה כולל הניסיון החינמי?',
-                a: 'הניסיון החינמי ל-7 ימים כולל גישה מלאה לכל היכולות של תוכנית ה-Pro - קמפיינים ללא הגבלה, כל הפלטפורמות, ציון ביצועים, דפי נחיתה AI ועוד. ללא כרטיס אשראי.',
-              },
-              {
-                q: 'האם הקמפיינים באמת מותאמים לשוק הישראלי?',
-                a: 'בהחלט. AdSync אומן ספציפית על נתוני השוק הישראלי - הטקסטים בעברית טבעית, העיצוב מותאם לקהל ישראלי, והמערכת מבינה את ההעדפות והטרנדים של הצרכן הישראלי.',
-              },
-              {
-                q: 'אפשר לבטל בכל עת?',
-                a: 'כמובן. אין התחייבות כלל. אתה יכול לבטל את המנוי בכל עת בלחיצת כפתור, בלי שאלות ובלי עמלות ביטול.',
-              },
-            ].map((faq, index) => (
+            {faqData.map((faq, index) => (
               <div
                 key={index}
-                className={`rounded-xl border transition-all duration-300 hover-glow-card ${
-                  openFaq === index
-                    ? 'border-primary/30 bg-primary/5 shadow-lg'
-                    : 'border-border/50 hover:border-border'
+                className={`rounded-xl border transition-all duration-300 bg-card ${
+                  openFaq === index ? 'border-primary/30 shadow-lg' : 'border-border/50 hover:border-border'
                 }`}
               >
                 <button
@@ -1347,11 +742,7 @@ const HomeAlt = () => {
 
           <div className="text-center mt-10">
             <p className="text-muted-foreground text-sm mb-3">עדיין יש שאלות?</p>
-            <Button
-              variant="outline"
-              onClick={() => navigate('/ai-agents')}
-              className="rounded-xl group"
-            >
+            <Button variant="outline" onClick={() => navigate('/ai-agents')} className="rounded-xl group">
               <Bot className="w-4 h-4 ml-2" />
               שאל את סוכן ה-AI שלנו
               <ArrowLeft className="w-4 h-4 mr-2 group-hover:translate-x-[-4px] transition-transform" />
@@ -1360,28 +751,14 @@ const HomeAlt = () => {
         </div>
       </section>
 
-      {/* ===================== FINAL CTA ===================== */}
+      {/* ═══════════════════ FINAL CTA ═══════════════════ */}
       <section ref={ctaReveal.ref} className={`py-24 sm:py-32 px-4 relative overflow-hidden section-reveal ${ctaReveal.isVisible ? 'is-visible' : ''}`}>
-        {/* Animated mesh background */}
-        <div className="absolute inset-0 animated-mesh-bg" />
-        <div className="absolute top-0 right-[20%] w-[400px] h-[400px] bg-purple-600 rounded-full mix-blend-screen filter blur-[120px] opacity-15 morph-orb-1" />
-        <div className="absolute bottom-0 left-[20%] w-[300px] h-[300px] bg-blue-600 rounded-full mix-blend-screen filter blur-[100px] opacity-15 morph-orb-2" />
-
-        {/* Floating particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(4)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1.5 h-1.5 bg-white/15 rounded-full"
-              style={{
-                left: `${20 + i * 20}%`,
-                top: `${25 + (i % 2) * 30}%`,
-                animation: `particle-float ${4 + i * 0.7}s ease-in-out infinite`,
-                animationDelay: `${i * 0.5}s`,
-              }}
-            />
-          ))}
-        </div>
+        {/* Gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500" />
+        <div className="absolute inset-0 opacity-20" style={{
+          backgroundImage: 'radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px)',
+          backgroundSize: '24px 24px'
+        }} />
 
         <div className="container mx-auto max-w-4xl relative z-10 text-center">
           <div className="mb-8">
@@ -1390,23 +767,18 @@ const HomeAlt = () => {
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-white leading-tight">
             מוכנים לשדרג את
             <br />
-            <span className="text-shimmer">הפרסום שלכם?</span>
+            הפרסום שלכם?
           </h2>
-          <p className="text-lg sm:text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
             הצטרפו ל-3,200+ עסקים ישראליים שכבר יוצרים קמפיינים מנצחים עם AI.
             התחילו בחינם ותראו תוצאות מהיום הראשון.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
               onClick={() => navigate('/brief')}
-              className="text-lg sm:text-xl px-12 sm:px-16 py-7 sm:py-8 rounded-2xl shadow-2xl hover:scale-105 transition-all font-bold neon-glow group relative overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 50%, #06b6d4 100%)',
-                color: 'white'
-              }}
+              className="text-lg px-12 py-7 rounded-2xl shadow-2xl hover:scale-105 transition-all font-bold group relative overflow-hidden bg-white text-purple-700 hover:bg-white/95"
             >
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
               <span className="relative z-10 flex items-center gap-3">
                 <Sparkles className="w-5 h-5" />
                 יצירת קמפיין חינם
@@ -1416,39 +788,27 @@ const HomeAlt = () => {
             <Button
               size="lg"
               onClick={() => navigate('/landing-page-builder')}
-              className="text-lg px-10 py-7 sm:py-8 rounded-2xl font-semibold group relative overflow-hidden"
-              style={{
-                background: 'rgba(255,255,255,0.08)',
-                backdropFilter: 'blur(10px)',
-                borderColor: 'rgba(255,255,255,0.15)',
-                color: 'white'
-              }}
+              className="text-lg px-10 py-7 rounded-2xl font-semibold border-2 border-white/30 bg-white/10 text-white hover:bg-white/20 hover:scale-105 transition-all group"
             >
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-              <span className="relative z-10 flex items-center gap-2">
-                <Layout className="w-5 h-5" />
-                בנה דף נחיתה
-              </span>
+              <Layout className="w-5 h-5 ml-1" />
+              בנה דף נחיתה
             </Button>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8 mt-8 text-sm text-gray-400">
-            <span className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-400" />
-              7 ימי ניסיון חינם
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-400" />
-              ללא כרטיס אשראי
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-400" />
-              תוצאות תוך 4 דקות
-            </span>
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-white/70">
+            {['7 ימי ניסיון חינם', 'ללא כרטיס אשראי', 'תוצאות תוך 4 דקות'].map((t, i) => (
+              <span key={i} className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-white/80" />
+                {t}
+              </span>
+            ))}
           </div>
         </div>
       </section>
 
       <Footer />
+
+      {/* Floating Chat Widget */}
+      <ChatWidget />
     </div>
   );
 };

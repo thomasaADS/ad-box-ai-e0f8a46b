@@ -1,10 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { ScrollArea } from './ui/scroll-area';
-import { useTranslation } from '@/hooks/useTranslation';
-import { MessageSquare, X, Send, Loader2 } from 'lucide-react';
+import { X, Send, Loader2, Sparkles, Bot } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Message {
@@ -13,13 +11,12 @@ interface Message {
 }
 
 export const ChatWidget = () => {
-  const { t } = useTranslation();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'שלום! אני עוזר השיווק של בוסטי. איך אני יכול לעזור לך היום?',
+      content: 'היי! 👋 אני הסוכן של AdSync לבניית קמפיינים. אני יכול לעזור לך ליצור מודעות, דפי נחיתה, לבחור קהלי יעד ועוד. מה תרצה לשאול?',
     },
   ]);
   const [input, setInput] = useState('');
@@ -169,7 +166,7 @@ export const ChatWidget = () => {
 
   const suggestedQuestions = [
     'איך אני יוצר קמפיין ראשון?',
-    'מה ההבדל בין המוצרים?',
+    'איך בונים דף נחיתה עם AI?',
     'איזה פלטפורמות אתם תומכים?',
     'כמה עולה להתחיל?',
   ];
@@ -178,32 +175,39 @@ export const ChatWidget = () => {
     <>
       {/* Chat Button */}
       {!isOpen && (
-        <Button
+        <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 left-6 z-50 h-14 w-14 rounded-full shadow-glow-lg hover:scale-110 transition-transform"
-          size="icon"
+          className="fixed bottom-6 left-6 z-50 h-14 w-14 rounded-full shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-300 flex items-center justify-center group"
+          style={{ background: 'linear-gradient(135deg, #7c3aed, #2563eb)' }}
+          aria-label="פתח צ'אט"
         >
-          <MessageSquare className="h-6 w-6" />
-        </Button>
+          <Bot className="h-6 w-6 text-white group-hover:scale-110 transition-transform" />
+          {/* Pulse ring */}
+          <span className="absolute inset-0 rounded-full animate-ping opacity-20" style={{ background: 'linear-gradient(135deg, #7c3aed, #2563eb)' }} />
+        </button>
       )}
 
       {/* Chat Window */}
       {isOpen && (
-        <Card className="fixed bottom-6 left-6 z-50 w-96 h-[600px] glass-card shadow-glow-lg flex flex-col animate-scale-in">
+        <Card className="fixed bottom-6 left-6 z-50 w-[360px] sm:w-96 h-[550px] sm:h-[600px] shadow-2xl flex flex-col animate-scale-in border border-border/60 overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-border">
-            <div className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold">עוזר שיווק AI</h3>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border/50" style={{ background: 'linear-gradient(135deg, #7c3aed, #2563eb)' }}>
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                <Sparkles className="h-4 w-4 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white text-sm">AdSync AI</h3>
+                <p className="text-[10px] text-white/70">סוכן בניית קמפיינים</p>
+              </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
+            <button
               onClick={() => setIsOpen(false)}
-              className="h-8 w-8"
+              className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+              aria-label="סגור צ'אט"
             >
-              <X className="h-4 w-4" />
-            </Button>
+              <X className="h-3.5 w-3.5 text-white" />
+            </button>
           </div>
 
           {/* Messages */}
@@ -214,33 +218,34 @@ export const ChatWidget = () => {
                   key={index}
                   className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
+                  {message.role === 'assistant' && (
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center ml-2 mt-1 shrink-0">
+                      <Bot className="w-3.5 h-3.5 text-white" />
+                    </div>
+                  )}
                   <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
+                    className={`max-w-[78%] rounded-2xl px-4 py-2.5 ${
                       message.role === 'user'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
+                        ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-bl-2xl rounded-br-sm'
+                        : 'bg-muted/60 rounded-br-2xl rounded-bl-sm'
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
                   </div>
                 </div>
               ))}
 
               {messages.length === 1 && !isLoading && (
                 <div className="space-y-2 mt-4">
-                  <p className="text-xs text-muted-foreground">שאלות מוצעות:</p>
+                  <p className="text-xs text-muted-foreground font-medium">שאלות מוצעות:</p>
                   {suggestedQuestions.map((question, index) => (
-                    <Button
+                    <button
                       key={index}
-                      variant="outline"
-                      size="sm"
-                      className="w-full text-right justify-start text-xs h-auto py-2"
-                      onClick={() => {
-                        setInput(question);
-                      }}
+                      className="w-full text-right text-xs py-2.5 px-3 rounded-xl border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200"
+                      onClick={() => setInput(question)}
                     >
                       {question}
-                    </Button>
+                    </button>
                   ))}
                 </div>
               )}
@@ -248,7 +253,7 @@ export const ChatWidget = () => {
           </ScrollArea>
 
           {/* Input */}
-          <div className="p-4 border-t border-border">
+          <div className="p-3 border-t border-border/50 bg-card">
             <div className="flex gap-2">
               <Input
                 value={input}
@@ -256,15 +261,21 @@ export const ChatWidget = () => {
                 onKeyPress={handleKeyPress}
                 placeholder="שאל שאלה..."
                 disabled={isLoading}
-                className="flex-1"
+                className="flex-1 rounded-xl text-sm h-10"
               />
-              <Button onClick={handleSend} disabled={isLoading || !input.trim()} size="icon">
+              <button
+                onClick={handleSend}
+                disabled={isLoading || !input.trim()}
+                className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0 disabled:opacity-40 transition-all hover:scale-105"
+                style={{ background: 'linear-gradient(135deg, #7c3aed, #2563eb)' }}
+                aria-label="שלח"
+              >
                 {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin text-white" />
                 ) : (
-                  <Send className="h-4 w-4" />
+                  <Send className="h-4 w-4 text-white" />
                 )}
-              </Button>
+              </button>
             </div>
           </div>
         </Card>
