@@ -48,7 +48,7 @@ export function CTASection() {
       <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] bg-violet-400/10 rounded-full blur-[100px]" />
 
       <div className="container mx-auto max-w-4xl relative z-10 text-center">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-white leading-tight">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-extrabold mb-6 text-white leading-tight">
           מוכן להתחיל לפרסם
           <br />
           כמו מקצוען?
@@ -59,15 +59,15 @@ export function CTASection() {
         <Button
           size="lg"
           onClick={() => navigate('/brief')}
-          className="text-lg px-12 py-7 rounded-2xl shadow-2xl hover:scale-105 transition-all font-bold group relative overflow-hidden bg-white text-purple-700 hover:bg-white/95"
+          className="text-base sm:text-lg px-8 sm:px-12 py-5 sm:py-7 rounded-2xl shadow-2xl hover:scale-105 transition-all font-bold group relative overflow-hidden bg-white text-purple-700 hover:bg-white/95"
         >
-          <span className="relative z-10 flex items-center gap-3">
+          <span className="relative z-10 flex items-center gap-2 sm:gap-3">
             <Sparkles className="w-5 h-5" />
             התחל בחינם עכשיו
             <ArrowLeft className="w-5 h-5 group-hover:translate-x-[-4px] transition-transform" />
           </span>
         </Button>
-        <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-white/70">
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mt-8 text-xs sm:text-sm text-white/70">
           {['7 ימי ניסיון חינם', 'ללא כרטיס אשראי', 'תוצאות תוך דקות'].map(
             (t, i) => (
               <span key={i} className="flex items-center gap-2">

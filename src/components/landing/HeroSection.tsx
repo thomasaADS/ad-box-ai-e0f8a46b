@@ -201,32 +201,32 @@ function HeroVisual() {
       </svg>
 
       {/* Floating elements around the orb */}
-      <div className="absolute top-[5%] right-[15%] rounded-2xl bg-white/90 backdrop-blur-sm border border-purple-100 shadow-lg px-4 py-3 animate-float">
+      <div className="absolute top-[5%] right-[10%] sm:right-[15%] rounded-2xl bg-white/90 backdrop-blur-sm border border-purple-100 shadow-lg px-3 sm:px-4 py-2 sm:py-3 animate-float">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-green-400" />
-          <span className="text-xs font-bold text-gray-800">ROAS 4.8x</span>
+          <span className="text-[10px] sm:text-xs font-bold text-gray-800">ROAS 4.8x</span>
         </div>
       </div>
 
       <div
-        className="absolute bottom-[8%] left-[8%] rounded-2xl bg-white/90 backdrop-blur-sm border border-purple-100 shadow-lg px-4 py-3 animate-float"
+        className="absolute bottom-[8%] left-[5%] sm:left-[8%] rounded-2xl bg-white/90 backdrop-blur-sm border border-purple-100 shadow-lg px-3 sm:px-4 py-2 sm:py-3 animate-float"
         style={{ animationDelay: '2s' }}
       >
         <div className="flex items-center gap-2">
-          <span className="text-xs text-green-500 font-bold">↑23%</span>
-          <span className="text-xs font-bold text-gray-800">CTR 4.32%</span>
+          <span className="text-[10px] sm:text-xs text-green-500 font-bold">↑23%</span>
+          <span className="text-[10px] sm:text-xs font-bold text-gray-800">CTR 4.32%</span>
         </div>
       </div>
 
       <div
-        className="absolute top-[40%] -left-[2%] rounded-2xl bg-white/90 backdrop-blur-sm border border-purple-100 shadow-lg px-3 py-2 animate-float hidden sm:block"
+        className="absolute top-[40%] left-[2%] rounded-2xl bg-white/90 backdrop-blur-sm border border-purple-100 shadow-lg px-3 py-2 animate-float hidden sm:block"
         style={{ animationDelay: '4s' }}
       >
         <span className="text-[11px] font-bold text-purple-600">AI מנתח...</span>
       </div>
 
       <div
-        className="absolute bottom-[25%] -right-[2%] rounded-2xl bg-white/90 backdrop-blur-sm border border-purple-100 shadow-lg px-3 py-2 animate-float hidden sm:block"
+        className="absolute bottom-[25%] right-[2%] rounded-2xl bg-white/90 backdrop-blur-sm border border-purple-100 shadow-lg px-3 py-2 animate-float hidden sm:block"
         style={{ animationDelay: '3s' }}
       >
         <span className="text-[11px] font-bold text-gray-700">₪2.95 CPC</span>
@@ -240,7 +240,7 @@ export function HeroSection() {
   const rotator = useTextRotator(heroWords, 3000);
 
   return (
-    <section className="relative pt-24 sm:pt-32 lg:pt-40 pb-20 sm:pb-28 lg:pb-36 px-4 overflow-hidden">
+    <section className="relative pt-24 sm:pt-32 lg:pt-40 pb-20 sm:pb-28 lg:pb-36 px-4 overflow-x-clip">
       {/* Subtle gradient background */}
       <div className="absolute inset-0 bg-gradient-to-b from-white from-[12%] to-[#ebebff]" />
 
@@ -254,18 +254,18 @@ export function HeroSection() {
             <div className="inline-block mb-6 animate-fade-in">
               <Badge
                 variant="secondary"
-                className="text-sm font-medium px-5 py-2.5 rounded-full border border-purple-200 bg-white/90 backdrop-blur-sm shadow-sm text-gray-700"
+                className="text-xs sm:text-sm font-medium px-3 sm:px-5 py-2 sm:py-2.5 rounded-full border border-purple-200 bg-white/90 backdrop-blur-sm shadow-sm text-gray-700"
               >
                 <Sparkles className="w-4 h-4 ml-2 text-purple-500" />
                 +3,200 עסקים ישראליים כבר משתמשים
               </Badge>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] mb-6 animate-fade-in text-gray-900">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold leading-[1.15] mb-6 animate-fade-in text-gray-900">
               מנוע ה-AI שלך ליצירת
               <br />
               <span
-                className="inline-block h-[1.15em] overflow-hidden relative"
+                className="inline-block h-[1.2em] relative"
                 style={{ perspective: '500px' }}
               >
                 <span
@@ -282,7 +282,7 @@ export function HeroSection() {
             </h1>
 
             <p
-              className="text-lg sm:text-xl md:text-2xl text-gray-500 leading-relaxed max-w-2xl mx-auto lg:mx-0 mb-10 animate-slide-up"
+              className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-500 leading-relaxed max-w-2xl mx-auto lg:mx-0 mb-10 animate-slide-up"
               style={{ animationDelay: '0.15s' }}
             >
               קבל עד{' '}
@@ -299,10 +299,10 @@ export function HeroSection() {
               <Button
                 size="lg"
                 onClick={() => navigate('/brief')}
-                className="text-lg px-10 py-7 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all group relative overflow-hidden bg-purple-600 hover:bg-purple-700 text-white"
+                className="text-base sm:text-lg px-7 sm:px-10 py-5 sm:py-7 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all group relative overflow-hidden bg-purple-600 hover:bg-purple-700 text-white"
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                <span className="relative z-10 flex items-center gap-3">
+                <span className="relative z-10 flex items-center gap-2 sm:gap-3">
                   <Sparkles className="w-5 h-5" />
                   התחל בחינם עכשיו
                   <ArrowLeft className="w-5 h-5 group-hover:translate-x-[-4px] transition-transform" />
@@ -312,7 +312,7 @@ export function HeroSection() {
                 size="lg"
                 onClick={() => navigate('/how-it-works')}
                 variant="outline"
-                className="text-base px-8 py-7 rounded-2xl font-semibold hover:scale-105 transition-all group border-purple-200 text-purple-700 hover:bg-purple-50"
+                className="text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-7 rounded-2xl font-semibold hover:scale-105 transition-all group border-purple-200 text-purple-700 hover:bg-purple-50"
               >
                 <Play className="w-5 h-5 ml-1 text-purple-500" />
                 ראה איך זה עובד
@@ -320,7 +320,7 @@ export function HeroSection() {
             </div>
 
             <div
-              className="flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm text-gray-500 animate-slide-up"
+              className="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-6 text-xs sm:text-sm text-gray-500 animate-slide-up"
               style={{ animationDelay: '0.45s' }}
             >
               {['7 ימי ניסיון חינם', 'ללא כרטיס אשראי', 'ביטול בכל עת'].map(

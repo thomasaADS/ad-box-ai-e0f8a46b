@@ -176,14 +176,14 @@ export function ProductDemo() {
 
       <div className="container mx-auto max-w-6xl relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5 text-gray-900">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-5 text-gray-900">
             מהלינק שלך ל
             <span className="bg-gradient-to-l from-purple-600 to-violet-500 bg-clip-text text-transparent">
               קמפיין חי
             </span>{' '}
             — ב-3 צעדים
           </h2>
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto">
             תהליך פשוט ומהיר שנותן לך שליטה מלאה בכל שלב
           </p>
         </div>
