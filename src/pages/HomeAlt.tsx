@@ -7,7 +7,6 @@ import { Card } from '@/components/ui/card';
 import { SEOHead } from '@/components/SEOHead';
 import { useEffect, useRef, useState } from 'react';
 import {
-  ArrowRight,
   Sparkles,
   Zap,
   Target,
@@ -24,6 +23,7 @@ import {
   Shield,
   Play,
   ChevronLeft,
+  ChevronDown,
   Layers,
   Monitor,
   Smartphone,
@@ -40,7 +40,6 @@ import {
   ArrowLeft,
   Eye,
   PenTool,
-  Megaphone,
   LineChart,
   CircleDot,
   Bot,
@@ -111,6 +110,25 @@ function useScrollReveal() {
   return { ref, isVisible };
 }
 
+// Text rotator hook for hero
+function useTextRotator(words: string[], interval = 3000) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIsAnimating(true);
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + 1) % words.length);
+        setIsAnimating(false);
+      }, 500);
+    }, interval);
+    return () => clearInterval(timer);
+  }, [words.length, interval]);
+
+  return { currentWord: words[currentIndex], isAnimating };
+}
+
 const HomeAlt = () => {
   const navigate = useNavigate();
 
@@ -120,15 +138,29 @@ const HomeAlt = () => {
   const roiCount = useCountUp(340);
   const timeCount = useCountUp(4);
 
+  // Hero text rotator
+  const heroRotator = useTextRotator([
+    'מודעות AI מנצחות',
+    'דפי נחיתה ממירים',
+    'וידאו פרסומי מקצועי',
+    'קמפיינים אוטומטיים',
+    'ציון ביצועים חכם',
+  ], 3000);
+
+  // FAQ state
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
   // Section scroll reveals
   const logosReveal = useScrollReveal();
   const howItWorksReveal = useScrollReveal();
   const featuresReveal = useScrollReveal();
   const comparisonReveal = useScrollReveal();
   const productsReveal = useScrollReveal();
+  const kpiReveal = useScrollReveal();
   const testimonialsReveal = useScrollReveal();
   const agentsReveal = useScrollReveal();
   const pricingReveal = useScrollReveal();
+  const faqReveal = useScrollReveal();
   const ctaReveal = useScrollReveal();
 
   const features = [
@@ -325,27 +357,43 @@ const HomeAlt = () => {
 
       {/* ===================== HERO SECTION ===================== */}
       <section className="relative pt-24 sm:pt-32 md:pt-36 pb-20 sm:pb-28 md:pb-32 px-4 overflow-hidden">
-        {/* Dark gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0f0a2e] via-[#1a1145] to-[#2d1b69]" />
+        {/* Animated mesh gradient background */}
+        <div className="absolute inset-0 animated-mesh-bg" />
 
         {/* Grid pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
+        <div className="absolute inset-0 opacity-[0.04]" style={{
           backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
           backgroundSize: '60px 60px'
         }} />
 
-        {/* Animated gradient orbs */}
-        <div className="absolute top-10 right-[10%] w-[500px] h-[500px] bg-purple-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20 animate-float" />
-        <div className="absolute top-40 left-[5%] w-[400px] h-[400px] bg-blue-600 rounded-full mix-blend-screen filter blur-[100px] opacity-15 animate-float" style={{ animationDelay: '2s' }} />
-        <div className="absolute bottom-10 right-[30%] w-[350px] h-[350px] bg-pink-500 rounded-full mix-blend-screen filter blur-[100px] opacity-10 animate-float" style={{ animationDelay: '4s' }} />
-        <div className="absolute top-[60%] left-[40%] w-[300px] h-[300px] bg-cyan-500 rounded-full mix-blend-screen filter blur-[80px] opacity-10 animate-float" style={{ animationDelay: '3s' }} />
+        {/* Morphing gradient orbs */}
+        <div className="absolute top-10 right-[10%] w-[500px] h-[500px] bg-purple-600 mix-blend-screen filter blur-[120px] opacity-25 morph-orb-1" />
+        <div className="absolute top-40 left-[5%] w-[400px] h-[400px] bg-blue-600 mix-blend-screen filter blur-[100px] opacity-20 morph-orb-2" />
+        <div className="absolute bottom-10 right-[30%] w-[350px] h-[350px] bg-pink-500 mix-blend-screen filter blur-[100px] opacity-15 morph-orb-1" style={{ animationDelay: '-5s' }} />
+        <div className="absolute top-[60%] left-[40%] w-[300px] h-[300px] bg-cyan-500 mix-blend-screen filter blur-[80px] opacity-15 morph-orb-2" style={{ animationDelay: '-8s' }} />
+
+        {/* Floating particle dots */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1.5 h-1.5 bg-white/20 rounded-full"
+              style={{
+                left: `${15 + i * 15}%`,
+                top: `${20 + (i % 3) * 25}%`,
+                animation: `particle-float ${4 + i * 0.5}s ease-in-out infinite`,
+                animationDelay: `${i * 0.7}s`,
+              }}
+            />
+          ))}
+        </div>
 
         <div className="container mx-auto max-w-6xl relative z-10">
           <div className="text-center space-y-7 sm:space-y-8">
             {/* Top Badge */}
             <div className="inline-block animate-bounce-in">
               <Badge
-                className="text-sm sm:text-base font-medium px-5 sm:px-7 py-2.5 sm:py-3 border hover:scale-105 transition-transform cursor-default rounded-full"
+                className="text-sm sm:text-base font-medium px-5 sm:px-7 py-2.5 sm:py-3 border hover:scale-105 transition-transform cursor-default rounded-full badge-shine"
                 style={{
                   color: '#a78bfa',
                   borderColor: 'rgba(167, 139, 250, 0.3)',
@@ -358,12 +406,17 @@ const HomeAlt = () => {
               </Badge>
             </div>
 
-            {/* Main Heading */}
+            {/* Main Heading with text rotator */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.08] animate-fade-in text-white">
-              מנוע ה-AI שלך
+              מנוע ה-AI שלך ליצירת
               <br />
-              <span className="hero-gradient-text">
-                לכל צרכי הפרסום
+              <span className="inline-block h-[1.15em] overflow-hidden relative" style={{ perspective: '500px' }}>
+                <span
+                  key={heroRotator.currentWord}
+                  className={`inline-block text-shimmer ${heroRotator.isAnimating ? 'text-rotator-exit' : 'text-rotator-enter'}`}
+                >
+                  {heroRotator.currentWord}
+                </span>
               </span>
             </h1>
 
@@ -379,12 +432,14 @@ const HomeAlt = () => {
               <Button
                 size="lg"
                 onClick={() => navigate('/brief')}
-                className="text-lg sm:text-xl px-10 sm:px-14 py-7 sm:py-8 rounded-2xl font-bold border-0 hover:opacity-95 transition-all hover:scale-105 shadow-2xl group relative overflow-hidden"
+                className="text-lg sm:text-xl px-10 sm:px-14 py-7 sm:py-8 rounded-2xl font-bold border-0 hover:opacity-95 transition-all hover:scale-105 shadow-2xl group relative overflow-hidden neon-glow"
                 style={{
                   background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 50%, #06b6d4 100%)',
                   color: 'white'
                 }}
               >
+                {/* Shine sweep on button */}
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 <span className="relative z-10 flex items-center gap-3">
                   <Sparkles className="w-5 h-5" />
                   התחל בחינם עכשיו
@@ -394,7 +449,7 @@ const HomeAlt = () => {
               <Button
                 size="lg"
                 onClick={() => navigate('/how-it-works')}
-                className="text-base sm:text-lg px-8 sm:px-12 py-7 sm:py-8 rounded-2xl font-semibold border hover:scale-105 transition-all"
+                className="text-base sm:text-lg px-8 sm:px-12 py-7 sm:py-8 rounded-2xl font-semibold border hover:scale-105 transition-all group relative overflow-hidden"
                 style={{
                   background: 'rgba(255,255,255,0.05)',
                   backdropFilter: 'blur(10px)',
@@ -402,8 +457,11 @@ const HomeAlt = () => {
                   color: 'white'
                 }}
               >
-                <Play className="w-5 h-5 ml-2" />
-                ראה איך זה עובד
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <span className="relative z-10 flex items-center gap-2">
+                  <Play className="w-5 h-5 ml-1" />
+                  ראה איך זה עובד
+                </span>
               </Button>
             </div>
 
@@ -425,23 +483,23 @@ const HomeAlt = () => {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 pt-10 sm:pt-14">
-              <div ref={campaignsCount.ref} className="hero-stat-card">
-                <Zap className="w-6 h-6 mx-auto mb-2 text-purple-400" />
+              <div ref={campaignsCount.ref} className="hero-stat-card neon-glow group cursor-default">
+                <Zap className="w-6 h-6 mx-auto mb-2 text-purple-400 group-hover:scale-125 transition-transform duration-300" />
                 <div className="text-2xl sm:text-3xl font-bold text-white">{campaignsCount.count.toLocaleString()}+</div>
                 <div className="text-xs sm:text-sm text-gray-400">קמפיינים נוצרו</div>
               </div>
-              <div ref={usersCount.ref} className="hero-stat-card">
-                <Users className="w-6 h-6 mx-auto mb-2 text-blue-400" />
+              <div ref={usersCount.ref} className="hero-stat-card group cursor-default" style={{ animationDelay: '0.1s' }}>
+                <Users className="w-6 h-6 mx-auto mb-2 text-blue-400 group-hover:scale-125 transition-transform duration-300" />
                 <div className="text-2xl sm:text-3xl font-bold text-white">{usersCount.count.toLocaleString()}+</div>
                 <div className="text-xs sm:text-sm text-gray-400">משתמשים פעילים</div>
               </div>
-              <div ref={roiCount.ref} className="hero-stat-card">
-                <TrendingUp className="w-6 h-6 mx-auto mb-2 text-green-400" />
+              <div ref={roiCount.ref} className="hero-stat-card group cursor-default">
+                <TrendingUp className="w-6 h-6 mx-auto mb-2 text-green-400 group-hover:scale-125 transition-transform duration-300" />
                 <div className="text-2xl sm:text-3xl font-bold text-white">{roiCount.count}%</div>
                 <div className="text-xs sm:text-sm text-gray-400">ROI ממוצע</div>
               </div>
-              <div ref={timeCount.ref} className="hero-stat-card">
-                <Clock className="w-6 h-6 mx-auto mb-2 text-cyan-400" />
+              <div ref={timeCount.ref} className="hero-stat-card group cursor-default">
+                <Clock className="w-6 h-6 mx-auto mb-2 text-cyan-400 group-hover:scale-125 transition-transform duration-300" />
                 <div className="text-2xl sm:text-3xl font-bold text-white">{timeCount.count} דק'</div>
                 <div className="text-xs sm:text-sm text-gray-400">זמן יצירה ממוצע</div>
               </div>
@@ -463,9 +521,9 @@ const HomeAlt = () => {
             {platforms.map((platform) => (
               <div
                 key={platform.name}
-                className="flex flex-col items-center gap-2 group cursor-default"
+                className="flex flex-col items-center gap-2 group cursor-default levitate"
               >
-                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${platform.color} flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300`}>
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${platform.color} flex items-center justify-center shadow-lg group-hover:scale-125 group-hover:shadow-xl transition-all duration-300 gradient-shadow`}>
                   <span className="text-lg sm:text-xl filter drop-shadow-sm">{platform.icon}</span>
                 </div>
                 <span className="text-[11px] sm:text-xs font-medium text-muted-foreground group-hover:text-foreground transition-colors">{platform.name}</span>
@@ -476,7 +534,7 @@ const HomeAlt = () => {
       </section>
 
       {/* ===================== HOW IT WORKS ===================== */}
-      <section ref={howItWorksReveal.ref} className={`py-20 sm:py-28 px-4 bg-gradient-to-b from-background to-muted/20 transition-all duration-700 ${howItWorksReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <section ref={howItWorksReveal.ref} className={`py-20 sm:py-28 px-4 bg-gradient-to-b from-background to-muted/20 section-reveal ${howItWorksReveal.isVisible ? 'is-visible' : ''}`}>
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-14 sm:mb-18">
             <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full">
@@ -491,22 +549,22 @@ const HomeAlt = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 sm:gap-8">
+          <div className={`grid md:grid-cols-3 gap-6 sm:gap-8 stagger-reveal ${howItWorksReveal.isVisible ? 'is-visible' : ''}`}>
             {howItWorks.map((item, index) => {
               const Icon = item.icon;
               return (
                 <div key={index} className="relative group">
-                  <Card className="p-7 sm:p-9 text-center hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 h-full border-2 border-transparent hover:border-primary/20 bg-card/80 backdrop-blur-sm">
+                  <Card className="p-7 sm:p-9 text-center hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 h-full border-2 border-transparent hover:border-primary/20 bg-card/80 backdrop-blur-sm gradient-border-animated">
                     {/* Step number */}
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-5 sm:mb-7 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center relative group-hover:scale-110 transition-transform duration-500">
-                      <span className="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white text-sm font-bold flex items-center justify-center shadow-lg">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-5 sm:mb-7 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center relative group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                      <span className="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white text-sm font-bold flex items-center justify-center shadow-lg neon-glow">
                         {item.step}
                       </span>
                       <Icon className="w-10 sm:w-12 h-10 sm:h-12 text-primary" />
                     </div>
                     <h3 className="text-xl sm:text-2xl font-bold mb-3">{item.title}</h3>
                     <p className="text-muted-foreground text-base sm:text-lg leading-relaxed mb-4">{item.description}</p>
-                    <Badge variant="outline" className="text-xs rounded-full">
+                    <Badge variant="outline" className="text-xs rounded-full badge-shine">
                       {item.detail}
                     </Badge>
                   </Card>
@@ -542,7 +600,7 @@ const HomeAlt = () => {
       </section>
 
       {/* ===================== BENTO FEATURES GRID ===================== */}
-      <section ref={featuresReveal.ref} className={`py-20 sm:py-28 px-4 transition-all duration-700 ${featuresReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <section ref={featuresReveal.ref} className={`py-20 sm:py-28 px-4 section-reveal ${featuresReveal.isVisible ? 'is-visible' : ''}`}>
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-14 sm:mb-18">
             <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full">
@@ -557,27 +615,27 @@ const HomeAlt = () => {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-7">
+          <div className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-7 stagger-reveal ${featuresReveal.isVisible ? 'is-visible' : ''}`}>
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <Card
                   key={index}
-                  className="feature-card p-7 sm:p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-border/50 hover:border-primary/20 group relative overflow-hidden"
+                  className="feature-card gradient-border-animated card-3d p-7 sm:p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-border/50 hover:border-primary/20 group relative overflow-hidden"
                 >
                   {/* Hover gradient overlay */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-[0.03] transition-opacity duration-500`} />
+                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-[0.04] transition-opacity duration-500`} />
 
                   {feature.tag && (
-                    <Badge className="absolute top-4 left-4 text-[10px] bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 shadow-lg">
+                    <Badge className="absolute top-4 left-4 text-[10px] bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 shadow-lg badge-shine">
                       {feature.tag}
                     </Badge>
                   )}
 
-                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300`}>
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 group-hover:shadow-xl group-hover:rotate-3 transition-all duration-500`}>
                     <Icon className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                  <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors duration-300">{feature.title}</h3>
                   <p className="text-muted-foreground leading-relaxed text-[15px]">{feature.description}</p>
                 </Card>
               );
@@ -587,7 +645,7 @@ const HomeAlt = () => {
       </section>
 
       {/* ===================== COMPARISON TABLE ===================== */}
-      <section ref={comparisonReveal.ref} className={`py-20 sm:py-28 px-4 bg-gradient-to-b from-muted/30 to-background transition-all duration-700 ${comparisonReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <section ref={comparisonReveal.ref} className={`py-20 sm:py-28 px-4 bg-gradient-to-b from-muted/30 to-background section-reveal ${comparisonReveal.isVisible ? 'is-visible' : ''}`}>
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-14">
             <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full">
@@ -685,11 +743,88 @@ const HomeAlt = () => {
         </div>
       </section>
 
+      {/* ===================== KPI PERFORMANCE DASHBOARD ===================== */}
+      <section ref={kpiReveal.ref} className={`py-20 sm:py-28 px-4 relative overflow-hidden section-reveal ${kpiReveal.isVisible ? 'is-visible' : ''}`}>
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0f0a2e] via-[#1a1145] to-[#0f0a2e]" />
+        <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-purple-600 rounded-full mix-blend-screen filter blur-[150px] opacity-10 morph-orb-1" />
+        <div className="absolute bottom-[20%] right-[10%] w-[300px] h-[300px] bg-cyan-500 rounded-full mix-blend-screen filter blur-[120px] opacity-10 morph-orb-2" />
+
+        <div className="container mx-auto max-w-6xl relative z-10">
+          <div className="text-center mb-14">
+            <Badge className="mb-5 text-sm px-4 py-1.5 rounded-full bg-purple-500/20 text-purple-300 border-purple-500/30 badge-shine">
+              <TrendingUp className="w-3.5 h-3.5 ml-1.5" />
+              ביצועים אמיתיים
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5 text-white">
+              התוצאות <span className="text-shimmer">מדברות</span> בעד עצמן
+            </h2>
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+              הנתונים של הלקוחות שלנו - שיפור משמעותי בכל מדד קמפיין
+            </p>
+          </div>
+
+          <div className={`grid sm:grid-cols-2 lg:grid-cols-4 gap-5 stagger-reveal ${kpiReveal.isVisible ? 'is-visible' : ''}`}>
+            {[
+              { label: 'CTR ממוצע', value: '4.32%', change: '+23.15%', positive: true, icon: MousePointerClick },
+              { label: 'עלות לקליק', value: '₪2.95', change: '-12.26%', positive: true, icon: Target },
+              { label: 'ROAS ממוצע', value: '10.8x', change: '+340%', positive: true, icon: TrendingUp },
+              { label: 'מהירות יצירה', value: '30x', change: 'מהר יותר', positive: true, icon: Zap },
+            ].map((kpi, i) => {
+              const Icon = kpi.icon;
+              return (
+                <div key={i} className="relative group">
+                  <div className="p-6 sm:p-7 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-purple-500/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover-glow-card">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${kpi.positive ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                        {kpi.change}
+                      </span>
+                    </div>
+                    <div className="text-3xl sm:text-4xl font-extrabold text-white mb-1">{kpi.value}</div>
+                    <div className="text-sm text-gray-400">{kpi.label}</div>
+                    {/* Subtle animated bar */}
+                    <div className="mt-4 h-1 rounded-full bg-white/5 overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 transition-all duration-1000" style={{ width: kpiReveal.isVisible ? `${70 + i * 8}%` : '0%' }} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Social proof bar */}
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mt-12 text-gray-400">
+            <div className="flex items-center gap-2.5">
+              <div className="flex -space-x-2 space-x-reverse">
+                {['ד', 'ר', 'מ', 'י'].map((letter, i) => (
+                  <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white text-xs font-bold border-2 border-[#1a1145]">
+                    {letter}
+                  </div>
+                ))}
+              </div>
+              <span className="text-sm">+3,200 עסקים פעילים</span>
+            </div>
+            <div className="glow-divider w-px h-6 hidden sm:block" />
+            <div className="flex items-center gap-2">
+              <div className="flex gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
+              <span className="text-sm">4.9/5 דירוג ממוצע</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ===================== PRODUCTS BENTO ===================== */}
-      <section ref={productsReveal.ref} className={`py-20 sm:py-28 px-4 transition-all duration-700 ${productsReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <section ref={productsReveal.ref} className={`py-20 sm:py-28 px-4 section-reveal ${productsReveal.isVisible ? 'is-visible' : ''}`}>
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-14">
-            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full">
+            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full badge-shine">
               <Wand2 className="w-3.5 h-3.5 ml-1.5" />
               מוצרי AI
             </Badge>
@@ -701,24 +836,24 @@ const HomeAlt = () => {
             </p>
           </div>
 
-          <div className="bento-grid">
+          <div className={`bento-grid stagger-reveal ${productsReveal.isVisible ? 'is-visible' : ''}`}>
             {products.map((product, index) => {
               const Icon = product.icon;
               return (
                 <Card
                   key={index}
-                  className={`bento-item ${product.size === 'large' ? 'bento-large' : 'bento-small'} p-6 sm:p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-border/50 hover:border-primary/20 group relative overflow-hidden cursor-pointer`}
+                  className={`bento-item ${product.size === 'large' ? 'bento-large' : 'bento-small'} p-6 sm:p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-border/50 hover:border-primary/20 group relative overflow-hidden cursor-pointer gradient-border-animated card-3d hover-glow-card`}
                   onClick={() => product.title === 'דפי נחיתה AI' ? navigate('/landing-page-builder') : navigate('/brief')}
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${product.gradient} opacity-0 group-hover:opacity-[0.04] transition-opacity duration-500`} />
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${product.gradient} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-all duration-300`}>
+                  <div className={`absolute inset-0 bg-gradient-to-br ${product.gradient} opacity-0 group-hover:opacity-[0.05] transition-opacity duration-500`} />
+                  <div className={`w-13 h-13 rounded-xl bg-gradient-to-br ${product.gradient} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 gradient-shadow`}>
                     <Icon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-lg sm:text-xl font-bold mb-2">{product.title}</h3>
+                  <h3 className="text-lg sm:text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-300">{product.title}</h3>
                   <p className="text-muted-foreground text-sm sm:text-[15px] leading-relaxed">{product.description}</p>
-                  <div className="mt-4 flex items-center gap-1 text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="mt-4 flex items-center gap-1 text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:gap-2.5">
                     גלה עוד
-                    <ArrowLeft className="w-4 h-4" />
+                    <ArrowLeft className="w-4 h-4 group-hover:translate-x-[-4px] transition-transform" />
                   </div>
                 </Card>
               );
@@ -728,22 +863,24 @@ const HomeAlt = () => {
       </section>
 
       {/* ===================== LANDING PAGE BUILDER CTA ===================== */}
-      <section className="py-16 sm:py-20 px-4 bg-gradient-to-br from-[#0f0a2e] via-[#1a1145] to-[#2d1b69] relative overflow-hidden">
-        {/* Background effects */}
-        <div className="absolute top-0 left-[20%] w-[300px] h-[300px] bg-purple-600 rounded-full mix-blend-screen filter blur-[100px] opacity-15" />
-        <div className="absolute bottom-0 right-[20%] w-[250px] h-[250px] bg-blue-600 rounded-full mix-blend-screen filter blur-[80px] opacity-15" />
+      <section className="py-16 sm:py-20 px-4 relative overflow-hidden">
+        {/* Animated mesh background */}
+        <div className="absolute inset-0 animated-mesh-bg" />
+        {/* Morphing orbs */}
+        <div className="absolute top-0 left-[20%] w-[300px] h-[300px] bg-purple-600 rounded-full mix-blend-screen filter blur-[100px] opacity-15 morph-orb-1" />
+        <div className="absolute bottom-0 right-[20%] w-[250px] h-[250px] bg-blue-600 rounded-full mix-blend-screen filter blur-[80px] opacity-15 morph-orb-2" />
 
         <div className="container mx-auto max-w-5xl relative z-10">
           <div className="flex flex-col lg:flex-row items-center gap-10 sm:gap-14">
             <div className="flex-1 text-center lg:text-right">
-              <Badge className="mb-5 bg-purple-500/20 text-purple-300 border-purple-500/30 rounded-full">
+              <Badge className="mb-5 bg-purple-500/20 text-purple-300 border-purple-500/30 rounded-full badge-shine">
                 <Wand2 className="w-3.5 h-3.5 ml-1.5" />
                 חדש!
               </Badge>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-5 text-white">
                 בנה דף נחיתה מקצועי
                 <br />
-                <span className="hero-gradient-text">עם AI תוך דקות</span>
+                <span className="text-shimmer">עם AI תוך דקות</span>
               </h2>
               <p className="text-lg text-gray-300 mb-8 leading-relaxed max-w-xl">
                 סוכן AI חכם שבונה לך דף נחיתה ממיר עם תמונות, טקסטים שיווקיים ו-CTA מותאמים אישית.
@@ -753,33 +890,38 @@ const HomeAlt = () => {
                 <Button
                   size="lg"
                   onClick={() => navigate('/landing-page-builder')}
-                  className="text-lg px-10 py-7 rounded-xl shadow-2xl hover:scale-105 transition-transform group font-bold"
+                  className="text-lg px-10 py-7 rounded-xl shadow-2xl hover:scale-105 transition-transform group font-bold neon-glow relative overflow-hidden"
                   style={{
                     background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)',
                     color: 'white'
                   }}
                 >
-                  <Wand2 className="w-5 h-5 ml-2 group-hover:rotate-12 transition-transform" />
-                  בנה דף נחיתה עכשיו
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  <span className="relative z-10 flex items-center gap-2">
+                    <Wand2 className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                    בנה דף נחיתה עכשיו
+                  </span>
                 </Button>
                 <Button
                   size="lg"
                   onClick={() => navigate('/services/landing-pages')}
-                  className="text-lg px-8 py-7 rounded-xl font-semibold"
+                  className="text-lg px-8 py-7 rounded-xl font-semibold group relative overflow-hidden"
                   style={{
-                    background: 'rgba(255,255,255,0.1)',
-                    borderColor: 'rgba(255,255,255,0.2)',
+                    background: 'rgba(255,255,255,0.08)',
+                    backdropFilter: 'blur(10px)',
+                    borderColor: 'rgba(255,255,255,0.15)',
                     color: 'white'
                   }}
                 >
-                  למד עוד
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  <span className="relative z-10">למד עוד</span>
                 </Button>
               </div>
             </div>
-            <div className="w-56 sm:w-72 h-56 sm:h-72 rounded-3xl bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 flex items-center justify-center shadow-2xl shrink-0 relative group">
+            <div className="w-56 sm:w-72 h-56 sm:h-72 rounded-3xl bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 flex items-center justify-center shadow-2xl shrink-0 relative group gradient-shadow">
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 opacity-50 blur-xl group-hover:blur-2xl transition-all" />
               <div className="text-center text-white relative z-10">
-                <Layout className="w-16 sm:w-20 h-16 sm:h-20 mx-auto mb-3 opacity-90" />
+                <Layout className="w-16 sm:w-20 h-16 sm:h-20 mx-auto mb-3 opacity-90 group-hover:scale-110 transition-transform duration-500" />
                 <div className="flex items-center gap-2 justify-center text-white/70">
                   <Monitor className="w-5 h-5" />
                   <Smartphone className="w-4 h-4" />
@@ -792,7 +934,7 @@ const HomeAlt = () => {
       </section>
 
       {/* ===================== AI AGENTS ===================== */}
-      <section ref={agentsReveal.ref} className={`py-20 sm:py-28 px-4 bg-gradient-to-br from-[#0f0a2e]/5 via-[#1a1145]/5 to-[#2d1b69]/5 transition-all duration-700 ${agentsReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <section ref={agentsReveal.ref} className={`py-20 sm:py-28 px-4 bg-gradient-to-br from-[#0f0a2e]/5 via-[#1a1145]/5 to-[#2d1b69]/5 section-reveal ${agentsReveal.isVisible ? 'is-visible' : ''}`}>
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-14">
             <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full">
@@ -807,7 +949,7 @@ const HomeAlt = () => {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
+          <div className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10 stagger-reveal ${agentsReveal.isVisible ? 'is-visible' : ''}`}>
             {[
               { id: 'seo', name: 'סוכן SEO', avatar: '🔍', role: 'מומחה קידום אורגני', gradient: 'from-green-500 to-emerald-600', desc: 'שיפור דירוג בגוגל ותנועה אורגנית' },
               { id: 'ppc', name: 'סוכן PPC', avatar: '🎯', role: 'מומחה פרסום ממומן', gradient: 'from-blue-600 to-purple-600', desc: 'קמפיינים ממומנים עם ROI מקסימלי' },
@@ -818,22 +960,22 @@ const HomeAlt = () => {
             ].map((agent) => (
               <Card
                 key={agent.id}
-                className="p-5 border border-border/50 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer group"
+                className="p-5 border border-border/50 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer group gradient-border-animated card-3d"
                 onClick={() => navigate('/ai-agents')}
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${agent.gradient} flex items-center justify-center text-xl group-hover:scale-110 transition-transform shadow-lg`}>
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${agent.gradient} flex items-center justify-center text-xl group-hover:scale-125 group-hover:rotate-6 transition-all duration-500 shadow-lg gradient-shadow`}>
                     {agent.avatar}
                   </div>
                   <div>
-                    <div className="font-bold text-sm">{agent.name}</div>
+                    <div className="font-bold text-sm group-hover:text-primary transition-colors">{agent.name}</div>
                     <div className="text-[11px] text-muted-foreground">{agent.role}</div>
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground">{agent.desc}</p>
                 <div className="mt-3 flex items-center gap-1.5 text-xs text-primary font-medium group-hover:gap-2.5 transition-all">
                   התחל שיחה
-                  <ArrowLeft className="w-3 h-3" />
+                  <ArrowLeft className="w-3 h-3 group-hover:translate-x-[-4px] transition-transform" />
                 </div>
               </Card>
             ))}
@@ -854,13 +996,13 @@ const HomeAlt = () => {
         </div>
       </section>
 
-      {/* ===================== TESTIMONIALS ===================== */}
-      <section ref={testimonialsReveal.ref} className={`py-20 sm:py-28 px-4 transition-all duration-700 ${testimonialsReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      {/* ===================== TESTIMONIALS - AUTO-SCROLLING MARQUEE ===================== */}
+      <section ref={testimonialsReveal.ref} className={`py-20 sm:py-28 px-4 section-reveal ${testimonialsReveal.isVisible ? 'is-visible' : ''}`}>
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-14">
-            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full">
+            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full badge-shine">
               <Star className="w-3.5 h-3.5 ml-1.5 fill-yellow-400 text-yellow-400" />
-              המלצות לקוחות
+              עוזרים לעסקים לצמוח
             </Badge>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5">
               <span className="gradient-text">אלפי עסקים</span> כבר משתמשים
@@ -870,40 +1012,99 @@ const HomeAlt = () => {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-6 sm:gap-7">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="p-6 sm:p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 relative border border-border/50 hover:border-primary/20">
-                {/* Metric Badge */}
-                <div className="absolute -top-3 left-6">
-                  <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 shadow-lg text-sm font-bold px-3 py-1">
-                    {testimonial.metric}
-                  </Badge>
-                </div>
-
-                <div className="flex gap-1 mb-4 pt-3">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-4 h-4 fill-yellow-400 text-yellow-400"
-                    />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-6 text-[15px] sm:text-base leading-relaxed">
-                  &ldquo;{testimonial.text}&rdquo;
-                </p>
-                <div className="border-t border-border/50 pt-5 flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                    {testimonial.avatar}
-                  </div>
-                  <div>
-                    <div className="font-bold text-[15px]">{testimonial.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {testimonial.role} | {testimonial.company}
+          {/* Auto-scrolling marquee columns */}
+          <div className="marquee-container h-[500px] sm:h-[550px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 h-full">
+              {/* Column 1 - scrolls up */}
+              <div className="marquee-column marquee-up" style={{ '--marquee-duration': '22s' } as React.CSSProperties}>
+                {[...testimonials, ...testimonials].map((testimonial, index) => (
+                  <Card key={`col1-${index}`} className="p-5 sm:p-6 hover:shadow-xl transition-all duration-300 border border-border/50 hover:border-primary/20 hover-glow-card shrink-0">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 text-[11px] font-bold px-2 py-0.5">
+                        {testimonial.metric}
+                      </Badge>
+                      <div className="flex gap-0.5 mr-auto">
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                      &ldquo;{testimonial.text}&rdquo;
+                    </p>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-lg">
+                        {testimonial.avatar}
+                      </div>
+                      <div>
+                        <div className="font-bold text-sm">{testimonial.name}</div>
+                        <div className="text-xs text-muted-foreground">{testimonial.role} | {testimonial.company}</div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Column 2 - scrolls down */}
+              <div className="marquee-column marquee-down hidden sm:flex" style={{ '--marquee-duration': '28s' } as React.CSSProperties}>
+                {[...testimonials.slice(2), ...testimonials.slice(0, 2), ...testimonials.slice(2), ...testimonials.slice(0, 2)].map((testimonial, index) => (
+                  <Card key={`col2-${index}`} className="p-5 sm:p-6 hover:shadow-xl transition-all duration-300 border border-border/50 hover:border-primary/20 hover-glow-card shrink-0">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 text-[11px] font-bold px-2 py-0.5">
+                        {testimonial.metric}
+                      </Badge>
+                      <div className="flex gap-0.5 mr-auto">
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                      &ldquo;{testimonial.text}&rdquo;
+                    </p>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-lg">
+                        {testimonial.avatar}
+                      </div>
+                      <div>
+                        <div className="font-bold text-sm">{testimonial.name}</div>
+                        <div className="text-xs text-muted-foreground">{testimonial.role} | {testimonial.company}</div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Column 3 - scrolls up (hidden on small) */}
+              <div className="marquee-column marquee-up hidden lg:flex" style={{ '--marquee-duration': '25s' } as React.CSSProperties}>
+                {[...testimonials.slice(1), ...testimonials.slice(0, 1), ...testimonials.slice(1), ...testimonials.slice(0, 1)].map((testimonial, index) => (
+                  <Card key={`col3-${index}`} className="p-5 sm:p-6 hover:shadow-xl transition-all duration-300 border border-border/50 hover:border-primary/20 hover-glow-card shrink-0">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 text-[11px] font-bold px-2 py-0.5">
+                        {testimonial.metric}
+                      </Badge>
+                      <div className="flex gap-0.5 mr-auto">
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                      &ldquo;{testimonial.text}&rdquo;
+                    </p>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-lg">
+                        {testimonial.avatar}
+                      </div>
+                      <div>
+                        <div className="font-bold text-sm">{testimonial.name}</div>
+                        <div className="text-xs text-muted-foreground">{testimonial.role} | {testimonial.company}</div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Trust badges */}
@@ -929,10 +1130,10 @@ const HomeAlt = () => {
       </section>
 
       {/* ===================== PRICING ===================== */}
-      <section ref={pricingReveal.ref} className={`py-20 sm:py-28 px-4 bg-muted/20 transition-all duration-700 ${pricingReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <section ref={pricingReveal.ref} className={`py-20 sm:py-28 px-4 bg-muted/20 section-reveal ${pricingReveal.isVisible ? 'is-visible' : ''}`}>
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-14">
-            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full">
+            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full badge-shine">
               <CircleDot className="w-3.5 h-3.5 ml-1.5" />
               תמחור
             </Badge>
@@ -944,13 +1145,14 @@ const HomeAlt = () => {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 stagger-reveal ${pricingReveal.isVisible ? 'is-visible' : ''}`}>
             {[
               {
                 name: 'סטרטר',
                 price: '₪99',
                 originalPrice: '₪149',
                 period: 'לחודש',
+                save: 'חסכון 33%',
                 description: 'מושלם לעסקים קטנים שרוצים להתחיל עם AI',
                 features: [
                   '10 קמפיינים בחודש',
@@ -967,6 +1169,7 @@ const HomeAlt = () => {
                 price: '₪349',
                 originalPrice: '₪499',
                 period: 'לחודש',
+                save: 'חסכון 30%',
                 description: 'לעסקים שרוצים למקסם תוצאות',
                 features: [
                   'קמפיינים ללא הגבלה',
@@ -974,9 +1177,9 @@ const HomeAlt = () => {
                   'ציון ביצועים מתקדם',
                   'דפי נחיתה AI',
                   'וידאו AI',
+                  'סוכני AI מתקדמים',
                   'תמיכה 24/7',
                   'A/B Testing מתקדם',
-                  'אנליטיקס מתקדם',
                 ],
                 popular: true,
                 cta: 'התחל ניסיון חינם',
@@ -1001,19 +1204,24 @@ const HomeAlt = () => {
             ].map((plan, index) => (
               <Card
                 key={index}
-                className={`pricing-card p-7 sm:p-9 relative hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 ${
+                className={`pricing-card p-7 sm:p-9 relative hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 hover-glow-card ${
                   plan.popular
-                    ? 'border-2 border-primary shadow-xl ring-4 ring-primary/10 bg-card scale-[1.02]'
-                    : 'border border-border/50'
+                    ? 'border-2 border-primary shadow-xl ring-4 ring-primary/10 bg-card scale-[1.02] shimmer-border'
+                    : 'border border-border/50 gradient-border-animated'
                 }`}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <Badge className="shadow-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 text-sm px-4 py-1.5 rounded-full">
+                    <Badge className="shadow-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 text-sm px-4 py-1.5 rounded-full badge-shine">
                       <Sparkles className="w-3 h-3 ml-1" />
                       הכי פופולרי
                     </Badge>
                   </div>
+                )}
+                {'save' in plan && plan.save && (
+                  <Badge className="absolute top-4 left-4 bg-green-500/10 text-green-600 border-green-500/20 text-[11px]">
+                    {plan.save}
+                  </Badge>
                 )}
                 <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
                 <p className="text-sm text-muted-foreground mb-5">{plan.description}</p>
@@ -1033,8 +1241,8 @@ const HomeAlt = () => {
                   ))}
                 </ul>
                 <Button
-                  className={`w-full py-6 text-base font-bold rounded-xl ${
-                    plan.popular ? '' : ''
+                  className={`w-full py-6 text-base font-bold rounded-xl group relative overflow-hidden ${
+                    plan.popular ? 'neon-glow' : ''
                   }`}
                   variant={plan.popular ? 'default' : 'outline'}
                   onClick={() => navigate('/brief')}
@@ -1043,8 +1251,11 @@ const HomeAlt = () => {
                     color: 'white'
                   } : {}}
                 >
-                  {plan.cta}
-                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  <span className="relative z-10 flex items-center gap-2">
+                    {plan.cta}
+                    <ArrowLeft className="w-4 h-4 group-hover:translate-x-[-4px] transition-transform" />
+                  </span>
                 </Button>
               </Card>
             ))}
@@ -1054,7 +1265,7 @@ const HomeAlt = () => {
             <Button
               variant="ghost"
               onClick={() => navigate('/pricing')}
-              className="text-base"
+              className="text-base animated-underline"
             >
               ראה את כל החבילות בפירוט
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -1063,21 +1274,123 @@ const HomeAlt = () => {
         </div>
       </section>
 
+      {/* ===================== FAQ ACCORDION ===================== */}
+      <section ref={faqReveal.ref} className={`py-20 sm:py-28 px-4 section-reveal ${faqReveal.isVisible ? 'is-visible' : ''}`}>
+        <div className="container mx-auto max-w-3xl">
+          <div className="text-center mb-14">
+            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full badge-shine">
+              <MessageSquare className="w-3.5 h-3.5 ml-1.5" />
+              שאלות נפוצות
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5">
+              יש <span className="gradient-text">שאלות?</span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              הנה תשובות לשאלות הנפוצות ביותר
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              {
+                q: 'האם צריך ניסיון בפרסום כדי להשתמש ב-AdSync?',
+                a: 'בכלל לא! AdSync נבנה כדי שכל אחד יוכל ליצור קמפיינים מקצועיים. ה-AI עושה את כל העבודה הקשה - מהקופי ועד העיצוב, אתה רק צריך לספר על העסק שלך.',
+              },
+              {
+                q: 'איך AdSync שונה מסוכנות פרסום רגילה?',
+                a: 'AdSync מספק תוצאות מהירות פי 30 בעלות נמוכה פי 6. אתה מקבל עשרות וריאציות של מודעות תוך שניות, ציון ביצועים AI שמנבא הצלחה, ואופטימיזציה אוטומטית 24/7 - דברים שסוכנות רגילה לא יכולה להציע.',
+              },
+              {
+                q: 'לאילו פלטפורמות AdSync תומך?',
+                a: 'אנחנו תומכים בכל הפלטפורמות המובילות: Meta (פייסבוק ואינסטגרם), Google Ads, TikTok, LinkedIn, Taboola, Outbrain, וגם Email ו-SMS marketing.',
+              },
+              {
+                q: 'מה כולל הניסיון החינמי?',
+                a: 'הניסיון החינמי ל-7 ימים כולל גישה מלאה לכל היכולות של תוכנית ה-Pro - קמפיינים ללא הגבלה, כל הפלטפורמות, ציון ביצועים, דפי נחיתה AI ועוד. ללא כרטיס אשראי.',
+              },
+              {
+                q: 'האם הקמפיינים באמת מותאמים לשוק הישראלי?',
+                a: 'בהחלט. AdSync אומן ספציפית על נתוני השוק הישראלי - הטקסטים בעברית טבעית, העיצוב מותאם לקהל ישראלי, והמערכת מבינה את ההעדפות והטרנדים של הצרכן הישראלי.',
+              },
+              {
+                q: 'אפשר לבטל בכל עת?',
+                a: 'כמובן. אין התחייבות כלל. אתה יכול לבטל את המנוי בכל עת בלחיצת כפתור, בלי שאלות ובלי עמלות ביטול.',
+              },
+            ].map((faq, index) => (
+              <div
+                key={index}
+                className={`rounded-xl border transition-all duration-300 hover-glow-card ${
+                  openFaq === index
+                    ? 'border-primary/30 bg-primary/5 shadow-lg'
+                    : 'border-border/50 hover:border-border'
+                }`}
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                  className="w-full flex items-center justify-between p-5 sm:p-6 text-right"
+                >
+                  <span className="font-bold text-[15px] sm:text-base pr-2">{faq.q}</span>
+                  <div className={`w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 transition-transform duration-300 ${openFaq === index ? 'rotate-180' : ''}`}>
+                    <ChevronDown className="w-4 h-4 text-primary" />
+                  </div>
+                </button>
+                <div className={`accordion-content ${openFaq === index ? 'is-open' : ''}`}>
+                  <div>
+                    <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-0">
+                      <p className="text-muted-foreground text-sm sm:text-[15px] leading-relaxed">{faq.a}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-10">
+            <p className="text-muted-foreground text-sm mb-3">עדיין יש שאלות?</p>
+            <Button
+              variant="outline"
+              onClick={() => navigate('/ai-agents')}
+              className="rounded-xl group"
+            >
+              <Bot className="w-4 h-4 ml-2" />
+              שאל את סוכן ה-AI שלנו
+              <ArrowLeft className="w-4 h-4 mr-2 group-hover:translate-x-[-4px] transition-transform" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* ===================== FINAL CTA ===================== */}
-      <section ref={ctaReveal.ref} className={`py-24 sm:py-32 px-4 relative overflow-hidden transition-all duration-700 ${ctaReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        {/* Dark gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0f0a2e] via-[#1a1145] to-[#2d1b69]" />
-        <div className="absolute top-0 right-[20%] w-[400px] h-[400px] bg-purple-600 rounded-full mix-blend-screen filter blur-[120px] opacity-15" />
-        <div className="absolute bottom-0 left-[20%] w-[300px] h-[300px] bg-blue-600 rounded-full mix-blend-screen filter blur-[100px] opacity-15" />
+      <section ref={ctaReveal.ref} className={`py-24 sm:py-32 px-4 relative overflow-hidden section-reveal ${ctaReveal.isVisible ? 'is-visible' : ''}`}>
+        {/* Animated mesh background */}
+        <div className="absolute inset-0 animated-mesh-bg" />
+        <div className="absolute top-0 right-[20%] w-[400px] h-[400px] bg-purple-600 rounded-full mix-blend-screen filter blur-[120px] opacity-15 morph-orb-1" />
+        <div className="absolute bottom-0 left-[20%] w-[300px] h-[300px] bg-blue-600 rounded-full mix-blend-screen filter blur-[100px] opacity-15 morph-orb-2" />
+
+        {/* Floating particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1.5 h-1.5 bg-white/15 rounded-full"
+              style={{
+                left: `${20 + i * 20}%`,
+                top: `${25 + (i % 2) * 30}%`,
+                animation: `particle-float ${4 + i * 0.7}s ease-in-out infinite`,
+                animationDelay: `${i * 0.5}s`,
+              }}
+            />
+          ))}
+        </div>
 
         <div className="container mx-auto max-w-4xl relative z-10 text-center">
           <div className="mb-8">
-            <span className="text-6xl sm:text-7xl">🚀</span>
+            <span className="text-6xl sm:text-7xl inline-block animate-bounce-in">🚀</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-white leading-tight">
             מוכנים לשדרג את
             <br />
-            <span className="hero-gradient-text">הפרסום שלכם?</span>
+            <span className="text-shimmer">הפרסום שלכם?</span>
           </h2>
           <p className="text-lg sm:text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
             הצטרפו ל-3,200+ עסקים ישראליים שכבר יוצרים קמפיינים מנצחים עם AI.
@@ -1087,28 +1400,35 @@ const HomeAlt = () => {
             <Button
               size="lg"
               onClick={() => navigate('/brief')}
-              className="text-lg sm:text-xl px-12 sm:px-16 py-7 sm:py-8 rounded-2xl shadow-2xl hover:scale-105 transition-all font-bold"
+              className="text-lg sm:text-xl px-12 sm:px-16 py-7 sm:py-8 rounded-2xl shadow-2xl hover:scale-105 transition-all font-bold neon-glow group relative overflow-hidden"
               style={{
                 background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 50%, #06b6d4 100%)',
                 color: 'white'
               }}
             >
-              <Sparkles className="w-5 h-5 ml-2" />
-              יצירת קמפיין חינם
-              <ArrowLeft className="w-5 h-5 mr-2" />
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <span className="relative z-10 flex items-center gap-3">
+                <Sparkles className="w-5 h-5" />
+                יצירת קמפיין חינם
+                <ArrowLeft className="w-5 h-5 group-hover:translate-x-[-4px] transition-transform" />
+              </span>
             </Button>
             <Button
               size="lg"
               onClick={() => navigate('/landing-page-builder')}
-              className="text-lg px-10 py-7 sm:py-8 rounded-2xl font-semibold"
+              className="text-lg px-10 py-7 sm:py-8 rounded-2xl font-semibold group relative overflow-hidden"
               style={{
-                background: 'rgba(255,255,255,0.1)',
-                borderColor: 'rgba(255,255,255,0.2)',
+                background: 'rgba(255,255,255,0.08)',
+                backdropFilter: 'blur(10px)',
+                borderColor: 'rgba(255,255,255,0.15)',
                 color: 'white'
               }}
             >
-              <Layout className="w-5 h-5 ml-2" />
-              בנה דף נחיתה
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <span className="relative z-10 flex items-center gap-2">
+                <Layout className="w-5 h-5" />
+                בנה דף נחיתה
+              </span>
             </Button>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8 mt-8 text-sm text-gray-400">
