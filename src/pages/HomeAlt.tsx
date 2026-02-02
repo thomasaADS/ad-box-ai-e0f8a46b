@@ -450,33 +450,23 @@ const HomeAlt = () => {
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
       </section>
 
-      {/* ===================== LOGO CAROUSEL ===================== */}
-      <section ref={logosReveal.ref} className={`py-12 sm:py-16 px-4 border-b border-border/50 transition-all duration-700 ${logosReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <div className="container mx-auto max-w-6xl">
+      {/* ===================== SUPPORTED PLATFORMS ===================== */}
+      <section ref={logosReveal.ref} className={`py-14 sm:py-18 px-4 border-b border-border/50 transition-all duration-700 ${logosReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className="container mx-auto max-w-5xl">
           <p className="text-center text-sm text-muted-foreground mb-8 font-medium tracking-wide">
-            נבחר על ידי עסקים מובילים בישראל
+            יוצרים קמפיינים לכל הפלטפורמות המובילות
           </p>
-          <div className="logo-carousel-container">
-            <div className="logo-carousel">
-              {[...platforms, ...platforms].map((platform, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-muted/50 border border-border/50 whitespace-nowrap"
-                >
-                  <span className="text-xl">{platform.icon}</span>
-                  <span className="text-sm font-semibold text-muted-foreground">{platform.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-3 justify-center mt-8">
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-4 sm:gap-6">
             {platforms.map((platform) => (
-              <span
+              <div
                 key={platform.name}
-                className={`bg-gradient-to-r ${platform.color} text-white text-xs sm:text-sm px-4 py-1.5 rounded-full font-medium shadow-lg`}
+                className="flex flex-col items-center gap-2 group cursor-default"
               >
-                {platform.icon} {platform.name}
-              </span>
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${platform.color} flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300`}>
+                  <span className="text-lg sm:text-xl filter drop-shadow-sm">{platform.icon}</span>
+                </div>
+                <span className="text-[11px] sm:text-xs font-medium text-muted-foreground group-hover:text-foreground transition-colors">{platform.name}</span>
+              </div>
             ))}
           </div>
         </div>

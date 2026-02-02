@@ -1,53 +1,395 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
-import LandingPageAgent from '@/components/LandingPageAgent';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChatWidget } from '@/components/ChatWidget';
-import { Wand2, Layout, Palette, Sparkles, ArrowRight, CheckCircle2, Eye, Image as ImageIcon, Target, Zap, Clock, Download, Copy } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import {
+  Wand2,
+  Layout,
+  Sparkles,
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle,
+  Globe,
+  Target,
+  Zap,
+  Clock,
+  Download,
+  Copy,
+  Eye,
+  Loader2,
+  Image as ImageIcon,
+  FileText,
+  Palette,
+  Monitor,
+  Smartphone,
+  Link2,
+  Search,
+  Facebook,
+  Chrome,
+  Video,
+  Users,
+  BarChart3,
+  Megaphone,
+  ShoppingCart,
+  Mail,
+  MousePointerClick,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+  ExternalLink,
+  Building2,
+  Layers,
+  X,
+  type LucideIcon,
+} from 'lucide-react';
 
-interface PageData {
-  businessName?: string;
-  industry?: string;
-  targetAudience?: string;
-  mainGoal?: string;
-  colorScheme?: string;
-  style?: string;
-  heroImage?: string;
-  ctaText?: string;
+// ============================================================
+// Types
+// ============================================================
+
+interface ScrapedData {
+  url: string;
+  title: string;
+  description: string;
+  images: string[];
+  colors: string[];
+  texts: string[];
+  logo?: string;
 }
+
+interface CampaignConfig {
+  platform: 'facebook' | 'google' | 'tiktok' | 'all';
+  campaignType: string;
+  targetAudience: string;
+  businessName: string;
+  industry: string;
+  mainGoal: string;
+  colorScheme: string;
+  style: string;
+  heroImage: string;
+  ctaText: string;
+  additionalInfo: string;
+}
+
+type WizardStep = 'url' | 'analyze' | 'platform' | 'details' | 'generate' | 'preview';
+
+// ============================================================
+// URL Scraper - extracts data from client website
+// ============================================================
+
+async function scrapeWebsite(url: string): Promise<ScrapedData> {
+  // Ensure URL has protocol
+  const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+
+  try {
+    // Use allorigins proxy to fetch the page
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(fullUrl)}`;
+    const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
+
+    if (!response.ok) throw new Error('Failed to fetch');
+
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Extract title
+    const title =
+      doc.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
+      doc.querySelector('title')?.textContent ||
+      '';
+
+    // Extract description
+    const description =
+      doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
+      doc.querySelector('meta[name="description"]')?.getAttribute('content') ||
+      '';
+
+    // Extract images (og:image, large images, logo)
+    const images: string[] = [];
+    const ogImage = doc.querySelector('meta[property="og:image"]')?.getAttribute('content');
+    if (ogImage) images.push(ogImage.startsWith('http') ? ogImage : new URL(ogImage, fullUrl).href);
+
+    doc.querySelectorAll('img[src]').forEach((img) => {
+      const src = img.getAttribute('src');
+      if (src && !src.includes('data:') && !src.includes('.svg') && !src.includes('pixel') && !src.includes('tracking')) {
+        try {
+          const imgUrl = src.startsWith('http') ? src : new URL(src, fullUrl).href;
+          if (!images.includes(imgUrl)) images.push(imgUrl);
+        } catch { }
+      }
+    });
+
+    // Extract logo
+    const logo =
+      doc.querySelector('link[rel*="icon"][sizes="192x192"]')?.getAttribute('href') ||
+      doc.querySelector('link[rel*="icon"]')?.getAttribute('href') ||
+      doc.querySelector('link[rel="apple-touch-icon"]')?.getAttribute('href');
+    const logoUrl = logo ? (logo.startsWith('http') ? logo : new URL(logo, fullUrl).href) : undefined;
+
+    // Extract colors from inline styles and meta
+    const themeColor = doc.querySelector('meta[name="theme-color"]')?.getAttribute('content');
+    const colors: string[] = [];
+    if (themeColor) colors.push(themeColor);
+
+    // Extract meaningful text
+    const texts: string[] = [];
+    doc.querySelectorAll('h1, h2, h3, p').forEach((el) => {
+      const text = el.textContent?.trim();
+      if (text && text.length > 10 && text.length < 300) {
+        texts.push(text);
+      }
+    });
+
+    return {
+      url: fullUrl,
+      title: title.trim(),
+      description: description.trim(),
+      images: images.slice(0, 12),
+      colors,
+      texts: texts.slice(0, 10),
+      logo: logoUrl,
+    };
+  } catch (error) {
+    console.error('Scraping error:', error);
+    // Return minimal data - user can still fill in manually
+    return {
+      url: fullUrl,
+      title: '',
+      description: '',
+      images: [],
+      colors: [],
+      texts: [],
+    };
+  }
+}
+
+// ============================================================
+// Platform configs
+// ============================================================
+
+const platformOptions = [
+  {
+    id: 'facebook' as const,
+    name: 'Meta (Facebook & Instagram)',
+    icon: Facebook,
+    color: 'from-blue-500 to-blue-700',
+    description: 'מודעות לפיד, סטוריז, Reels ועוד',
+    sizes: ['1200x628', '1080x1080', '1080x1920'],
+  },
+  {
+    id: 'google' as const,
+    name: 'Google Ads',
+    icon: Chrome,
+    color: 'from-red-500 to-yellow-500',
+    description: 'באנרים ל-Display, YouTube ו-Search',
+    sizes: ['300x250', '728x90', '160x600'],
+  },
+  {
+    id: 'tiktok' as const,
+    name: 'TikTok Ads',
+    icon: Video,
+    color: 'from-gray-900 to-pink-600',
+    description: 'סרטוני פרסום ומודעות In-Feed',
+    sizes: ['1080x1920', '1080x1080'],
+  },
+  {
+    id: 'all' as const,
+    name: 'כל הפלטפורמות',
+    icon: Globe,
+    color: 'from-purple-600 to-blue-600',
+    description: 'קבל קמפיינים מותאמים לכל הפלטפורמות',
+    sizes: [],
+  },
+];
+
+const campaignTypes = [
+  { id: 'leads', label: 'יצירת לידים', icon: Users, desc: 'טפסים, הרשמות, פניות' },
+  { id: 'sales', label: 'מכירות', icon: ShoppingCart, desc: 'חנות אונליין, מוצרים' },
+  { id: 'awareness', label: 'מודעות למותג', icon: Megaphone, desc: 'חשיפה, ברנדינג' },
+  { id: 'traffic', label: 'תנועה לאתר', icon: MousePointerClick, desc: 'קליקים, ביקורים' },
+  { id: 'engagement', label: 'אינטראקציה', icon: BarChart3, desc: 'לייקים, תגובות, שיתופים' },
+  { id: 'app', label: 'התקנת אפליקציה', icon: Smartphone, desc: 'הורדות, רישומים' },
+];
+
+const colorSchemes = [
+  { id: 'purple-blue', name: 'סגול כחול', colors: ['#7c3aed', '#2563eb'], gradient: 'from-purple-600 to-blue-600' },
+  { id: 'green-teal', name: 'ירוק טורקיז', colors: ['#059669', '#0d9488'], gradient: 'from-emerald-600 to-teal-500' },
+  { id: 'orange-pink', name: 'כתום ורוד', colors: ['#ea580c', '#ec4899'], gradient: 'from-orange-600 to-pink-500' },
+  { id: 'dark-gold', name: 'שחור וזהב', colors: ['#1f2937', '#d97706'], gradient: 'from-gray-800 to-amber-500' },
+  { id: 'blue-cyan', name: 'כחול תכלת', colors: ['#2563eb', '#06b6d4'], gradient: 'from-blue-600 to-cyan-500' },
+  { id: 'red-orange', name: 'אדום כתום', colors: ['#dc2626', '#f97316'], gradient: 'from-red-600 to-orange-500' },
+];
+
+const styleOptions = [
+  { id: 'modern', label: 'מודרני ומינימליסטי' },
+  { id: 'bold', label: 'נועז וצבעוני' },
+  { id: 'corporate', label: 'עסקי ומקצועי' },
+  { id: 'creative', label: 'יצירתי ומקורי' },
+  { id: 'elegant', label: 'אלגנטי ומעודן' },
+];
+
+// ============================================================
+// Main Component
+// ============================================================
 
 export default function LandingPageBuilder() {
   const navigate = useNavigate();
-  const [showAgent, setShowAgent] = useState(false);
-  const [generatedPage, setGeneratedPage] = useState<PageData | null>(null);
+  const [step, setStep] = useState<WizardStep>('url');
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [scrapedData, setScrapedData] = useState<ScrapedData | null>(null);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedPage, setGeneratedPage] = useState<any>(null);
 
-  const handleAgentComplete = (data: PageData) => {
-    setGeneratedPage(data);
-    setShowAgent(false);
-    // Save to localStorage for persistence
-    const savedPages = JSON.parse(localStorage.getItem('savedLandingPages') || '[]');
-    savedPages.unshift({ ...data, id: Date.now().toString(), createdAt: new Date().toISOString() });
-    localStorage.setItem('savedLandingPages', JSON.stringify(savedPages));
+  const [config, setConfig] = useState<CampaignConfig>({
+    platform: 'facebook',
+    campaignType: 'leads',
+    targetAudience: '',
+    businessName: '',
+    industry: '',
+    mainGoal: 'יצירת לידים',
+    colorScheme: 'purple-blue',
+    style: 'modern',
+    heroImage: '',
+    ctaText: 'התחל עכשיו',
+    additionalInfo: '',
+  });
+
+  // Progress steps for wizard
+  const steps: { id: WizardStep; label: string; icon: LucideIcon }[] = [
+    { id: 'url', label: 'כתובת אתר', icon: Link2 },
+    { id: 'analyze', label: 'ניתוח', icon: Search },
+    { id: 'platform', label: 'פלטפורמה', icon: Globe },
+    { id: 'details', label: 'פרטים', icon: FileText },
+    { id: 'generate', label: 'יצירה', icon: Sparkles },
+    { id: 'preview', label: 'תצוגה', icon: Eye },
+  ];
+
+  const currentStepIndex = steps.findIndex((s) => s.id === step);
+
+  // ============================================================
+  // Handle URL analysis
+  // ============================================================
+
+  const handleAnalyzeUrl = async () => {
+    if (!websiteUrl.trim()) {
+      toast.error('הכנס כתובת אתר');
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setStep('analyze');
+
+    try {
+      const data = await scrapeWebsite(websiteUrl.trim());
+      setScrapedData(data);
+
+      // Auto-fill config from scraped data
+      if (data.title) {
+        setConfig((prev) => ({ ...prev, businessName: data.title }));
+      }
+      if (data.description) {
+        setConfig((prev) => ({ ...prev, additionalInfo: data.description }));
+      }
+      if (data.images.length > 0) {
+        setConfig((prev) => ({ ...prev, heroImage: data.images[0] }));
+        setSelectedImages([data.images[0]]);
+      }
+
+      toast.success('האתר נותח בהצלחה!');
+    } catch {
+      toast.error('לא הצלחנו לנתח את האתר, ניתן להמשיך ידנית');
+      setScrapedData({ url: websiteUrl, title: '', description: '', images: [], colors: [], texts: [] });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
-  const handlePublishPage = () => {
-    if (!generatedPage) return;
+  const handleSkipUrl = () => {
+    setScrapedData({ url: '', title: '', description: '', images: [], colors: [], texts: [] });
+    setStep('platform');
+  };
 
-    // Generate a downloadable HTML page
-    const colorGradient = generatedPage.colorScheme === 'כחול וסגול'
-      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-      : generatedPage.colorScheme === 'ירוק וכחול'
-      ? 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
-      : generatedPage.colorScheme === 'כתום וורוד'
-      ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
-      : generatedPage.colorScheme === 'שחור וזהב'
-      ? 'linear-gradient(135deg, #000000 0%, #b8860b 100%)'
-      : 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)';
+  // ============================================================
+  // Handle page generation
+  // ============================================================
+
+  const handleGenerate = async () => {
+    setStep('generate');
+    setIsGenerating(true);
+
+    // Generate AI image if no hero image from scraping
+    let heroImage = config.heroImage;
+    if (!heroImage) {
+      try {
+        const styles = [
+          'cinematic lighting, 8k uhd, professional photography',
+          'vibrant colors, dynamic composition, award winning',
+          'soft natural lighting, ultra detailed, masterpiece',
+        ];
+        const randomStyle = styles[Math.floor(Math.random() * styles.length)];
+        const seed = Math.floor(Math.random() * 1000000);
+        const prompt = `professional ${config.industry || 'business'} landing page hero, ${config.style}, ${randomStyle}`;
+        heroImage = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1200&height=800&seed=${seed}&nologo=true&enhance=true&model=flux&t=${Date.now()}`;
+
+        // Preload
+        await new Promise<void>((resolve, reject) => {
+          const img = document.createElement('img');
+          img.onload = () => resolve();
+          img.onerror = () => reject();
+          img.src = heroImage;
+        });
+      } catch {
+        heroImage = '';
+      }
+    }
+
+    // Simulate generation with progress
+    await new Promise((r) => setTimeout(r, 2500));
+
+    const scheme = colorSchemes.find((c) => c.id === config.colorScheme);
+    const gradientCSS = scheme
+      ? `linear-gradient(135deg, ${scheme.colors[0]} 0%, ${scheme.colors[1]} 100%)`
+      : 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)';
+
+    setGeneratedPage({
+      ...config,
+      heroImage,
+      gradient: gradientCSS,
+      scrapedImages: selectedImages,
+      platformName: platformOptions.find((p) => p.id === config.platform)?.name || 'Meta',
+    });
+
+    setIsGenerating(false);
+    setStep('preview');
+
+    // Save to localStorage
+    const savedPages = JSON.parse(localStorage.getItem('savedLandingPages') || '[]');
+    savedPages.unshift({
+      ...config,
+      heroImage,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+    });
+    localStorage.setItem('savedLandingPages', JSON.stringify(savedPages));
+
+    toast.success('דף הנחיתה נוצר בהצלחה!');
+  };
+
+  // ============================================================
+  // Download HTML
+  // ============================================================
+
+  const handleDownload = () => {
+    if (!generatedPage) return;
 
     const html = `<!DOCTYPE html>
 <html lang="he" dir="rtl">
@@ -56,52 +398,73 @@ export default function LandingPageBuilder() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${generatedPage.businessName || 'דף נחיתה'}</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Heebo', 'Segoe UI', sans-serif; direction: rtl; }
-.hero { min-height: 600px; display: flex; align-items: center; justify-content: center; background: ${colorGradient}; position: relative; text-align: center; color: white; padding: 40px 20px; }
-.hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.4; }
-.hero-content { position: relative; z-index: 2; max-width: 800px; }
-.hero h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 20px; text-shadow: 2px 2px 8px rgba(0,0,0,0.3); }
-.hero p { font-size: 1.5rem; margin-bottom: 30px; }
-.btn { display: inline-block; padding: 16px 48px; background: white; color: #6b46c1; border-radius: 50px; font-size: 1.3rem; font-weight: 700; text-decoration: none; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-.features { padding: 80px 20px; background: white; text-align: center; }
-.features h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 50px; }
-.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; max-width: 1000px; margin: 0 auto; }
-.feature-card { padding: 30px; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
-.feature-card h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; }
-.cta { padding: 80px 20px; background: ${colorGradient}; text-align: center; color: white; }
-.cta h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 20px; }
-.cta p { font-size: 1.3rem; margin-bottom: 30px; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Heebo','Segoe UI',sans-serif;direction:rtl;color:#1a1a2e}
+.hero{min-height:90vh;display:flex;align-items:center;justify-content:center;background:${generatedPage.gradient};position:relative;text-align:center;color:#fff;padding:60px 24px;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.25)}
+.hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.35}
+.hero-content{position:relative;z-index:2;max-width:720px}
+.hero h1{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;margin-bottom:24px;line-height:1.1}
+.hero p{font-size:clamp(1.1rem,2.5vw,1.5rem);margin-bottom:32px;opacity:0.9}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:18px 48px;background:#fff;color:${colorSchemes.find((c) => c.id === config.colorScheme)?.colors[0] || '#7c3aed'};border-radius:16px;font-size:1.2rem;font-weight:700;text-decoration:none;box-shadow:0 8px 32px rgba(0,0,0,0.2);transition:transform 0.2s}
+.btn:hover{transform:scale(1.05)}
+.badge{display:inline-block;padding:10px 24px;background:rgba(255,255,255,0.15);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.2);border-radius:50px;font-size:0.95rem;margin-bottom:24px}
+.features{padding:100px 24px;background:#fff;text-align:center}
+.features h2{font-size:clamp(2rem,4vw,3rem);font-weight:800;margin-bottom:16px}
+.features .sub{font-size:1.15rem;color:#666;margin-bottom:60px;max-width:600px;margin-left:auto;margin-right:auto}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;max-width:1100px;margin:0 auto}
+.f-card{padding:36px 28px;border-radius:20px;background:#f8f9fc;border:1px solid #eee;text-align:center;transition:transform 0.3s,box-shadow 0.3s}
+.f-card:hover{transform:translateY(-8px);box-shadow:0 12px 40px rgba(0,0,0,0.08)}
+.f-card .icon{width:64px;height:64px;border-radius:16px;background:${generatedPage.gradient};display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;color:#fff}
+.f-card h3{font-size:1.3rem;font-weight:700;margin-bottom:10px}
+.f-card p{color:#666;line-height:1.7}
+.stats{padding:80px 24px;background:#f8f9fc}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;max-width:900px;margin:0 auto;text-align:center}
+.stat-num{font-size:2.5rem;font-weight:900;background:${generatedPage.gradient};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-label{font-size:0.95rem;color:#666;margin-top:4px}
+.cta{padding:100px 24px;background:${generatedPage.gradient};text-align:center;color:#fff;position:relative;overflow:hidden}
+.cta h2{font-size:clamp(2rem,4vw,3rem);font-weight:800;margin-bottom:20px}
+.cta p{font-size:1.2rem;margin-bottom:32px;opacity:0.9}
+.footer{padding:32px 24px;text-align:center;color:#666;font-size:0.9rem;border-top:1px solid #eee}
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
 <section class="hero">
-${generatedPage.heroImage ? `<img src="${generatedPage.heroImage}" alt="Hero">` : ''}
+${generatedPage.heroImage ? `<img class="bg" src="${generatedPage.heroImage}" alt="">` : ''}
 <div class="hero-content">
-<p style="font-size:1rem;background:rgba(255,255,255,0.2);display:inline-block;padding:8px 24px;border-radius:50px;margin-bottom:20px">${generatedPage.industry || ''}</p>
-<h1>${generatedPage.businessName || ''}</h1>
-<p>הפתרון המושלם ל${generatedPage.targetAudience || ''}</p>
-<a href="#" class="btn">${generatedPage.mainGoal || 'התחל עכשיו'}</a>
+<div class="badge">${generatedPage.industry || 'פתרון מקצועי'}</div>
+<h1>${generatedPage.businessName || 'העסק שלך'}</h1>
+<p>${generatedPage.additionalInfo || `הפתרון המושלם ל${generatedPage.targetAudience || 'הלקוחות שלך'}`}</p>
+<a href="#" class="btn">${generatedPage.ctaText || 'התחל עכשיו'} &larr;</a>
 </div>
 </section>
 <section class="features">
 <h2>למה לבחור בנו?</h2>
+<p class="sub">אנחנו מספקים את הפתרון המושלם עבורך</p>
 <div class="features-grid">
-<div class="feature-card"><h3>מהיר ויעיל</h3><p>תוצאות מיידיות שחוסכות לך זמן</p></div>
-<div class="feature-card"><h3>מדויק ומקצועי</h3><p>פתרונות מותאמים אישית לצרכים שלך</p></div>
-<div class="feature-card"><h3>אמין ובטוח</h3><p>השירות הכי מהימן בשוק</p></div>
+<div class="f-card"><div class="icon">⚡</div><h3>מהיר ויעיל</h3><p>תוצאות מיידיות שחוסכות לך זמן יקר</p></div>
+<div class="f-card"><div class="icon">🎯</div><h3>מדויק ומקצועי</h3><p>פתרונות מותאמים אישית לצרכים שלך</p></div>
+<div class="f-card"><div class="icon">🛡️</div><h3>אמין ובטוח</h3><p>השירות הכי מהימן ומקצועי בשוק</p></div>
+</div>
+</section>
+<section class="stats">
+<div class="stats-grid">
+<div><div class="stat-num">3,200+</div><div class="stat-label">לקוחות מרוצים</div></div>
+<div><div class="stat-num">98%</div><div class="stat-label">שביעות רצון</div></div>
+<div><div class="stat-num">24/7</div><div class="stat-label">זמינות מלאה</div></div>
+<div><div class="stat-num">5⭐</div><div class="stat-label">דירוג ממוצע</div></div>
 </div>
 </section>
 <section class="cta">
 <h2>מוכנים להתחיל?</h2>
 <p>הצטרפו אלינו עוד היום וגלו את ההבדל!</p>
-<a href="#" class="btn">${generatedPage.mainGoal || 'התחל'} עכשיו!</a>
+<a href="#" class="btn" style="color:${colorSchemes.find((c) => c.id === config.colorScheme)?.colors[0] || '#7c3aed'}">${generatedPage.ctaText || 'התחל'} עכשיו! &larr;</a>
 </section>
+<div class="footer">&copy; ${new Date().getFullYear()} ${generatedPage.businessName || ''} | נבנה ע"י AdSync AI</div>
 </body>
 </html>`;
 
-    // Create downloadable file
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -112,227 +475,644 @@ ${generatedPage.heroImage ? `<img src="${generatedPage.heroImage}" alt="Hero">` 
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    toast.success('דף הנחיתה הורד בהצלחה!', {
-      description: 'קובץ HTML מוכן להעלאה לשרת שלך',
-    });
+    toast.success('דף הנחיתה הורד בהצלחה!');
   };
 
-  const handleCopyHTML = () => {
-    if (!generatedPage) return;
-    // Copy a simplified version to clipboard
-    const text = `${generatedPage.businessName}\n\n${generatedPage.industry}\nקהל יעד: ${generatedPage.targetAudience}\nמטרה: ${generatedPage.mainGoal}\nסגנון: ${generatedPage.style}\nצבעים: ${generatedPage.colorScheme}`;
-    navigator.clipboard.writeText(text);
-    toast.success('הפרטים הועתקו!');
-  };
-
-  if (showAgent) {
-    return <LandingPageAgent onComplete={handleAgentComplete} />;
-  }
-
-  if (generatedPage) {
-    // Preview the generated landing page
-    return (
-      <div className="min-h-screen">
-        <Navbar />
-        
-        {/* Generated Landing Page Preview */}
-        <div className="pt-20">
-          {/* Hero Section */}
-          <section 
-            className="relative min-h-[600px] flex items-center justify-center overflow-hidden"
-            style={{
-              background: generatedPage.colorScheme === 'כחול וסגול' 
-                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                : generatedPage.colorScheme === 'ירוק וכחול'
-                ? 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
-                : generatedPage.colorScheme === 'כתום וורוד'
-                ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
-                : generatedPage.colorScheme === 'שחור וזהב'
-                ? 'linear-gradient(135deg, #000000 0%, #b8860b 100%)'
-                : 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
-            }}
-          >
-            {generatedPage.heroImage && (
-              <div className="absolute inset-0">
-                <img 
-                  src={generatedPage.heroImage} 
-                  alt="Hero" 
-                  className="w-full h-full object-cover opacity-40"
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-black/50 to-transparent"></div>
-              </div>
-            )}
-            
-            <div className="relative z-10 text-center text-white px-4 sm:px-6 max-w-5xl">
-              <Badge className="mb-4 sm:mb-6 text-sm sm:text-lg px-4 sm:px-6 py-1.5 sm:py-2 bg-white/20 backdrop-blur-md border-white/30">
-                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 inline" />
-                {generatedPage.industry}
-              </Badge>
-
-              <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold mb-4 sm:mb-6 drop-shadow-2xl">
-                {generatedPage.businessName}
-              </h1>
-
-              <p className="text-lg sm:text-2xl mb-6 sm:mb-8 drop-shadow-lg">
-                הפתרון המושלם ל{generatedPage.targetAudience}
-              </p>
-
-              <Button
-                size="lg"
-                className="text-base sm:text-xl px-8 sm:px-12 py-5 sm:py-7 bg-white text-purple-600 hover:bg-gray-100 font-bold rounded-full shadow-2xl"
-              >
-                {generatedPage.mainGoal} <ArrowRight className="mr-2 w-5 h-5 sm:w-6 sm:h-6" />
-              </Button>
-            </div>
-          </section>
-
-          {/* Features Section */}
-          <section className="py-20 px-6 bg-white">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-5xl font-bold text-center mb-16">למה לבחור בנו?</h2>
-
-              <div className="grid md:grid-cols-3 gap-8">
-                {[
-                  { Icon: Zap, title: 'מהיר ויעיל', desc: 'תוצאות מיידיות שחוסכות לך זמן' },
-                  { Icon: Target, title: 'מדויק ומקצועי', desc: 'פתרונות מותאמים אישית לצרכים שלך' },
-                  { Icon: CheckCircle2, title: 'אמין ובטוח', desc: 'השירות הכי מהימן בשוק' }
-                ].map((feature, idx) => (
-                  <Card key={idx} className="p-8 text-center hover:shadow-xl transition-shadow">
-                    <div className="flex justify-center mb-4">
-                      <feature.Icon className="w-16 h-16 text-purple-600" />
-                    </div>
-                    <h3 className="text-2xl font-bold mb-3">{feature.title}</h3>
-                    <p className="text-gray-600 text-lg">{feature.desc}</p>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* CTA Section */}
-          <section className="py-20 px-6 bg-gradient-to-br from-purple-600 to-blue-600 text-white">
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-5xl font-bold mb-6">מוכנים להתחיל?</h2>
-              <p className="text-2xl mb-10">הצטרפו אלינו עוד היום וגלו את ההבדל!</p>
-              
-              <Button 
-                size="lg"
-                className="text-xl px-12 py-7 bg-white text-purple-600 hover:bg-gray-100 font-bold rounded-full shadow-2xl"
-              >
-                {generatedPage.mainGoal} עכשיו! <Sparkles className="mr-2 w-6 h-6" />
-              </Button>
-            </div>
-          </section>
-
-          {/* Edit Controls */}
-          <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-white rounded-2xl shadow-2xl px-6 py-4 flex gap-3 z-50 border border-gray-200">
-            <Button onClick={() => setShowAgent(true)} variant="outline" className="gap-2">
-              <Eye className="w-4 h-4" />
-              ערוך את הדף
-            </Button>
-            <Button onClick={() => setGeneratedPage(null)} variant="outline" className="gap-2">
-              <Sparkles className="w-4 h-4" />
-              צור דף חדש
-            </Button>
-            <Button onClick={handleCopyHTML} variant="outline" className="gap-2">
-              <Copy className="w-4 h-4" />
-              העתק פרטים
-            </Button>
-            <Button onClick={handlePublishPage} className="bg-gradient-to-r from-purple-600 to-blue-600 text-white gap-2">
-              <Download className="w-5 h-5" />
-              הורד דף נחיתה
-            </Button>
-          </div>
-        </div>
-        
-        <Footer />
-        <ChatWidget />
-      </div>
-    );
-  }
+  // ============================================================
+  // Render wizard steps
+  // ============================================================
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+    <div className="min-h-screen bg-background">
       <Navbar />
-      
-      <div className="pt-20 sm:pt-24 pb-12 sm:pb-16 px-3 sm:px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8 sm:mb-12">
-            <Badge className="mb-4 text-sm sm:text-lg px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-              <Wand2 className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2 inline" />
-              יצירת תמונות וטקסט עם AI
-            </Badge>
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              בונה דפי נחיתה AI
-            </h1>
-            <p className="text-lg sm:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed px-2">
-              צור דף נחיתה מקצועי בדקות עם סוכן AI חכם
-              <br />
-              <span className="text-base sm:text-xl text-purple-600 font-semibold">+ יצירת תמונות מדהימות בבינה מלאכותית!</span>
-            </p>
+
+      {/* Hero Header */}
+      <section className="relative pt-24 sm:pt-28 pb-6 sm:pb-8 px-4 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0f0a2e] via-[#1a1145] to-[#2d1b69]" />
+        <div className="absolute top-0 right-[20%] w-[300px] h-[300px] bg-purple-600 rounded-full mix-blend-screen filter blur-[100px] opacity-15" />
+        <div className="absolute bottom-0 left-[10%] w-[250px] h-[250px] bg-blue-600 rounded-full mix-blend-screen filter blur-[80px] opacity-10" />
+
+        <div className="container mx-auto max-w-4xl relative z-10 text-center">
+          <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30 rounded-full text-sm">
+            <Wand2 className="w-3.5 h-3.5 ml-1.5" />
+            בונה דפי נחיתה + קמפיינים AI
+          </Badge>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-3">
+            בנה דף נחיתה <span className="hero-gradient-text">וקמפיינים</span>
+          </h1>
+          <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto">
+            הכנס את כתובת האתר שלך ו-AI ינתח, ייצור ויתאים קמפיינים לפייסבוק, גוגל וטיקטוק
+          </p>
+        </div>
+
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent" />
+      </section>
+
+      {/* Progress Steps */}
+      <div className="container mx-auto max-w-4xl px-4 py-6">
+        <div className="flex items-center justify-between relative">
+          {/* Progress line */}
+          <div className="absolute top-5 right-5 left-5 h-0.5 bg-border" />
+          <div
+            className="absolute top-5 right-5 h-0.5 bg-primary transition-all duration-500"
+            style={{ width: `${(currentStepIndex / (steps.length - 1)) * 100}%`, maxWidth: 'calc(100% - 40px)' }}
+          />
+
+          {steps.map((s, i) => {
+            const Icon = s.icon;
+            const isActive = i === currentStepIndex;
+            const isCompleted = i < currentStepIndex;
+            return (
+              <div key={s.id} className="relative z-10 flex flex-col items-center gap-1.5">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/20 scale-110'
+                      : isCompleted
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  {isCompleted ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+                </div>
+                <span className={`text-[10px] sm:text-xs font-medium ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                  {s.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Wizard Content */}
+      <div className="container mx-auto max-w-4xl px-4 pb-20">
+
+        {/* ============ STEP: URL INPUT ============ */}
+        {step === 'url' && (
+          <div className="space-y-6 animate-fade-in">
+            <Card className="p-6 sm:p-10 border-2 border-border/50 shadow-xl">
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <Globe className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-extrabold mb-2">הכנס את כתובת האתר</h2>
+                <p className="text-muted-foreground text-base sm:text-lg">
+                  ה-AI ינתח את האתר, ימשוך תמונות, צבעים ותוכן - ויתאים קמפיינים בדיוק למותג שלך
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
+                <div className="flex-1 relative">
+                  <Link2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    type="url"
+                    placeholder="www.example.co.il"
+                    value={websiteUrl}
+                    onChange={(e) => setWebsiteUrl(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAnalyzeUrl()}
+                    className="h-14 text-base sm:text-lg pr-11 rounded-xl border-2 focus:border-primary/50"
+                    dir="ltr"
+                  />
+                </div>
+                <Button
+                  onClick={handleAnalyzeUrl}
+                  className="h-14 px-8 text-base font-bold rounded-xl shadow-lg"
+                  style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)', color: 'white' }}
+                >
+                  <Search className="w-5 h-5 ml-2" />
+                  נתח אתר
+                </Button>
+              </div>
+
+              <div className="text-center mt-6">
+                <button
+                  onClick={handleSkipUrl}
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors underline underline-offset-4"
+                >
+                  אין לי אתר, אני רוצה ליצור מאפס
+                </button>
+              </div>
+            </Card>
+
+            {/* Feature highlights */}
+            <div className="grid sm:grid-cols-3 gap-4">
+              {[
+                { icon: Search, title: 'ניתוח אוטומטי', desc: 'AI סורק את האתר ומשיך תמונות, צבעים ותוכן', gradient: 'from-purple-600 to-blue-600' },
+                { icon: Target, title: 'התאמה לפלטפורמה', desc: 'מודעות מותאמות לפייסבוק, גוגל וטיקטוק', gradient: 'from-blue-600 to-cyan-500' },
+                { icon: Zap, title: 'תוצאות מיידיות', desc: 'דף נחיתה + קמפיינים מוכנים תוך דקות', gradient: 'from-cyan-500 to-teal-500' },
+              ].map((item, i) => {
+                const Icon = item.icon;
+                return (
+                  <Card key={i} className="p-5 border border-border/50 hover:shadow-lg transition-all hover:-translate-y-1">
+                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center mb-3 shadow`}>
+                      <Icon className="w-5 h-5 text-white" />
+                    </div>
+                    <h3 className="font-bold text-sm mb-1">{item.title}</h3>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
+        )}
 
-          <Card className="p-5 sm:p-10 mb-6 sm:mb-8 shadow-2xl rounded-2xl">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 mb-8 sm:mb-10">
-              <div className="text-center p-5 sm:p-8 bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl hover:scale-105 transition-transform">
-                <Wand2 className="w-10 h-10 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-purple-600" />
-                <h3 className="text-lg sm:text-2xl font-bold mb-2 sm:mb-3">סוכן AI חכם</h3>
-                <p className="text-gray-600 text-sm sm:text-lg">AI שואל שאלות ויוצר את הדף המושלם</p>
-              </div>
-              <div className="text-center p-5 sm:p-8 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl hover:scale-105 transition-transform">
-                <Sparkles className="w-10 h-10 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-blue-600" />
-                <h3 className="text-lg sm:text-2xl font-bold mb-2 sm:mb-3">יצירת תמונות AI</h3>
-                <p className="text-gray-600 text-sm sm:text-lg">יצירת תמונות ייחודיות עם בינה מלאכותית</p>
-              </div>
-              <div className="text-center p-5 sm:p-8 bg-gradient-to-br from-cyan-50 to-teal-50 rounded-2xl hover:scale-105 transition-transform">
-                <Palette className="w-10 h-10 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-cyan-600" />
-                <h3 className="text-lg sm:text-2xl font-bold mb-2 sm:mb-3">התאמה מלאה</h3>
-                <p className="text-gray-600 text-sm sm:text-lg">כל פרט מותאם לעסק שלך</p>
-              </div>
-            </div>
-
-            <div className="text-center">
-              <Button
-                size="lg"
-                onClick={() => setShowAgent(true)}
-                className="text-lg sm:text-2xl px-8 sm:px-16 py-6 sm:py-8 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold rounded-2xl shadow-2xl hover:scale-[1.03] transition-all"
-              >
-                <Sparkles className="w-5 h-5 sm:w-7 sm:h-7 mr-2 sm:mr-3 animate-pulse" />
-                בואו ניצור דף נחיתה!
-              </Button>
-              <p className="text-gray-500 mt-3 sm:mt-4 text-sm sm:text-lg flex items-center justify-center gap-2">
-                <Clock className="w-4 h-4" />
-                לוקח בערך 2-3 דקות
-              </p>
-            </div>
-          </Card>
-
-          {/* Features List */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            {[
-              { Icon: ImageIcon, title: 'יצירת תמונות AI', desc: 'תאר מה שאתה רוצה והAI יצור תמונה מושלמת', bgColor: 'bg-blue-50', color: 'text-blue-600' },
-              { Icon: Target, title: 'ממוקד בתוצאות', desc: 'כל דף מותאם להשגת המטרה שלך', bgColor: 'bg-purple-50', color: 'text-purple-600' },
-              { Icon: Layout, title: 'רספונסיבי לחלוטין', desc: 'נראה מעולה בכל מכשיר', bgColor: 'bg-green-50', color: 'text-green-600' },
-              { Icon: Zap, title: 'מהיר וקל', desc: 'מענה לשאלות פשוטות ודף מוכן תוך דקות', bgColor: 'bg-orange-50', color: 'text-orange-600' }
-            ].map((feature, idx) => (
-              <Card key={idx} className="p-5 sm:p-6 hover:shadow-lg transition-shadow rounded-xl">
-                <div className="flex items-start gap-3 sm:gap-4">
-                  <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-lg ${feature.bgColor} flex items-center justify-center flex-shrink-0`}>
-                    <feature.Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${feature.color}`} />
-                  </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2">{feature.title}</h3>
-                    <p className="text-gray-600 text-sm sm:text-base">{feature.desc}</p>
-                  </div>
+        {/* ============ STEP: ANALYZING ============ */}
+        {step === 'analyze' && (
+          <div className="space-y-6 animate-fade-in">
+            {isAnalyzing ? (
+              <Card className="p-10 sm:p-16 text-center border-2 border-border/50 shadow-xl">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <Loader2 className="w-10 h-10 text-white animate-spin" />
+                </div>
+                <h2 className="text-2xl font-extrabold mb-3">מנתח את האתר...</h2>
+                <p className="text-muted-foreground mb-6">סורק תמונות, צבעים ותוכן מ-{websiteUrl}</p>
+                <div className="flex flex-col gap-2 max-w-xs mx-auto text-right">
+                  {['סורק מבנה אתר...', 'מושך תמונות...', 'מנתח צבעי מותג...', 'קורא תוכן...'].map((text, i) => (
+                    <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground animate-slide-up" style={{ animationDelay: `${i * 0.5}s` }}>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+                      {text}
+                    </div>
+                  ))}
                 </div>
               </Card>
-            ))}
+            ) : scrapedData ? (
+              <div className="space-y-6">
+                <Card className="p-6 sm:p-8 border-2 border-border/50 shadow-xl">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                      <CheckCircle className="w-6 h-6 text-green-500" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold">האתר נותח בהצלחה</h2>
+                      <p className="text-sm text-muted-foreground">{scrapedData.url}</p>
+                    </div>
+                  </div>
+
+                  {/* Title & Description */}
+                  {scrapedData.title && (
+                    <div className="mb-5 p-4 bg-muted/50 rounded-xl">
+                      <div className="text-sm font-semibold text-muted-foreground mb-1">שם העסק/אתר</div>
+                      <div className="font-bold text-lg">{scrapedData.title}</div>
+                      {scrapedData.description && (
+                        <div className="text-sm text-muted-foreground mt-1">{scrapedData.description}</div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Scraped Images */}
+                  {scrapedData.images.length > 0 && (
+                    <div className="mb-5">
+                      <div className="text-sm font-semibold text-muted-foreground mb-3">
+                        תמונות שנמצאו ({scrapedData.images.length}) - בחר תמונות לקמפיין:
+                      </div>
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                        {scrapedData.images.slice(0, 8).map((img, i) => (
+                          <div
+                            key={i}
+                            className={`relative aspect-square rounded-xl overflow-hidden cursor-pointer border-2 transition-all hover:scale-105 ${
+                              selectedImages.includes(img) ? 'border-primary ring-2 ring-primary/20' : 'border-transparent'
+                            }`}
+                            onClick={() => {
+                              setSelectedImages((prev) =>
+                                prev.includes(img) ? prev.filter((x) => x !== img) : [...prev, img]
+                              );
+                              if (!config.heroImage) setConfig((prev) => ({ ...prev, heroImage: img }));
+                            }}
+                          >
+                            <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
+                            {selectedImages.includes(img) && (
+                              <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                                <CheckCircle className="w-6 h-6 text-white drop-shadow-lg" />
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Scraped Texts */}
+                  {scrapedData.texts.length > 0 && (
+                    <div>
+                      <div className="text-sm font-semibold text-muted-foreground mb-2">
+                        טקסטים מהאתר:
+                      </div>
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {scrapedData.texts.slice(0, 5).map((text, i) => (
+                          <div key={i} className="text-sm text-muted-foreground p-2.5 bg-muted/30 rounded-lg">
+                            {text}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </Card>
+
+                <div className="flex gap-3 justify-between">
+                  <Button variant="outline" onClick={() => setStep('url')} className="rounded-xl">
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                    חזרה
+                  </Button>
+                  <Button
+                    onClick={() => setStep('platform')}
+                    className="rounded-xl font-bold px-8"
+                    style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)', color: 'white' }}
+                  >
+                    המשך לבחירת פלטפורמה
+                    <ChevronLeft className="w-4 h-4 mr-1" />
+                  </Button>
+                </div>
+              </div>
+            ) : null}
           </div>
-        </div>
+        )}
+
+        {/* ============ STEP: PLATFORM SELECTION ============ */}
+        {step === 'platform' && (
+          <div className="space-y-6 animate-fade-in">
+            <Card className="p-6 sm:p-8 border-2 border-border/50 shadow-xl">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl sm:text-3xl font-extrabold mb-2">בחר פלטפורמת פרסום</h2>
+                <p className="text-muted-foreground">לאיזו פלטפורמה רוצים להתאים את הקמפיין?</p>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                {platformOptions.map((platform) => {
+                  const Icon = platform.icon;
+                  const isSelected = config.platform === platform.id;
+                  return (
+                    <div
+                      key={platform.id}
+                      onClick={() => setConfig((prev) => ({ ...prev, platform: platform.id }))}
+                      className={`p-5 rounded-xl border-2 cursor-pointer transition-all hover:shadow-lg hover:-translate-y-1 ${
+                        isSelected ? 'border-primary bg-primary/5 shadow-md' : 'border-border/50 hover:border-primary/30'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${platform.color} flex items-center justify-center`}>
+                          <Icon className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-bold text-sm">{platform.name}</div>
+                          <div className="text-xs text-muted-foreground">{platform.description}</div>
+                        </div>
+                        {isSelected && <CheckCircle className="w-5 h-5 text-primary shrink-0" />}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Campaign Type */}
+              <div className="mt-8">
+                <h3 className="text-lg font-bold mb-4 text-center">מהי מטרת הקמפיין?</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
+                  {campaignTypes.map((type) => {
+                    const Icon = type.icon;
+                    const isSelected = config.campaignType === type.id;
+                    return (
+                      <div
+                        key={type.id}
+                        onClick={() =>
+                          setConfig((prev) => ({ ...prev, campaignType: type.id, mainGoal: type.label }))
+                        }
+                        className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all text-center hover:shadow ${
+                          isSelected ? 'border-primary bg-primary/5' : 'border-border/50 hover:border-primary/30'
+                        }`}
+                      >
+                        <Icon className={`w-6 h-6 mx-auto mb-1.5 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
+                        <div className="font-semibold text-sm">{type.label}</div>
+                        <div className="text-[11px] text-muted-foreground">{type.desc}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </Card>
+
+            <div className="flex gap-3 justify-between">
+              <Button
+                variant="outline"
+                onClick={() => setStep(scrapedData && scrapedData.url ? 'analyze' : 'url')}
+                className="rounded-xl"
+              >
+                <ChevronRight className="w-4 h-4 ml-1" />
+                חזרה
+              </Button>
+              <Button
+                onClick={() => setStep('details')}
+                className="rounded-xl font-bold px-8"
+                style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)', color: 'white' }}
+              >
+                המשך לפרטי העסק
+                <ChevronLeft className="w-4 h-4 mr-1" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* ============ STEP: DETAILS ============ */}
+        {step === 'details' && (
+          <div className="space-y-6 animate-fade-in">
+            <Card className="p-6 sm:p-8 border-2 border-border/50 shadow-xl">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl sm:text-3xl font-extrabold mb-2">פרטי העסק והעיצוב</h2>
+                <p className="text-muted-foreground">ספר לנו על העסק ובחר עיצוב</p>
+              </div>
+
+              <div className="space-y-5 max-w-xl mx-auto">
+                <div>
+                  <label className="text-sm font-semibold mb-1.5 block">שם העסק</label>
+                  <Input
+                    value={config.businessName}
+                    onChange={(e) => setConfig((prev) => ({ ...prev, businessName: e.target.value }))}
+                    placeholder="לדוגמה: TechFlow"
+                    className="h-12 text-base rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-semibold mb-1.5 block">תחום עיסוק</label>
+                  <Input
+                    value={config.industry}
+                    onChange={(e) => setConfig((prev) => ({ ...prev, industry: e.target.value }))}
+                    placeholder="לדוגמה: טכנולוגיה, אופנה, מזון..."
+                    className="h-12 text-base rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-semibold mb-1.5 block">קהל יעד</label>
+                  <Input
+                    value={config.targetAudience}
+                    onChange={(e) => setConfig((prev) => ({ ...prev, targetAudience: e.target.value }))}
+                    placeholder="לדוגמה: בעלי עסקים קטנים, גיל 25-45"
+                    className="h-12 text-base rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-semibold mb-1.5 block">טקסט כפתור CTA</label>
+                  <Input
+                    value={config.ctaText}
+                    onChange={(e) => setConfig((prev) => ({ ...prev, ctaText: e.target.value }))}
+                    placeholder="לדוגמה: התחל עכשיו, קבל הצעת מחיר"
+                    className="h-12 text-base rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-semibold mb-1.5 block">מידע נוסף (אופציונלי)</label>
+                  <Textarea
+                    value={config.additionalInfo}
+                    onChange={(e) => setConfig((prev) => ({ ...prev, additionalInfo: e.target.value }))}
+                    placeholder="תאר את העסק, המוצרים או השירותים..."
+                    rows={3}
+                    className="text-base rounded-xl resize-none"
+                  />
+                </div>
+
+                {/* Color Scheme */}
+                <div>
+                  <label className="text-sm font-semibold mb-3 block">פלטת צבעים</label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {colorSchemes.map((scheme) => (
+                      <div
+                        key={scheme.id}
+                        onClick={() => setConfig((prev) => ({ ...prev, colorScheme: scheme.id }))}
+                        className={`p-3 rounded-xl border-2 cursor-pointer transition-all text-center hover:shadow ${
+                          config.colorScheme === scheme.id ? 'border-primary bg-primary/5' : 'border-border/50 hover:border-primary/30'
+                        }`}
+                      >
+                        <div className={`h-8 rounded-lg bg-gradient-to-r ${scheme.gradient} mb-2`} />
+                        <div className="text-xs font-medium">{scheme.name}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Style */}
+                <div>
+                  <label className="text-sm font-semibold mb-3 block">סגנון עיצוב</label>
+                  <div className="flex flex-wrap gap-2">
+                    {styleOptions.map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => setConfig((prev) => ({ ...prev, style: opt.id }))}
+                        className={`px-4 py-2 rounded-full text-sm font-medium border-2 transition-all ${
+                          config.style === opt.id
+                            ? 'border-primary bg-primary/5 text-primary'
+                            : 'border-border/50 text-muted-foreground hover:border-primary/30'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <div className="flex gap-3 justify-between">
+              <Button variant="outline" onClick={() => setStep('platform')} className="rounded-xl">
+                <ChevronRight className="w-4 h-4 ml-1" />
+                חזרה
+              </Button>
+              <Button
+                onClick={handleGenerate}
+                disabled={!config.businessName.trim()}
+                className="rounded-xl font-bold px-8 shadow-lg"
+                style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)', color: 'white' }}
+              >
+                <Sparkles className="w-5 h-5 ml-2" />
+                צור דף נחיתה + קמפיין
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* ============ STEP: GENERATING ============ */}
+        {step === 'generate' && isGenerating && (
+          <div className="animate-fade-in">
+            <Card className="p-10 sm:p-16 text-center border-2 border-border/50 shadow-xl">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <Sparkles className="w-10 h-10 text-white animate-pulse" />
+              </div>
+              <h2 className="text-2xl font-extrabold mb-3">יוצר את הקמפיין שלך...</h2>
+              <p className="text-muted-foreground mb-8">ה-AI בונה דף נחיתה, מודעות ותוכן מותאם</p>
+
+              <div className="flex flex-col gap-3 max-w-sm mx-auto text-right">
+                {[
+                  'מנתח מותג ותוכן...',
+                  `מתאים לפלטפורמת ${platformOptions.find((p) => p.id === config.platform)?.name || ''}...`,
+                  'יוצר עיצוב דף נחיתה...',
+                  'מייצר תמונות AI...',
+                  'כותב טקסטים שיווקיים...',
+                  'מסיים ומייצא...',
+                ].map((text, i) => (
+                  <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground animate-slide-up" style={{ animationDelay: `${i * 0.4}s` }}>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-primary shrink-0" />
+                    {text}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* ============ STEP: PREVIEW ============ */}
+        {step === 'preview' && generatedPage && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Preview Card */}
+            <Card className="overflow-hidden border-2 border-border/50 shadow-xl">
+              {/* Mini Hero Preview */}
+              <div
+                className="relative h-64 sm:h-80 flex items-center justify-center overflow-hidden"
+                style={{ background: generatedPage.gradient }}
+              >
+                {generatedPage.heroImage && (
+                  <>
+                    <img src={generatedPage.heroImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-35" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  </>
+                )}
+                <div className="relative z-10 text-center text-white px-6">
+                  <Badge className="mb-3 bg-white/15 text-white border-white/20 backdrop-blur-sm text-xs">
+                    {generatedPage.industry || 'פתרון מקצועי'}
+                  </Badge>
+                  <h2 className="text-3xl sm:text-4xl font-extrabold mb-3 drop-shadow-lg">
+                    {generatedPage.businessName}
+                  </h2>
+                  <p className="text-base sm:text-lg opacity-90 mb-4 drop-shadow">
+                    {generatedPage.additionalInfo || `הפתרון המושלם ל${generatedPage.targetAudience}`}
+                  </p>
+                  <div className="inline-block px-6 py-3 bg-white text-gray-900 rounded-xl font-bold shadow-lg text-sm">
+                    {generatedPage.ctaText || 'התחל עכשיו'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Page Info */}
+              <div className="p-6">
+                <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                  <div className="p-4 bg-muted/30 rounded-xl">
+                    <div className="text-xs text-muted-foreground mb-1">פלטפורמה</div>
+                    <div className="font-bold text-sm">{generatedPage.platformName}</div>
+                  </div>
+                  <div className="p-4 bg-muted/30 rounded-xl">
+                    <div className="text-xs text-muted-foreground mb-1">מטרת קמפיין</div>
+                    <div className="font-bold text-sm">{generatedPage.mainGoal}</div>
+                  </div>
+                  <div className="p-4 bg-muted/30 rounded-xl">
+                    <div className="text-xs text-muted-foreground mb-1">קהל יעד</div>
+                    <div className="font-bold text-sm">{generatedPage.targetAudience || 'כלל הקהל'}</div>
+                  </div>
+                  <div className="p-4 bg-muted/30 rounded-xl">
+                    <div className="text-xs text-muted-foreground mb-1">סגנון</div>
+                    <div className="font-bold text-sm">{styleOptions.find((s) => s.id === generatedPage.style)?.label || generatedPage.style}</div>
+                  </div>
+                </div>
+
+                {/* Selected images from scraping */}
+                {generatedPage.scrapedImages && generatedPage.scrapedImages.length > 0 && (
+                  <div className="mb-6">
+                    <div className="text-sm font-semibold mb-3">תמונות לקמפיין ({generatedPage.scrapedImages.length})</div>
+                    <div className="flex gap-3 overflow-x-auto pb-2">
+                      {generatedPage.scrapedImages.map((img: string, i: number) => (
+                        <img key={i} src={img} alt="" className="w-24 h-24 rounded-xl object-cover border border-border/50 shrink-0" />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action buttons */}
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    onClick={handleDownload}
+                    className="flex-1 min-w-[180px] h-12 rounded-xl font-bold shadow-lg"
+                    style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)', color: 'white' }}
+                  >
+                    <Download className="w-5 h-5 ml-2" />
+                    הורד דף נחיתה HTML
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      const text = `${generatedPage.businessName}\nפלטפורמה: ${generatedPage.platformName}\nמטרה: ${generatedPage.mainGoal}\nקהל: ${generatedPage.targetAudience}\nCTA: ${generatedPage.ctaText}`;
+                      navigator.clipboard.writeText(text);
+                      toast.success('הפרטים הועתקו!');
+                    }}
+                    className="h-12 rounded-xl"
+                  >
+                    <Copy className="w-4 h-4 ml-2" />
+                    העתק פרטים
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setGeneratedPage(null);
+                      setStep('url');
+                      setWebsiteUrl('');
+                      setScrapedData(null);
+                      setSelectedImages([]);
+                      setConfig({
+                        platform: 'facebook',
+                        campaignType: 'leads',
+                        targetAudience: '',
+                        businessName: '',
+                        industry: '',
+                        mainGoal: 'יצירת לידים',
+                        colorScheme: 'purple-blue',
+                        style: 'modern',
+                        heroImage: '',
+                        ctaText: 'התחל עכשיו',
+                        additionalInfo: '',
+                      });
+                    }}
+                    className="h-12 rounded-xl"
+                  >
+                    <RefreshCw className="w-4 h-4 ml-2" />
+                    צור חדש
+                  </Button>
+                </div>
+              </div>
+            </Card>
+
+            {/* Next steps */}
+            <Card className="p-6 border border-border/50">
+              <h3 className="font-bold mb-4">מה הלאה?</h3>
+              <div className="grid sm:grid-cols-3 gap-3">
+                <button
+                  onClick={() => navigate('/brief')}
+                  className="p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors text-right"
+                >
+                  <Megaphone className="w-6 h-6 text-purple-500 mb-2" />
+                  <div className="font-semibold text-sm">צור קמפיין מלא</div>
+                  <div className="text-xs text-muted-foreground">מודעות + טקסטים + אסטרטגיה</div>
+                </button>
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors text-right"
+                >
+                  <BarChart3 className="w-6 h-6 text-blue-500 mb-2" />
+                  <div className="font-semibold text-sm">עבור לדשבורד</div>
+                  <div className="text-xs text-muted-foreground">נהל את כל הקמפיינים שלך</div>
+                </button>
+                <button
+                  onClick={() => navigate('/analytics')}
+                  className="p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors text-right"
+                >
+                  <Layers className="w-6 h-6 text-cyan-500 mb-2" />
+                  <div className="font-semibold text-sm">אנליטיקס</div>
+                  <div className="text-xs text-muted-foreground">עקוב אחרי ביצועים</div>
+                </button>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
 
       <Footer />
-      <ChatWidget />
     </div>
   );
 }
