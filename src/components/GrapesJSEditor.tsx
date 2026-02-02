@@ -24,7 +24,7 @@ export default function GrapesJSEditor({ onSave, initialHtml = '', initialCss = 
       storageManager: false,
       plugins: [gjsPresetWebpage],
       pluginsOpts: {
-        [gjsPresetWebpage]: {
+        'gjs-preset-webpage': {
           blocksBasicOpts: {
             blocks: ['column1', 'column2', 'column3', 'column3-7', 'text', 'link', 'image', 'video', 'map'],
             flexGrid: 1,
@@ -85,47 +85,7 @@ export default function GrapesJSEditor({ onSave, initialHtml = '', initialCss = 
                 className: 'btn-show-json',
                 label: '<i class="fa fa-download"></i>',
                 context: 'show-json',
-                command(editor: any) {
-                  const html = editor.getHtml();
-                  const css = editor.getCss();
-                  
-                  // Create downloadable file
-                  const fullHtml = `
-<!DOCTYPE html>
-<html dir="rtl" lang="he">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>דף נחיתה</title>
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; }
-    body { 
-      margin: 0; 
-      font-family: 'Heebo', sans-serif; 
-      direction: rtl;
-    }
-    ${css}
-  </style>
-</head>
-<body>
-  ${html}
-</body>
-</html>
-                  `;
-                  
-                  const blob = new Blob([fullHtml], { type: 'text/html' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = 'landing-page.html';
-                  a.click();
-                  URL.revokeObjectURL(url);
-                  
-                  if (onSave) {
-                    onSave(html, css);
-                  }
-                },
+                command: 'download-html',
               },
             ],
           },
@@ -211,6 +171,39 @@ export default function GrapesJSEditor({ onSave, initialHtml = '', initialCss = 
     });
     editor.Commands.add('set-device-mobile', {
       run: (ed: any) => ed.setDevice('Mobile'),
+    });
+    editor.Commands.add('download-html', {
+      run: (ed: any) => {
+        const html = ed.getHtml();
+        const css = ed.getCss();
+        const fullHtml = `<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>דף נחיתה</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Heebo', sans-serif; direction: rtl; }
+    ${css}
+  </style>
+</head>
+<body>
+  ${html}
+</body>
+</html>`;
+        const blob = new Blob([fullHtml], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'landing-page.html';
+        a.click();
+        URL.revokeObjectURL(url);
+        if (onSave) {
+          onSave(html, css);
+        }
+      },
     });
 
     grapesjsRef.current = editor;

@@ -390,7 +390,7 @@ const HomeAlt = () => {
           <div className="inline-block mb-6 animate-fade-in">
             <Badge
               variant="secondary"
-              className="text-sm font-medium px-5 py-2.5 rounded-full border border-purple-200 dark:border-purple-800 bg-white/80 dark:bg-white/5 backdrop-blur-sm"
+              className="text-sm font-medium px-5 py-2.5 rounded-full border border-purple-200 dark:border-purple-800 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-sm"
             >
               <Sparkles className="w-4 h-4 ml-2 text-purple-500" />
               3,200+ עסקים ישראליים כבר משתמשים
