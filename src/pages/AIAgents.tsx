@@ -899,6 +899,20 @@ export default function AIAgents() {
     eyal: 'from-emerald-600 to-cyan-600',
   };
 
+  // Hex color map for chat header inline style
+  const headerColorMap: Record<string, [string, string]> = {
+    maya: ['#059669', '#16a34a'],
+    adam: ['#2563eb', '#7c3aed'],
+    noa: ['#ec4899', '#f97316'],
+    dan: ['#06b6d4', '#2563eb'],
+    lior: ['#7c3aed', '#ec4899'],
+    roni: ['#f59e0b', '#dc2626'],
+    yael: ['#14b8a6', '#06b6d4'],
+    omer: ['#4b5563', '#db2777'],
+    shira: ['#6366f1', '#7c3aed'],
+    eyal: ['#059669', '#0891b2'],
+  };
+
   // Business value descriptions
   const businessValue: Record<string, string> = {
     maya: 'תעלי בגוגל ותקבלי תנועה אורגנית חינמית לאתר שלך',
@@ -965,12 +979,10 @@ export default function AIAgents() {
         <div className="fixed inset-0 z-50 bg-background flex flex-col">
           {/* Chat header with gradient */}
           <div
-            className={`flex items-center justify-between px-3 sm:px-5 py-3 sm:py-4 border-b border-white/10`}
-            style={{ background: `linear-gradient(135deg, var(--agent-from), var(--agent-to))`,
-              // @ts-ignore
-              '--agent-from': gradientMap[activeAgent.id]?.includes('emerald-500') ? '#059669' : gradientMap[activeAgent.id]?.includes('blue-600') ? '#2563eb' : gradientMap[activeAgent.id]?.includes('pink-500') ? '#ec4899' : gradientMap[activeAgent.id]?.includes('cyan-500') ? '#06b6d4' : gradientMap[activeAgent.id]?.includes('purple-600') ? '#7c3aed' : gradientMap[activeAgent.id]?.includes('amber-500') ? '#f59e0b' : gradientMap[activeAgent.id]?.includes('teal-500') ? '#14b8a6' : gradientMap[activeAgent.id]?.includes('gray-600') ? '#4b5563' : gradientMap[activeAgent.id]?.includes('indigo-500') ? '#6366f1' : '#059669',
-              '--agent-to': '#2563eb',
-            } as React.CSSProperties}
+            className="flex items-center justify-between px-3 sm:px-5 py-3 sm:py-4 border-b border-white/10"
+            style={{
+              background: `linear-gradient(135deg, ${headerColorMap[activeAgent.id]?.[0] ?? '#7c3aed'}, ${headerColorMap[activeAgent.id]?.[1] ?? '#2563eb'})`,
+            }}
           >
             <div className="flex items-center gap-2.5 sm:gap-3">
               {renderAvatar(activeAgent.id, 'sm')}
