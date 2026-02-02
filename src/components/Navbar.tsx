@@ -206,6 +206,23 @@ export const Navbar = () => {
                 </Link>
               ))}
 
+              <Link
+                to="/landing-page-builder"
+                className="text-sm font-medium px-6 py-2.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-primary transition-colors flex items-center gap-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+                מחולל קמפיינים AI
+              </Link>
+              <Link
+                to="/ai-agents"
+                className="text-sm font-medium px-6 py-2.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-primary transition-colors flex items-center gap-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Bot className="w-3.5 h-3.5 text-blue-500" />
+                סוכני AI
+              </Link>
+
               <div className="mt-4 pt-4 border-t border-border/50 flex flex-col gap-2.5 px-2">
                 {user ? (
                   <>
