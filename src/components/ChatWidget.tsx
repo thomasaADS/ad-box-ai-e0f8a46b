@@ -16,7 +16,7 @@ export const ChatWidget = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'היי! 👋 אני הסוכן של AdSync לבניית קמפיינים. אני יכול לעזור לך ליצור מודעות, דפי נחיתה, לבחור קהלי יעד ועוד. מה תרצה לשאול?',
+      content: 'היי, אני הסוכן של AdSync לבניית קמפיינים. אני יכול לעזור לך ליצור מודעות, לבחור קהלי יעד ועוד. מה תרצה לשאול?',
     },
   ]);
   const [input, setInput] = useState('');
