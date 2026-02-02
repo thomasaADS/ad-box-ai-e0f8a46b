@@ -61,7 +61,7 @@ export function GlobeSection() {
 
       <div className="container mx-auto max-w-6xl relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5 text-white">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-5 text-white">
             פרסום{' '}
             <span className="bg-gradient-to-l from-purple-400 to-violet-300 bg-clip-text text-transparent">
               ללא גבולות

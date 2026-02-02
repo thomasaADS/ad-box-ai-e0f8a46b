@@ -255,7 +255,7 @@ export function AgentsSection() {
             <Bot className="w-3.5 h-3.5 ml-1.5" />
             משרד פרסום AI מלא
           </Badge>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4">
             הכירו את{' '}
             <span className="bg-gradient-to-l from-purple-400 via-violet-400 to-blue-400 bg-clip-text text-transparent">
               הצוות
@@ -315,9 +315,9 @@ export function AgentsSection() {
           <Button
             onClick={() => navigate('/ai-agents')}
             size="lg"
-            className="text-base px-10 py-6 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all group bg-white text-purple-700 hover:bg-white/95"
+            className="text-sm sm:text-base px-7 sm:px-10 py-5 sm:py-6 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all group bg-white text-purple-700 hover:bg-white/95"
           >
-            <span className="flex items-center gap-3">
+            <span className="flex items-center gap-2 sm:gap-3">
               <Bot className="w-5 h-5" />
               התחל שיחה עם הצוות
               <ArrowLeft className="w-5 h-5 group-hover:translate-x-[-4px] transition-transform" />

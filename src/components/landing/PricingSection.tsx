@@ -75,13 +75,13 @@ export function PricingSection() {
     >
       <div className="container mx-auto max-w-5xl">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5 text-gray-900">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-5 text-gray-900">
             AdSync -{' '}
             <span className="bg-gradient-to-l from-purple-600 to-violet-500 bg-clip-text text-transparent">
               תמחור שקוף
             </span>
           </h2>
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto">
             בחר את התוכנית המתאימה לעסק שלך
           </p>
         </div>
@@ -179,7 +179,7 @@ export function PricingSection() {
         </div>
 
         {/* Trust signals */}
-        <div className="flex flex-wrap items-center justify-center gap-8 mt-12 text-sm text-gray-400">
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 mt-12 text-xs sm:text-sm text-gray-400">
           {['7 ימי ניסיון חינם', 'ללא כרטיס אשראי', 'ביטול בכל עת'].map(
             (t, i) => (
               <span key={i} className="flex items-center gap-2">
