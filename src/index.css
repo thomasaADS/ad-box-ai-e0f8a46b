@@ -776,3 +776,143 @@ All colors MUST be HSL.
   transition: transform 0.3s ease;
 }
 
+/* ==========================================
+   NEW DESIGN SYSTEM - adcreative.ai Inspired
+   ========================================== */
+
+/* Hero gradient text */
+.hero-gradient-text {
+  background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 40%, #22d3ee 70%, #34d399 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Hero stat cards */
+.hero-stat-card {
+  text-align: center;
+  padding: 1.25rem 1rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+}
+
+.hero-stat-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Logo Carousel */
+.logo-carousel-container {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+}
+
+.logo-carousel {
+  display: flex;
+  gap: 1rem;
+  animation: logo-scroll 30s linear infinite;
+  width: max-content;
+}
+
+@keyframes logo-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Bento Grid */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.bento-item.bento-large {
+  grid-column: span 2;
+}
+
+.bento-item.bento-small {
+  grid-column: span 1;
+}
+
+@media (max-width: 1024px) {
+  .bento-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .bento-item.bento-large {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .bento-grid {
+    grid-template-columns: 1fr;
+  }
+  .bento-item.bento-large,
+  .bento-item.bento-small {
+    grid-column: span 1;
+  }
+}
+
+/* Feature cards hover glow */
+.feature-card {
+  position: relative;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, transparent 40%, rgba(124, 58, 237, 0.3) 50%, transparent 60%);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.feature-card:hover::before {
+  opacity: 1;
+}
+
+/* Pricing card hover effects */
+.pricing-card {
+  position: relative;
+}
+
+.pricing-card::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(135deg, transparent, rgba(124, 58, 237, 0.2), transparent);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.pricing-card:hover::before {
+  opacity: 1;
+}
+
+/* Dark section text selection */
+::selection {
+  background: rgba(124, 58, 237, 0.3);
+  color: inherit;
+}
+
