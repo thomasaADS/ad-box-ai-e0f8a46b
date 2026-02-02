@@ -12,6 +12,7 @@ import { GlobeSection } from '@/components/landing/GlobeSection';
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
 import { FAQSection } from '@/components/landing/FAQSection';
 import { CTASection } from '@/components/landing/CTASection';
+import { AgentsSection } from '@/components/landing/AgentsSection';
 
 const HomeAlt = () => {
   const structuredData = {
@@ -46,7 +47,10 @@ const HomeAlt = () => {
       {/* 4. Features - How It Works */}
       <FeaturesSection />
 
-      {/* 5. Product Demo */}
+      {/* 5. AI Agents Team */}
+      <AgentsSection />
+
+      {/* 6. Product Demo */}
       <ProductDemo />
 
       {/* 6. Pricing */}

@@ -36,6 +36,8 @@ export const Navbar = () => {
   const navItems = [
     { path: '/', label: 'בית' },
     { path: '/how-it-works', label: 'תכונות' },
+    { path: '/ai-agents', label: 'סוכני AI' },
+    { path: '/brief', label: 'מחולל קמפיינים' },
     { path: '/pricing', label: 'תמחור' },
     { path: '/', label: 'שאלות נפוצות', hash: '#faq' },
   ];
