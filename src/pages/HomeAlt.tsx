@@ -43,6 +43,8 @@ import {
   Megaphone,
   LineChart,
   CircleDot,
+  Bot,
+  Search,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -125,6 +127,7 @@ const HomeAlt = () => {
   const comparisonReveal = useScrollReveal();
   const productsReveal = useScrollReveal();
   const testimonialsReveal = useScrollReveal();
+  const agentsReveal = useScrollReveal();
   const pricingReveal = useScrollReveal();
   const ctaReveal = useScrollReveal();
 
@@ -784,6 +787,69 @@ const HomeAlt = () => {
                 <p className="text-xs mt-2 text-white/50">דסקטופ + מובייל</p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===================== AI AGENTS ===================== */}
+      <section ref={agentsReveal.ref} className={`py-20 sm:py-28 px-4 bg-gradient-to-br from-[#0f0a2e]/5 via-[#1a1145]/5 to-[#2d1b69]/5 transition-all duration-700 ${agentsReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-14">
+            <Badge variant="secondary" className="mb-5 text-sm px-4 py-1.5 rounded-full">
+              <Bot className="w-3.5 h-3.5 ml-1.5" />
+              סוכני AI מתקדמים
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5">
+              הצוות <span className="hero-gradient-text">הדיגיטלי</span> שלך
+            </h2>
+            <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
+              6 סוכני AI מומחים שעובדים בשבילך 24/7 - SEO, PPC, תוכן, אנליטיקס, ברנדינג ואסטרטגיה
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
+            {[
+              { id: 'seo', name: 'סוכן SEO', avatar: '🔍', role: 'מומחה קידום אורגני', gradient: 'from-green-500 to-emerald-600', desc: 'שיפור דירוג בגוגל ותנועה אורגנית' },
+              { id: 'ppc', name: 'סוכן PPC', avatar: '🎯', role: 'מומחה פרסום ממומן', gradient: 'from-blue-600 to-purple-600', desc: 'קמפיינים ממומנים עם ROI מקסימלי' },
+              { id: 'content', name: 'סוכן תוכן', avatar: '✍️', role: 'אסטרטג תוכן שיווקי', gradient: 'from-pink-500 to-orange-500', desc: 'קופירייטינג ושיווק תוכן ממיר' },
+              { id: 'analytics', name: 'סוכן אנליטיקס', avatar: '📊', role: 'מומחה ניתוח נתונים', gradient: 'from-cyan-500 to-blue-600', desc: 'ניתוח נתונים והחלטות מבוססות דאטא' },
+              { id: 'branding', name: 'סוכן ברנדינג', avatar: '🎨', role: 'מומחה מיתוג ועיצוב', gradient: 'from-purple-600 to-pink-500', desc: 'בניית מותג חזק וזהות חזותית' },
+              { id: 'strategy', name: 'סוכן אסטרטגיה', avatar: '🧠', role: 'יועץ אסטרטגיה דיגיטלית', gradient: 'from-amber-500 to-red-600', desc: 'תוכניות שיווק ואסטרטגיית צמיחה' },
+            ].map((agent) => (
+              <Card
+                key={agent.id}
+                className="p-5 border border-border/50 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer group"
+                onClick={() => navigate('/ai-agents')}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${agent.gradient} flex items-center justify-center text-xl group-hover:scale-110 transition-transform shadow-lg`}>
+                    {agent.avatar}
+                  </div>
+                  <div>
+                    <div className="font-bold text-sm">{agent.name}</div>
+                    <div className="text-[11px] text-muted-foreground">{agent.role}</div>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground">{agent.desc}</p>
+                <div className="mt-3 flex items-center gap-1.5 text-xs text-primary font-medium group-hover:gap-2.5 transition-all">
+                  התחל שיחה
+                  <ArrowLeft className="w-3 h-3" />
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Button
+              onClick={() => navigate('/ai-agents')}
+              size="lg"
+              className="rounded-xl font-bold shadow-lg px-10 text-base"
+              style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)', color: 'white' }}
+            >
+              <Bot className="w-5 h-5 ml-2" />
+              פתח את צוות ה-AI
+              <ArrowLeft className="w-4 h-4 mr-1" />
+            </Button>
           </div>
         </div>
       </section>
