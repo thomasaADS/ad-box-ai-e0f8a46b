@@ -3,7 +3,7 @@ import Logo from './Logo';
 import { Button } from './ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Menu, X, LogOut, User, ChevronDown, Sparkles, Zap, Bot } from 'lucide-react';
+import { Menu, X, LogOut, User, Zap } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {
   DropdownMenu,
@@ -34,16 +34,10 @@ export const Navbar = () => {
   }, [location.pathname]);
 
   const navItems = [
-    { path: '/', label: t('nav.home') },
-    { path: '/how-it-works', label: t('nav.howItWorks') },
-    { path: '/pricing', label: t('nav.pricing') },
-    { path: '/about', label: t('nav.about') },
-  ];
-
-  const serviceItems = [
-    { path: '/services/facebook-ads', label: 'פרסום בפייסבוק' },
-    { path: '/services/google-ads', label: 'פרסום בגוגל' },
-    { path: '/services/tiktok-ads', label: 'פרסום בטיקטוק' },
+    { path: '/', label: 'בית' },
+    { path: '/how-it-works', label: 'תכונות' },
+    { path: '/pricing', label: 'תמחור' },
+    { path: '/', label: 'שאלות נפוצות', hash: '#faq' },
   ];
 
   const handleSignOut = async () => {
@@ -51,11 +45,22 @@ export const Navbar = () => {
     navigate('/');
   };
 
+  const handleNavClick = (item: { path: string; hash?: string }) => {
+    if (item.hash && location.pathname === '/') {
+      const el = document.querySelector(item.hash);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+    }
+    navigate(item.path);
+  };
+
   return (
     <nav
       className={`sticky top-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-sm'
+          ? 'bg-white/95 backdrop-blur-xl border-b border-gray-100 shadow-sm'
           : 'bg-transparent backdrop-blur-sm'
       }`}
     >
@@ -67,49 +72,31 @@ export const Navbar = () => {
 
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-0.5">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`text-sm font-medium px-3.5 py-2 rounded-lg transition-all duration-200 hover:bg-primary/5 hover:text-primary ${
-                  location.pathname === item.path
-                    ? 'text-primary bg-primary/5'
-                    : 'text-muted-foreground'
+            {navItems.map((item, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleNavClick(item)}
+                className={`text-sm font-medium px-3.5 py-2 rounded-lg transition-all duration-200 hover:bg-purple-50 hover:text-purple-600 ${
+                  location.pathname === item.path && !item.hash
+                    ? 'text-purple-600 bg-purple-50'
+                    : 'text-gray-500'
                 }`}
               >
                 {item.label}
-              </Link>
+              </button>
             ))}
-
-            <DropdownMenu>
-              <DropdownMenuTrigger className="text-sm font-medium px-3.5 py-2 rounded-lg transition-all duration-200 hover:bg-primary/5 hover:text-primary text-muted-foreground inline-flex items-center gap-1 outline-none">
-                שירותים
-                <ChevronDown className="w-3 h-3" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-52">
-                {serviceItems.map((item) => (
-                  <DropdownMenuItem key={item.path} onClick={() => navigate(item.path)} className="cursor-pointer">
-                    {item.label}
-                  </DropdownMenuItem>
-                ))}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate('/landing-page-builder')} className="cursor-pointer">
-                  <Sparkles className="w-3.5 h-3.5 ml-2 text-purple-500" />
-                  מחולל קמפיינים AI
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/ai-agents')} className="cursor-pointer">
-                  <Bot className="w-3.5 h-3.5 ml-2 text-blue-500" />
-                  סוכני AI
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-3">
             {user ? (
               <>
-                <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-500 hover:text-purple-600"
+                >
                   <Link to="/dashboard">{t('nav.dashboard')}</Link>
                 </Button>
                 <DropdownMenu>
@@ -119,17 +106,29 @@ export const Navbar = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem onClick={() => navigate('/my-campaigns')} className="cursor-pointer">
+                    <DropdownMenuItem
+                      onClick={() => navigate('/my-campaigns')}
+                      className="cursor-pointer"
+                    >
                       הקמפיינים שלי
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/analytics')} className="cursor-pointer">
+                    <DropdownMenuItem
+                      onClick={() => navigate('/analytics')}
+                      className="cursor-pointer"
+                    >
                       אנליטיקס
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/settings')} className="cursor-pointer">
+                    <DropdownMenuItem
+                      onClick={() => navigate('/settings')}
+                      className="cursor-pointer"
+                    >
                       {t('nav.settings')}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut} className="text-red-600 cursor-pointer">
+                    <DropdownMenuItem
+                      onClick={handleSignOut}
+                      className="text-red-600 cursor-pointer"
+                    >
                       <LogOut className="h-4 w-4 ml-2" />
                       {t('nav.logout')}
                     </DropdownMenuItem>
@@ -138,22 +137,22 @@ export const Navbar = () => {
               </>
             ) : (
               <>
-                <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
-                  <Link to="/auth">{t('nav.login')}</Link>
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-500 hover:text-purple-600"
+                >
+                  <Link to="/auth">התחבר</Link>
                 </Button>
                 <Button
                   asChild
                   size="sm"
-                  className="rounded-lg font-semibold shadow-md hover:shadow-lg transition-all"
-                  style={{
-                    background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)',
-                    color: 'white',
-                    border: 'none',
-                  }}
+                  className="rounded-lg font-semibold shadow-md hover:shadow-lg transition-all bg-purple-600 hover:bg-purple-700 text-white"
                 >
                   <Link to="/brief" className="flex items-center gap-1.5">
                     <Zap className="w-3.5 h-3.5" />
-                    {t('nav.getStarted')}
+                    התחל בחינם
                   </Link>
                 </Button>
               </>
@@ -161,79 +160,56 @@ export const Navbar = () => {
           </div>
 
           <button
-            className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </div>
 
         {/* Mobile Menu */}
         <div
           className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isMenuOpen ? 'max-h-[700px] opacity-100 pb-6' : 'max-h-0 opacity-0'
+            isMenuOpen ? 'max-h-[500px] opacity-100 pb-6' : 'max-h-0 opacity-0'
           }`}
         >
-          <div className="pt-3 border-t border-border/50">
+          <div className="pt-3 border-t border-gray-100">
             <div className="flex flex-col gap-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`text-sm font-medium px-4 py-3 rounded-lg transition-colors ${
-                    location.pathname === item.path
-                      ? 'text-primary bg-primary/5'
-                      : 'text-muted-foreground hover:bg-muted hover:text-primary'
+              {navItems.map((item, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    handleNavClick(item);
+                  }}
+                  className={`text-sm font-medium px-4 py-3 rounded-lg transition-colors text-right ${
+                    location.pathname === item.path && !item.hash
+                      ? 'text-purple-600 bg-purple-50'
+                      : 'text-gray-500 hover:bg-gray-50 hover:text-purple-600'
                   }`}
-                  onClick={() => setIsMenuOpen(false)}
                 >
                   {item.label}
-                </Link>
+                </button>
               ))}
 
-              <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-2">
-                שירותים
-              </div>
-              {serviceItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className="text-sm font-medium px-6 py-2.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-primary transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-
-              <Link
-                to="/landing-page-builder"
-                className="text-sm font-medium px-6 py-2.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-primary transition-colors flex items-center gap-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Sparkles className="w-3.5 h-3.5 text-purple-500" />
-                מחולל קמפיינים AI
-              </Link>
-              <Link
-                to="/ai-agents"
-                className="text-sm font-medium px-6 py-2.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-primary transition-colors flex items-center gap-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Bot className="w-3.5 h-3.5 text-blue-500" />
-                סוכני AI
-              </Link>
-
-              <div className="mt-4 pt-4 border-t border-border/50 flex flex-col gap-2.5 px-2">
+              <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-2.5 px-2">
                 {user ? (
                   <>
-                    <Button asChild variant="outline" className="w-full justify-center rounded-lg">
-                      <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="w-full justify-center rounded-lg"
+                    >
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
                         {t('nav.dashboard')}
-                      </Link>
-                    </Button>
-                    <Button asChild variant="outline" className="w-full justify-center rounded-lg">
-                      <Link to="/settings" onClick={() => setIsMenuOpen(false)}>
-                        {t('nav.settings')}
                       </Link>
                     </Button>
                     <Button
@@ -250,22 +226,26 @@ export const Navbar = () => {
                   </>
                 ) : (
                   <>
-                    <Button asChild variant="outline" className="w-full justify-center rounded-lg">
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="w-full justify-center rounded-lg"
+                    >
                       <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
-                        {t('nav.login')}
+                        התחבר
                       </Link>
                     </Button>
                     <Button
                       asChild
-                      className="w-full justify-center rounded-lg font-semibold"
-                      style={{
-                        background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)',
-                        color: 'white',
-                      }}
+                      className="w-full justify-center rounded-lg font-semibold bg-purple-600 hover:bg-purple-700 text-white"
                     >
-                      <Link to="/brief" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-1.5">
+                      <Link
+                        to="/brief"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="flex items-center gap-1.5"
+                      >
                         <Zap className="w-3.5 h-3.5" />
-                        {t('nav.getStarted')}
+                        התחל בחינם
                       </Link>
                     </Button>
                   </>
