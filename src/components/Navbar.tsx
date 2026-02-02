@@ -3,7 +3,7 @@ import Logo from './Logo';
 import { Button } from './ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Menu, X, LogOut, User, ChevronDown, Sparkles, Zap, Bot, Layout } from 'lucide-react';
+import { Menu, X, LogOut, User, ChevronDown, Sparkles, Zap, Bot } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {
   DropdownMenu,
@@ -44,7 +44,6 @@ export const Navbar = () => {
     { path: '/services/facebook-ads', label: 'פרסום בפייסבוק' },
     { path: '/services/google-ads', label: 'פרסום בגוגל' },
     { path: '/services/tiktok-ads', label: 'פרסום בטיקטוק' },
-    { path: '/services/landing-pages', label: 'דפי נחיתה' },
   ];
 
   const handleSignOut = async () => {
@@ -97,10 +96,6 @@ export const Navbar = () => {
                 <DropdownMenuItem onClick={() => navigate('/landing-page-builder')} className="cursor-pointer">
                   <Sparkles className="w-3.5 h-3.5 ml-2 text-purple-500" />
                   מחולל קמפיינים AI
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/page-builder')} className="cursor-pointer">
-                  <Layout className="w-3.5 h-3.5 ml-2 text-pink-500" />
-                  בונה דפי נחיתה
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate('/ai-agents')} className="cursor-pointer">
                   <Bot className="w-3.5 h-3.5 ml-2 text-blue-500" />

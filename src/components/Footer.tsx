@@ -6,7 +6,6 @@ export const Footer = () => {
   const productLinks = [
     { label: 'יצירת קמפיין', href: '/brief' },
     { label: 'מחולל קמפיינים AI', href: '/landing-page-builder' },
-    { label: 'בונה דפי נחיתה', href: '/page-builder' },
     { label: 'סוכני AI', href: '/ai-agents' },
     { label: 'דשבורד', href: '/dashboard' },
     { label: 'תמחור', href: '/pricing' },
@@ -16,7 +15,6 @@ export const Footer = () => {
     { label: 'פרסום בפייסבוק', href: '/services/facebook-ads' },
     { label: 'פרסום בגוגל', href: '/services/google-ads' },
     { label: 'פרסום בטיקטוק', href: '/services/tiktok-ads' },
-    { label: 'דפי נחיתה', href: '/services/landing-pages' },
   ];
 
   const companyLinks = [
@@ -68,7 +66,7 @@ export const Footer = () => {
               </span>
             </h3>
             <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-              מנוע AI מתקדם ליצירת קמפיינים פרסומיים, מודעות ודפי נחיתה מקצועיים - תוך דקות.
+              מנוע AI מתקדם ליצירת קמפיינים פרסומיים ומודעות מקצועיות - תוך דקות.
             </p>
             <div className="flex gap-2.5 mb-4">
               {socialLinks.map((social) => {

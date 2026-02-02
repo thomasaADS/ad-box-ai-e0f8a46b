@@ -22,14 +22,13 @@ import Pricing from "./pages/Pricing";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import LandingPageBuilder from "./pages/LandingPageBuilder";
-import PageBuilder from "./pages/PageBuilder";
 import AIAgents from "./pages/AIAgents";
+import { LoadingScreen } from "./components/LoadingScreen";
 
 // SEO Service Pages
 import FacebookAds from "./pages/services/FacebookAds";
 import GoogleAds from "./pages/services/GoogleAds";
 import TikTokAds from "./pages/services/TikTokAds";
-import LandingPages from "./pages/services/LandingPages";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +39,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <LoadingScreen />
           <BrowserRouter>
             <ScrollToTop />
             <Routes>
@@ -50,7 +50,6 @@ const App = () => (
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/about" element={<About />} />
               <Route path="/landing-page-builder" element={<LandingPageBuilder />} />
-              <Route path="/page-builder" element={<PageBuilder />} />
               <Route path="/ai-agents" element={<AIAgents />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
@@ -67,7 +66,6 @@ const App = () => (
               <Route path="/services/facebook-ads" element={<FacebookAds />} />
               <Route path="/services/google-ads" element={<GoogleAds />} />
               <Route path="/services/tiktok-ads" element={<TikTokAds />} />
-              <Route path="/services/landing-pages" element={<LandingPages />} />
 
               {/* 404 */}
               <Route path="*" element={<NotFound />} />
