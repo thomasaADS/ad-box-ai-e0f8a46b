@@ -47,6 +47,10 @@ import {
   Building2,
   Layers,
   X,
+  Instagram,
+  Star,
+  TrendingUp,
+  Heart,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -62,6 +66,7 @@ interface ScrapedData {
   colors: string[];
   texts: string[];
   logo?: string;
+  sourceType: 'website' | 'facebook' | 'instagram';
 }
 
 interface CampaignConfig {
@@ -81,15 +86,126 @@ interface CampaignConfig {
 type WizardStep = 'url' | 'analyze' | 'platform' | 'details' | 'generate' | 'preview';
 
 // ============================================================
-// URL Scraper - extracts data from client website
+// URL type detection
+// ============================================================
+
+function detectUrlType(url: string): 'website' | 'facebook' | 'instagram' {
+  const lower = url.toLowerCase();
+  if (lower.includes('facebook.com') || lower.includes('fb.com') || lower.includes('fb.me')) return 'facebook';
+  if (lower.includes('instagram.com') || lower.includes('instagr.am')) return 'instagram';
+  return 'website';
+}
+
+function getUrlTypeLabel(type: 'website' | 'facebook' | 'instagram'): string {
+  switch (type) {
+    case 'facebook': return 'דף פייסבוק';
+    case 'instagram': return 'פרופיל אינסטגרם';
+    default: return 'אתר';
+  }
+}
+
+function getUrlTypeIcon(type: 'website' | 'facebook' | 'instagram') {
+  switch (type) {
+    case 'facebook': return Facebook;
+    case 'instagram': return Instagram;
+    default: return Globe;
+  }
+}
+
+// ============================================================
+// Campaign showcase examples
+// ============================================================
+
+const campaignExamples = [
+  {
+    id: 1,
+    title: 'FreshMarket - קמפיין לידים',
+    platform: 'Meta',
+    type: 'לידים',
+    industry: 'מזון אורגני',
+    result: '+340% ROI',
+    gradient: 'from-green-500 to-emerald-600',
+    headline: 'טעם הטבע מגיע אליך הביתה',
+    subline: 'משלוחים של ירקות ופירות אורגניים ישירות מהחקלאי',
+    cta: 'הזמן עכשיו',
+    mockupType: 'feed',
+  },
+  {
+    id: 2,
+    title: 'TechFlow - מודעות מותג',
+    platform: 'Google',
+    type: 'מודעות מותג',
+    industry: 'SaaS',
+    result: '+180% חשיפה',
+    gradient: 'from-blue-600 to-purple-600',
+    headline: 'ניהול פרויקטים חכם עם AI',
+    subline: 'הפלטפורמה שמייעלת את העבודה הצוותית שלך',
+    cta: 'נסה חינם',
+    mockupType: 'banner',
+  },
+  {
+    id: 3,
+    title: 'StyleHome - קמפיין מכירות',
+    platform: 'TikTok',
+    type: 'מכירות',
+    industry: 'עיצוב פנים',
+    result: 'x12 ROAS',
+    gradient: 'from-pink-500 to-orange-500',
+    headline: 'הסלון החדש שלך מחכה',
+    subline: 'עד 50% הנחה על קולקציית הקיץ',
+    cta: 'קנה עכשיו',
+    mockupType: 'story',
+  },
+  {
+    id: 4,
+    title: 'YS Consulting - לידים',
+    platform: 'Meta',
+    type: 'לידים',
+    industry: 'ייעוץ עסקי',
+    result: '-60% CPL',
+    gradient: 'from-gray-800 to-amber-500',
+    headline: 'הצמיחה העסקית שלך מתחילה כאן',
+    subline: 'ייעוץ אסטרטגי לעסקים קטנים ובינוניים',
+    cta: 'פגישת ייעוץ חינם',
+    mockupType: 'feed',
+  },
+  {
+    id: 5,
+    title: 'FitZone - אפליקציה',
+    platform: 'TikTok',
+    type: 'התקנת אפליקציה',
+    industry: 'כושר',
+    result: '+500% הורדות',
+    gradient: 'from-cyan-500 to-blue-600',
+    headline: 'אימון אישי בכף היד',
+    subline: 'תוכניות אימון מותאמות אישית עם AI',
+    cta: 'הורד עכשיו',
+    mockupType: 'story',
+  },
+  {
+    id: 6,
+    title: 'LegalPro - תנועה לאתר',
+    platform: 'Google',
+    type: 'תנועה',
+    industry: 'משפט',
+    result: '+250% קליקים',
+    gradient: 'from-indigo-600 to-blue-700',
+    headline: 'ייעוץ משפטי מקצועי',
+    subline: 'צוות עורכי דין מנוסה לשירותך',
+    cta: 'יצירת קשר',
+    mockupType: 'banner',
+  },
+];
+
+// ============================================================
+// URL Scraper - extracts data from client website / social page
 // ============================================================
 
 async function scrapeWebsite(url: string): Promise<ScrapedData> {
-  // Ensure URL has protocol
   const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+  const sourceType = detectUrlType(fullUrl);
 
   try {
-    // Use allorigins proxy to fetch the page
     const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(fullUrl)}`;
     const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
 
@@ -111,14 +227,14 @@ async function scrapeWebsite(url: string): Promise<ScrapedData> {
       doc.querySelector('meta[name="description"]')?.getAttribute('content') ||
       '';
 
-    // Extract images (og:image, large images, logo)
+    // Extract images
     const images: string[] = [];
     const ogImage = doc.querySelector('meta[property="og:image"]')?.getAttribute('content');
     if (ogImage) images.push(ogImage.startsWith('http') ? ogImage : new URL(ogImage, fullUrl).href);
 
     doc.querySelectorAll('img[src]').forEach((img) => {
       const src = img.getAttribute('src');
-      if (src && !src.includes('data:') && !src.includes('.svg') && !src.includes('pixel') && !src.includes('tracking')) {
+      if (src && !src.includes('data:') && !src.includes('.svg') && !src.includes('pixel') && !src.includes('tracking') && !src.includes('1x1')) {
         try {
           const imgUrl = src.startsWith('http') ? src : new URL(src, fullUrl).href;
           if (!images.includes(imgUrl)) images.push(imgUrl);
@@ -126,19 +242,19 @@ async function scrapeWebsite(url: string): Promise<ScrapedData> {
       }
     });
 
-    // Extract logo
+    // Logo
     const logo =
       doc.querySelector('link[rel*="icon"][sizes="192x192"]')?.getAttribute('href') ||
       doc.querySelector('link[rel*="icon"]')?.getAttribute('href') ||
       doc.querySelector('link[rel="apple-touch-icon"]')?.getAttribute('href');
     const logoUrl = logo ? (logo.startsWith('http') ? logo : new URL(logo, fullUrl).href) : undefined;
 
-    // Extract colors from inline styles and meta
+    // Colors
     const themeColor = doc.querySelector('meta[name="theme-color"]')?.getAttribute('content');
     const colors: string[] = [];
     if (themeColor) colors.push(themeColor);
 
-    // Extract meaningful text
+    // Texts
     const texts: string[] = [];
     doc.querySelectorAll('h1, h2, h3, p').forEach((el) => {
       const text = el.textContent?.trim();
@@ -155,10 +271,10 @@ async function scrapeWebsite(url: string): Promise<ScrapedData> {
       colors,
       texts: texts.slice(0, 10),
       logo: logoUrl,
+      sourceType,
     };
   } catch (error) {
     console.error('Scraping error:', error);
-    // Return minimal data - user can still fill in manually
     return {
       url: fullUrl,
       title: '',
@@ -166,6 +282,7 @@ async function scrapeWebsite(url: string): Promise<ScrapedData> {
       images: [],
       colors: [],
       texts: [],
+      sourceType,
     };
   }
 }
@@ -306,15 +423,15 @@ export default function LandingPageBuilder() {
 
       toast.success('האתר נותח בהצלחה!');
     } catch {
-      toast.error('לא הצלחנו לנתח את האתר, ניתן להמשיך ידנית');
-      setScrapedData({ url: websiteUrl, title: '', description: '', images: [], colors: [], texts: [] });
+      toast.error('לא הצלחנו לנתח את המקור, ניתן להמשיך ידנית');
+      setScrapedData({ url: websiteUrl, title: '', description: '', images: [], colors: [], texts: [], sourceType: detectUrlType(websiteUrl) });
     } finally {
       setIsAnalyzing(false);
     }
   };
 
   const handleSkipUrl = () => {
-    setScrapedData({ url: '', title: '', description: '', images: [], colors: [], texts: [] });
+    setScrapedData({ url: '', title: '', description: '', images: [], colors: [], texts: [], sourceType: 'website' });
     setStep('platform');
   };
 
@@ -494,14 +611,14 @@ ${generatedPage.heroImage ? `<img class="bg" src="${generatedPage.heroImage}" al
 
         <div className="container mx-auto max-w-4xl relative z-10 text-center">
           <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30 rounded-full text-sm">
-            <Wand2 className="w-3.5 h-3.5 ml-1.5" />
-            בונה דפי נחיתה + קמפיינים AI
+            <Sparkles className="w-3.5 h-3.5 ml-1.5" />
+            מחולל קמפיינים AI
           </Badge>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-3">
-            בנה דף נחיתה <span className="hero-gradient-text">וקמפיינים</span>
+            צור קמפיינים <span className="hero-gradient-text">מכל מקור</span>
           </h1>
           <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto">
-            הכנס את כתובת האתר שלך ו-AI ינתח, ייצור ויתאים קמפיינים לפייסבוק, גוגל וטיקטוק
+            הכנס כתובת אתר, דף פייסבוק או פרופיל אינסטגרם - ו-AI ינתח ויתאים קמפיינים מושלמים
           </p>
         </div>
 
@@ -555,18 +672,61 @@ ${generatedPage.heroImage ? `<img class="bg" src="${generatedPage.heroImage}" al
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <Globe className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold mb-2">הכנס את כתובת האתר</h2>
+                <h2 className="text-2xl sm:text-3xl font-extrabold mb-2">הכנס מקור לניתוח</h2>
                 <p className="text-muted-foreground text-base sm:text-lg">
-                  ה-AI ינתח את האתר, ימשוך תמונות, צבעים ותוכן - ויתאים קמפיינים בדיוק למותג שלך
+                  ה-AI ינתח את המקור, ימשוך תמונות, צבעים ותוכן - ויתאים קמפיינים בדיוק למותג שלך
                 </p>
+              </div>
+
+              {/* Source type quick select */}
+              <div className="flex justify-center gap-3 mb-6 max-w-xl mx-auto">
+                {([
+                  { type: 'website' as const, icon: Globe, label: 'אתר', placeholder: 'www.example.co.il', color: 'from-blue-500 to-cyan-500' },
+                  { type: 'facebook' as const, icon: Facebook, label: 'פייסבוק', placeholder: 'facebook.com/yourpage', color: 'from-blue-600 to-blue-800' },
+                  { type: 'instagram' as const, icon: Instagram, label: 'אינסטגרם', placeholder: 'instagram.com/yourprofile', color: 'from-pink-500 to-purple-600' },
+                ]).map((source) => {
+                  const Icon = source.icon;
+                  const currentType = websiteUrl ? detectUrlType(websiteUrl) : 'website';
+                  const isActive = currentType === source.type;
+                  return (
+                    <button
+                      key={source.type}
+                      onClick={() => {
+                        if (source.type === 'facebook') setWebsiteUrl('https://facebook.com/');
+                        else if (source.type === 'instagram') setWebsiteUrl('https://instagram.com/');
+                        else setWebsiteUrl('');
+                      }}
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 transition-all text-sm font-medium ${
+                        isActive
+                          ? 'border-primary bg-primary/5 text-primary shadow-sm'
+                          : 'border-border/50 text-muted-foreground hover:border-primary/30 hover:bg-muted/30'
+                      }`}
+                    >
+                      <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${source.color} flex items-center justify-center`}>
+                        <Icon className="w-3.5 h-3.5 text-white" />
+                      </div>
+                      {source.label}
+                    </button>
+                  );
+                })}
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
                 <div className="flex-1 relative">
-                  <Link2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  {(() => {
+                    const detectedType = websiteUrl ? detectUrlType(websiteUrl) : 'website';
+                    const TypeIcon = getUrlTypeIcon(detectedType);
+                    return <TypeIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />;
+                  })()}
                   <Input
                     type="url"
-                    placeholder="www.example.co.il"
+                    placeholder={
+                      websiteUrl && detectUrlType(websiteUrl) === 'facebook'
+                        ? 'https://facebook.com/yourpage'
+                        : websiteUrl && detectUrlType(websiteUrl) === 'instagram'
+                        ? 'https://instagram.com/yourprofile'
+                        : 'www.example.co.il'
+                    }
                     value={websiteUrl}
                     onChange={(e) => setWebsiteUrl(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAnalyzeUrl()}
@@ -580,9 +740,31 @@ ${generatedPage.heroImage ? `<img class="bg" src="${generatedPage.heroImage}" al
                   style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)', color: 'white' }}
                 >
                   <Search className="w-5 h-5 ml-2" />
-                  נתח אתר
+                  {websiteUrl && detectUrlType(websiteUrl) === 'facebook'
+                    ? 'נתח דף פייסבוק'
+                    : websiteUrl && detectUrlType(websiteUrl) === 'instagram'
+                    ? 'נתח פרופיל'
+                    : 'נתח אתר'}
                 </Button>
               </div>
+
+              {/* Detected source type badge */}
+              {websiteUrl && websiteUrl.length > 5 && (
+                <div className="flex justify-center mt-3">
+                  <Badge variant="secondary" className="text-xs flex items-center gap-1.5 rounded-full px-3 py-1">
+                    {(() => {
+                      const t = detectUrlType(websiteUrl);
+                      const Icon = getUrlTypeIcon(t);
+                      return (
+                        <>
+                          <Icon className="w-3 h-3" />
+                          זוהה: {getUrlTypeLabel(t)}
+                        </>
+                      );
+                    })()}
+                  </Badge>
+                </div>
+              )}
 
               <div className="text-center mt-6">
                 <button
@@ -597,9 +779,9 @@ ${generatedPage.heroImage ? `<img class="bg" src="${generatedPage.heroImage}" al
             {/* Feature highlights */}
             <div className="grid sm:grid-cols-3 gap-4">
               {[
-                { icon: Search, title: 'ניתוח אוטומטי', desc: 'AI סורק את האתר ומשיך תמונות, צבעים ותוכן', gradient: 'from-purple-600 to-blue-600' },
+                { icon: Search, title: 'ניתוח אוטומטי', desc: 'AI סורק אתרים, דפי פייסבוק ופרופילי אינסטגרם', gradient: 'from-purple-600 to-blue-600' },
                 { icon: Target, title: 'התאמה לפלטפורמה', desc: 'מודעות מותאמות לפייסבוק, גוגל וטיקטוק', gradient: 'from-blue-600 to-cyan-500' },
-                { icon: Zap, title: 'תוצאות מיידיות', desc: 'דף נחיתה + קמפיינים מוכנים תוך דקות', gradient: 'from-cyan-500 to-teal-500' },
+                { icon: Zap, title: 'תוצאות מיידיות', desc: 'קמפיינים מוכנים להעלאה תוך דקות', gradient: 'from-cyan-500 to-teal-500' },
               ].map((item, i) => {
                 const Icon = item.icon;
                 return (
@@ -624,10 +806,17 @@ ${generatedPage.heroImage ? `<img class="bg" src="${generatedPage.heroImage}" al
                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center mx-auto mb-6 shadow-lg">
                   <Loader2 className="w-10 h-10 text-white animate-spin" />
                 </div>
-                <h2 className="text-2xl font-extrabold mb-3">מנתח את האתר...</h2>
+                <h2 className="text-2xl font-extrabold mb-3">
+                  {detectUrlType(websiteUrl) === 'facebook' ? 'מנתח דף פייסבוק...' : detectUrlType(websiteUrl) === 'instagram' ? 'מנתח פרופיל אינסטגרם...' : 'מנתח את האתר...'}
+                </h2>
                 <p className="text-muted-foreground mb-6">סורק תמונות, צבעים ותוכן מ-{websiteUrl}</p>
                 <div className="flex flex-col gap-2 max-w-xs mx-auto text-right">
-                  {['סורק מבנה אתר...', 'מושך תמונות...', 'מנתח צבעי מותג...', 'קורא תוכן...'].map((text, i) => (
+                  {[
+                    detectUrlType(websiteUrl) === 'facebook' ? 'מתחבר לדף הפייסבוק...' : detectUrlType(websiteUrl) === 'instagram' ? 'מתחבר לפרופיל...' : 'סורק מבנה אתר...',
+                    'מושך תמונות...',
+                    'מנתח צבעי מותג...',
+                    'קורא תוכן...',
+                  ].map((text, i) => (
                     <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground animate-slide-up" style={{ animationDelay: `${i * 0.5}s` }}>
                       <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
                       {text}
@@ -643,8 +832,16 @@ ${generatedPage.heroImage ? `<img class="bg" src="${generatedPage.heroImage}" al
                       <CheckCircle className="w-6 h-6 text-green-500" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold">האתר נותח בהצלחה</h2>
-                      <p className="text-sm text-muted-foreground">{scrapedData.url}</p>
+                      <h2 className="text-xl font-bold">
+                        {scrapedData.sourceType === 'facebook' ? 'דף הפייסבוק נותח בהצלחה' : scrapedData.sourceType === 'instagram' ? 'פרופיל האינסטגרם נותח בהצלחה' : 'האתר נותח בהצלחה'}
+                      </h2>
+                      <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                        {(() => {
+                          const Icon = getUrlTypeIcon(scrapedData.sourceType);
+                          return <Icon className="w-3.5 h-3.5" />;
+                        })()}
+                        {scrapedData.url}
+                      </p>
                     </div>
                   </div>
 
@@ -1111,6 +1308,119 @@ ${generatedPage.heroImage ? `<img class="bg" src="${generatedPage.heroImage}" al
           </div>
         )}
       </div>
+
+      {/* ============================================================ */}
+      {/* Campaign Showcase Gallery */}
+      {/* ============================================================ */}
+      <section className="py-16 sm:py-20 px-4 border-t border-border/50 bg-muted/20">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-10">
+            <Badge className="mb-4 bg-purple-500/10 text-purple-600 border-purple-500/20 rounded-full">
+              <Star className="w-3.5 h-3.5 ml-1.5" />
+              דוגמאות קמפיינים
+            </Badge>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-3">
+              קמפיינים שנוצרו עם <span className="hero-gradient-text">AdSync AI</span>
+            </h2>
+            <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
+              הנה כמה דוגמאות לקמפיינים שנוצרו על ידי הבינה המלאכותית שלנו עבור עסקים ישראליים
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {campaignExamples.map((example) => (
+              <Card
+                key={example.id}
+                className="overflow-hidden border border-border/50 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group"
+              >
+                {/* Ad Mockup */}
+                <div className={`relative bg-gradient-to-br ${example.gradient} ${example.mockupType === 'story' ? 'aspect-[9/16] max-h-[320px]' : example.mockupType === 'banner' ? 'aspect-[2/1]' : 'aspect-square max-h-[280px]'} flex flex-col items-center justify-center text-white p-6 overflow-hidden`}>
+                  <div className="absolute inset-0 bg-black/10" />
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+
+                  <div className="relative z-10 text-center">
+                    <div className="text-xs bg-white/15 backdrop-blur-sm rounded-full px-3 py-1 inline-block mb-3 border border-white/10">
+                      {example.industry}
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-extrabold mb-2 leading-tight drop-shadow-lg">
+                      {example.headline}
+                    </h3>
+                    <p className="text-sm opacity-85 mb-4 drop-shadow">
+                      {example.subline}
+                    </p>
+                    <div className="inline-block bg-white text-gray-900 font-bold text-sm px-5 py-2.5 rounded-xl shadow-lg">
+                      {example.cta}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Info Bar */}
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-sm">{example.title}</span>
+                    <Badge variant="secondary" className="text-[10px] rounded-full">
+                      {example.platform}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{example.type}</span>
+                    <span className="flex items-center gap-1 text-green-600 font-semibold">
+                      <TrendingUp className="w-3 h-3" />
+                      {example.result}
+                    </span>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          {/* CTA under showcase */}
+          <div className="text-center mt-10">
+            <Button
+              onClick={() => {
+                setStep('url');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              size="lg"
+              className="rounded-xl font-bold shadow-lg px-10"
+              style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)', color: 'white' }}
+            >
+              <Sparkles className="w-5 h-5 ml-2" />
+              צור קמפיין כזה עכשיו
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Link to Page Builder */}
+      <section className="py-12 sm:py-16 px-4 bg-gradient-to-r from-purple-600/5 via-blue-600/5 to-cyan-500/5">
+        <div className="container mx-auto max-w-4xl">
+          <Card className="p-8 sm:p-10 border-2 border-primary/10 hover:border-primary/20 transition-all shadow-lg">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg shrink-0">
+                <Layout className="w-8 h-8 text-white" />
+              </div>
+              <div className="flex-1 text-center sm:text-right">
+                <h3 className="text-xl sm:text-2xl font-extrabold mb-2">מחפש לבנות דף נחיתה מאפס?</h3>
+                <p className="text-muted-foreground text-sm sm:text-base">
+                  בונה דפי הנחיתה שלנו מאפשר לך לעצב ולבנות דפי נחיתה מקצועיים בסגנון drag & drop - ללא צורך בידע טכני
+                </p>
+              </div>
+              <Button
+                onClick={() => navigate('/page-builder')}
+                size="lg"
+                className="rounded-xl font-bold shadow-lg shrink-0"
+                style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #ec4899 100%)', color: 'white' }}
+              >
+                <Wand2 className="w-5 h-5 ml-2" />
+                בונה דפי נחיתה
+                <ArrowLeft className="w-4 h-4 mr-1" />
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </section>
 
       <Footer />
     </div>

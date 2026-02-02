@@ -5,9 +5,10 @@ import { Button } from './ui/button';
 export const Footer = () => {
   const productLinks = [
     { label: 'יצירת קמפיין', href: '/brief' },
-    { label: 'בונה דפי נחיתה AI', href: '/landing-page-builder' },
+    { label: 'מחולל קמפיינים AI', href: '/landing-page-builder' },
+    { label: 'בונה דפי נחיתה', href: '/page-builder' },
+    { label: 'סוכני AI', href: '/ai-agents' },
     { label: 'דשבורד', href: '/dashboard' },
-    { label: 'אנליטיקס', href: '/analytics' },
     { label: 'תמחור', href: '/pricing' },
   ];
 

@@ -22,6 +22,8 @@ import Pricing from "./pages/Pricing";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import LandingPageBuilder from "./pages/LandingPageBuilder";
+import PageBuilder from "./pages/PageBuilder";
+import AIAgents from "./pages/AIAgents";
 
 // SEO Service Pages
 import FacebookAds from "./pages/services/FacebookAds";
@@ -48,6 +50,8 @@ const App = () => (
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/about" element={<About />} />
               <Route path="/landing-page-builder" element={<LandingPageBuilder />} />
+              <Route path="/page-builder" element={<PageBuilder />} />
+              <Route path="/ai-agents" element={<AIAgents />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
 
