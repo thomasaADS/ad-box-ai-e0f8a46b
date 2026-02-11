@@ -16,7 +16,7 @@ export const ChatWidget = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'היי, אני הסוכן של AdSync לבניית קמפיינים. אני יכול לעזור לך ליצור מודעות, לבחור קהלי יעד ועוד. מה תרצה לשאול?',
+      content: 'היי, אני אריה - הסוכן של A.R.I.A לבניית קמפיינים. אני יכול לעזור לך ליצור מודעות, לבחור קהלי יעד ועוד. מה תרצה לשאול?',
     },
   ]);
   const [input, setInput] = useState('');
@@ -197,7 +197,7 @@ export const ChatWidget = () => {
                 <Sparkles className="h-4 w-4 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-sm">AdSync AI</h3>
+                <h3 className="font-bold text-white text-sm">A.R.I.A</h3>
                 <p className="text-[10px] text-white/70">סוכן בניית קמפיינים</p>
               </div>
             </div>

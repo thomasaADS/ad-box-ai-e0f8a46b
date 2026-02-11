@@ -64,9 +64,9 @@ export default function About() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
       <SEOHead
-        title="אודות AdSync - הסיפור שלנו"
-        description="AdSync היא פלטפורמת AI מתקדמת שמהפכת את עולם השיווק הדיגיטלי. הקמנו ב-2024 עם חזון ברור: להפוך שיווק מורכב לפשוט וזמין לכולם."
-        keywords="אודות AdSync, מי אנחנו, חברת שיווק, AI שיווק, סיפור AdSync"
+        title="אודות A.R.I.A - הסיפור שלנו"
+        description="A.R.I.A היא פלטפורמת AI מתקדמת שמהפכת את עולם השיווק הדיגיטלי. הקמנו ב-2024 עם חזון ברור: להפוך שיווק מורכב לפשוט וזמין לכולם."
+        keywords="אודות A.R.I.A, מי אנחנו, חברת שיווק, AI שיווק, סיפור A.R.I.A"
         canonicalUrl="/about"
       />
       {/* Star Background - same as home */}
@@ -86,7 +86,7 @@ export default function About() {
             מי אנחנו?
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            <span className="font-bold text-2xl text-primary">AdSync</span> היא פלטפורמת AI מתקדמת שמהפכת את עולם השיווק הדיגיטלי
+            <span className="font-bold text-2xl text-primary">A.R.I.A</span> היא פלטפורמת AI מתקדמת שמהפכת את עולם השיווק הדיגיטלי
           </p>
         </div>
 
@@ -99,7 +99,7 @@ export default function About() {
               הסיפור שלנו
             </h2>
               <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-                כשהקמנו את <span className="font-bold text-primary">AdSync</span> ב-2024, היה לנו חזון ברור: 
+                כשהקמנו את <span className="font-bold text-primary">A.R.I.A</span> ב-2024, היה לנו חזון ברור: 
                 <span className="font-bold"> להפוך שיווק מורכב לפשוט וזמין לכולם.</span>
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed mb-4">
@@ -146,7 +146,7 @@ export default function About() {
             <Globe className="w-12 h-12 text-blue-600 mb-4" />
             <h3 className="text-3xl font-bold mb-4">החזון שלנו</h3>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              להפוך את AdSync לפלטפורמת השיווק המובילה בעולם, 
+              להפוך את A.R.I.A לפלטפורמת השיווק המובילה בעולם, 
               שבה כל עסק - קטן כגדול - יכול ליצור קמפיינים מקצועיים ומנצחים בקלות ובמהירות.
             </p>
           </Card>
@@ -242,7 +242,7 @@ export default function About() {
             רוצים להצטרף למהפכה?
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            צור את הקמפיין הראשון שלך עכשיו וגלה איך AdSync משנה את חוקי המשחק
+            צור את הקמפיין הראשון שלך עכשיו וגלה איך A.R.I.A משנה את חוקי המשחק
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Button

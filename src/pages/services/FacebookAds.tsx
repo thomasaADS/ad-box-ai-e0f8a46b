@@ -26,11 +26,11 @@ export default function FacebookAds() {
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Service',
-    name: 'יצירת קמפיינים לפייסבוק עם AI - AdSync',
+    name: 'יצירת קמפיינים לפייסבוק עם AI - A.R.I.A',
     description: 'צור קמפיינים מקצועיים לפייסבוק ואינסטגרם עם AI. קופי, תמונות, קהלי יעד והמלצות תקציב - הכל אוטומטי.',
     provider: {
       '@type': 'Organization',
-      name: 'AdSync',
+      name: 'A.R.I.A',
     },
   };
 

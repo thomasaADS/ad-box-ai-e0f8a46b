@@ -23,7 +23,7 @@ const testimonials = [
   {
     name: 'דני כ.',
     role: 'בעל חנות אונליין',
-    text: 'AdSync הביא לי את שתי ההזמנות הראשונות תוך 48 שעות. מטורף!',
+    text: 'A.R.I.A הביא לי את שתי ההזמנות הראשונות תוך 48 שעות. מטורף!',
     rating: 5,
     avatar: 'ד',
     gradient: 'from-purple-500 to-violet-600',
@@ -73,7 +73,7 @@ export function TestimonialsSection() {
             </span>
           </h2>
           <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto">
-            אלפי עסקים ישראליים כבר סומכים על AdSync
+            אלפי עסקים ישראליים כבר סומכים על A.R.I.A
           </p>
         </div>
 
