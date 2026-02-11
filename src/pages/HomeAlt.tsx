@@ -18,17 +18,17 @@ const HomeAlt = () => {
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'AdSync - פלטפורמת AI ליצירת קמפיינים פרסומיים',
+    name: 'A.R.I.A - פלטפורמת AI ליצירת קמפיינים פרסומיים',
     description: 'צור קמפיינים מקצועיים עם AI תוך דקות',
-    url: 'https://adsync.co.il',
+    url: 'https://aria.co.il',
   };
 
   return (
     <div className="min-h-screen bg-white">
       <SEOHead
-        title="AdSync - מנוע AI ליצירת פרסום מקצועי | קמפיינים ומודעות"
+        title="A.R.I.A - מנוע AI ליצירת פרסום מקצועי | קמפיינים ומודעות"
         description="צור מודעות וקמפיינים מקצועיים עם AI תוך דקות. עד 14x יותר המרות. Meta, Google, TikTok ועוד. התחל חינם."
-        keywords="AI פרסום, קמפיינים פרסומיים, יצירת מודעות, שיווק דיגיטלי, פרסום פייסבוק, פרסום גוגל, AdSync"
+        keywords="AI פרסום, קמפיינים פרסומיים, יצירת מודעות, שיווק דיגיטלי, פרסום פייסבוק, פרסום גוגל, A.R.I.A"
         canonicalUrl="/"
         structuredData={structuredData}
       />

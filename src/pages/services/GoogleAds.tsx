@@ -26,9 +26,9 @@ export default function GoogleAds() {
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Service',
-    name: 'יצירת קמפיינים לגוגל עם AI - AdSync',
+    name: 'יצירת קמפיינים לגוגל עם AI - A.R.I.A',
     description: 'צור קמפייני Google Ads מקצועיים עם AI. מודעות חיפוש, מילות מפתח, כותרות וטקסטים - הכל אוטומטי.',
-    provider: { '@type': 'Organization', name: 'AdSync' },
+    provider: { '@type': 'Organization', name: 'A.R.I.A' },
   };
 
   const benefits = [

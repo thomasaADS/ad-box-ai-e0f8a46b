@@ -4,7 +4,7 @@
  */
 
 // Service
-export { agentService, AgentServiceError } from './agent-service';
+export { agentService } from './agent-service';
 
 // Types
 export type {

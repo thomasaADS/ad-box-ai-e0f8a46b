@@ -76,7 +76,7 @@ export function PricingSection() {
       <div className="container mx-auto max-w-5xl">
         <div className="text-center mb-14">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-5 text-gray-900">
-            AdSync -{' '}
+            A.R.I.A -{' '}
             <span className="bg-gradient-to-l from-purple-600 to-violet-500 bg-clip-text text-transparent">
               תמחור שקוף
             </span>

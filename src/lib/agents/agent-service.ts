@@ -1,9 +1,10 @@
 /**
  * Agent Service
  * Centralized service for running AI agents with consistent behavior
+ * NOTE: Uses mock data since agent tables don't exist in the database yet.
  */
 
-import { supabase } from '@/integrations/supabase/client';
+export { AgentServiceError } from './agent-errors';
 import type {
   AIAgent,
   AgentWithPrompt,
@@ -13,7 +14,6 @@ import type {
   AgentStreamChunk,
   RunAgentOptions,
   AgentMemory,
-  AgentRun,
 } from './types';
 import {
   AgentServiceError,
@@ -35,7 +35,42 @@ import type { z } from 'zod';
 
 const CHAT_ENDPOINT = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 const API_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-const DEFAULT_TIMEOUT_MS = 60000;
+
+// ============================================================
+// MOCK AGENTS DATA
+// ============================================================
+
+const mockAgents: AgentWithPrompt[] = [
+  {
+    id: 'mock-maya',
+    slug: 'maya',
+    name: 'מאיה',
+    name_en: 'Maya',
+    nickname: 'מלכת החיפוש',
+    description: 'מומחית SEO',
+    role: 'seo',
+    personality: 'מקצועית וממוקדת',
+    avatar_id: null,
+    gradient_from: '#059669',
+    gradient_to: '#10b981',
+    icon: 'Search',
+    specialties: ['SEO', 'מחקר מילות מפתח'],
+    sample_questions: ['איך לשפר SEO?'],
+    status: 'active',
+    is_public: true,
+    requires_auth: false,
+    max_tokens: 2048,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    created_by: null,
+    prompt_id: null,
+    prompt_version: null,
+    system_prompt: 'אתה מומחה SEO.',
+    model: 'gemini-pro',
+    temperature: 0.7,
+    output_schema: null,
+  },
+];
 
 // ============================================================
 // AGENT SERVICE CLASS
@@ -44,78 +79,42 @@ const DEFAULT_TIMEOUT_MS = 60000;
 class AgentService {
   private agentCache: Map<string, AgentWithPrompt> = new Map();
   private cacheExpiry: Map<string, number> = new Map();
-  private readonly CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+  private readonly CACHE_TTL_MS = 5 * 60 * 1000;
 
   // ============================================================
-  // AGENT FETCHING
+  // AGENT FETCHING (MOCK)
   // ============================================================
 
-  /**
-   * Get agent by ID or slug with caching
-   */
   async getAgent(idOrSlug: string): Promise<AgentWithPrompt> {
-    // Check cache first
     const cached = this.getCachedAgent(idOrSlug);
     if (cached) return cached;
 
-    // Fetch from database
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
-
-    const { data, error } = await supabase
-      .from('agent_with_prompt')
-      .select('*')
-      .eq(isUuid ? 'id' : 'slug', idOrSlug)
-      .single();
-
-    if (error || !data) {
+    const agent = mockAgents.find(a => a.id === idOrSlug || a.slug === idOrSlug);
+    if (!agent) {
       throw new AgentServiceError('AGENT_NOT_FOUND', `Agent not found: ${idOrSlug}`);
     }
 
-    // Cache the result
-    this.setCachedAgent(data.id, data as AgentWithPrompt);
-    if (data.slug) {
-      this.setCachedAgent(data.slug, data as AgentWithPrompt);
-    }
-
-    return data as AgentWithPrompt;
+    this.setCachedAgent(agent.id, agent);
+    this.setCachedAgent(agent.slug, agent);
+    return agent;
   }
 
-  /**
-   * Get all active agents
-   */
   async getAllAgents(): Promise<AIAgent[]> {
-    const { data, error } = await supabase
-      .from('ai_agents')
-      .select('*')
-      .eq('status', 'active')
-      .eq('is_public', true)
-      .order('name');
-
-    if (error) {
-      throw new AgentServiceError('UNKNOWN_ERROR', `Failed to fetch agents: ${error.message}`);
-    }
-
-    return (data || []) as AIAgent[];
+    return mockAgents.filter(a => a.status === 'active' && a.is_public);
   }
 
   // ============================================================
   // RUNNING AGENTS
   // ============================================================
 
-  /**
-   * Run an agent with given messages
-   * Single entry point for all agent executions
-   */
   async runAgent(
     request: AgentRunRequest,
     options: RunAgentOptions = {}
   ): Promise<AgentRunResponse> {
     const startTime = Date.now();
 
-    // Validate request
     const validatedRequest = validateAgentOutput(AgentRunRequestSchema, request, 'agent request');
 
-    // Get agent with prompt
     const agentIdOrSlug = validatedRequest.agent_id || validatedRequest.agent_slug!;
     const agent = await this.getAgent(agentIdOrSlug);
 
@@ -123,75 +122,39 @@ class AgentService {
       throw new AgentServiceError('PROMPT_NOT_FOUND', `No active prompt for agent: ${agent.slug}`);
     }
 
-    // Create run record
-    const runId = await this.createRunRecord(agent, validatedRequest, options.sessionId);
+    const runId = crypto.randomUUID();
+    const messages = validatedRequest.messages as ChatMessage[];
 
     try {
       let output: string;
 
       if (options.stream && options.onChunk) {
-        // Streaming mode
-        output = await this.streamAgentChat(agent, validatedRequest.messages, options.onChunk, options.signal);
+        output = await this.streamAgentChat(agent, messages, options.onChunk, options.signal);
       } else {
-        // Non-streaming mode
-        output = await this.callAgentChat(agent, validatedRequest.messages, options.signal);
+        output = await this.callAgentChat(agent, messages, options.signal);
       }
 
       const latencyMs = Date.now() - startTime;
-
-      // Update run record with success
-      await this.updateRunRecord(runId, {
-        status: 'completed',
-        output_raw: output,
-        latency_ms: latencyMs,
-        completed_at: new Date().toISOString(),
-      });
-
-      // Save to memory if session provided
-      if (options.sessionId) {
-        await this.saveToMemory(agent.id, options.sessionId, validatedRequest.messages, output);
-      }
 
       return {
         run_id: runId,
         agent_id: agent.id,
         output,
-        tokens_used: null, // Would need to parse from response
+        tokens_used: null,
         latency_ms: latencyMs,
       };
     } catch (error) {
-      const agentError = normalizeError(error);
-
-      // Update run record with failure
-      await this.updateRunRecord(runId, {
-        status: 'failed',
-        error_message: agentError.message,
-        error_code: agentError.code,
-        latency_ms: Date.now() - startTime,
-        completed_at: new Date().toISOString(),
-      });
-
-      throw agentError;
+      throw normalizeError(error);
     }
   }
 
-  /**
-   * Run agent and parse output with schema validation
-   */
   async runAgentWithSchema<T>(
     request: AgentRunRequest,
     schema: z.ZodSchema<T>,
     options: RunAgentOptions = {}
   ): Promise<{ response: AgentRunResponse; parsed: T }> {
     const response = await this.runAgent(request, options);
-
     const parsed = parseAIJsonOutput(response.output, schema);
-
-    // Update run record with parsed output
-    await this.updateRunRecord(response.run_id, {
-      output_parsed: parsed as Record<string, unknown>,
-    });
-
     return { response, parsed };
   }
 
@@ -199,9 +162,6 @@ class AgentService {
   // CHAT EXECUTION
   // ============================================================
 
-  /**
-   * Call agent chat endpoint (non-streaming)
-   */
   private async callAgentChat(
     agent: AgentWithPrompt,
     messages: ChatMessage[],
@@ -237,9 +197,6 @@ class AgentService {
     return data.choices?.[0]?.message?.content || '';
   }
 
-  /**
-   * Stream agent chat response
-   */
   private async streamAgentChat(
     agent: AgentWithPrompt,
     messages: ChatMessage[],
@@ -284,7 +241,6 @@ class AgentService {
 
         textBuffer += decoder.decode(value, { stream: true });
 
-        // Process complete lines
         let newlineIndex: number;
         while ((newlineIndex = textBuffer.indexOf('\n')) !== -1) {
           let line = textBuffer.slice(0, newlineIndex);
@@ -312,7 +268,6 @@ class AgentService {
               });
             }
           } catch {
-            // Incomplete JSON, will be processed next iteration
             textBuffer = line + '\n' + textBuffer;
             break;
           }
@@ -327,139 +282,20 @@ class AgentService {
   }
 
   // ============================================================
-  // RUN LOGGING
+  // MEMORY MANAGEMENT (MOCK - in-memory only)
   // ============================================================
 
-  /**
-   * Create a new run record
-   */
-  private async createRunRecord(
-    agent: AgentWithPrompt,
-    request: AgentRunRequest,
-    sessionId?: string
-  ): Promise<string> {
-    const { data: userData } = await supabase.auth.getUser();
+  private memoryStore: Map<string, AgentMemory[]> = new Map();
 
-    const runData = {
-      agent_id: agent.id,
-      prompt_version_id: agent.prompt_id,
-      user_id: userData?.user?.id || null,
-      session_id: sessionId || null,
-      input_messages: request.messages,
-      input_context: request.context || null,
-      status: 'running' as const,
-      model_used: agent.model,
-      temperature_used: agent.temperature,
-    };
-
-    const { data, error } = await supabase
-      .from('agent_runs')
-      .insert(runData)
-      .select('id')
-      .single();
-
-    if (error) {
-      // Log but don't fail - run logging is not critical
-      logAgentError(error, { context: 'createRunRecord', agentId: agent.id });
-      return crypto.randomUUID(); // Return fake ID for non-logged runs
-    }
-
-    return data.id;
-  }
-
-  /**
-   * Update run record
-   */
-  private async updateRunRecord(
-    runId: string,
-    updates: Partial<AgentRun>
-  ): Promise<void> {
-    const { error } = await supabase
-      .from('agent_runs')
-      .update(updates)
-      .eq('id', runId);
-
-    if (error) {
-      // Log but don't fail
-      logAgentError(error, { context: 'updateRunRecord', runId });
-    }
-  }
-
-  // ============================================================
-  // MEMORY MANAGEMENT
-  // ============================================================
-
-  /**
-   * Save messages to memory
-   */
-  private async saveToMemory(
-    agentId: string,
-    sessionId: string,
-    messages: ChatMessage[],
-    response: string
-  ): Promise<void> {
-    const { data: userData } = await supabase.auth.getUser();
-    const userId = userData?.user?.id || null;
-
-    const memoryEntries = [
-      ...messages.map((m) => ({
-        agent_id: agentId,
-        user_id: userId,
-        session_id: sessionId,
-        role: m.role as 'user' | 'assistant' | 'system',
-        content: m.content,
-        metadata: {},
-      })),
-      {
-        agent_id: agentId,
-        user_id: userId,
-        session_id: sessionId,
-        role: 'assistant' as const,
-        content: response,
-        metadata: {},
-      },
-    ];
-
-    const { error } = await supabase.from('agent_memories').insert(memoryEntries);
-
-    if (error) {
-      logAgentError(error, { context: 'saveToMemory', agentId, sessionId });
-    }
-  }
-
-  /**
-   * Get conversation history from memory
-   */
   async getMemory(agentId: string, sessionId: string, limit = 20): Promise<AgentMemory[]> {
-    const { data, error } = await supabase
-      .from('agent_memories')
-      .select('*')
-      .eq('agent_id', agentId)
-      .eq('session_id', sessionId)
-      .order('created_at', { ascending: true })
-      .limit(limit);
-
-    if (error) {
-      logAgentError(error, { context: 'getMemory', agentId, sessionId });
-      return [];
-    }
-
-    return (data || []) as AgentMemory[];
+    const key = `${agentId}:${sessionId}`;
+    const memories = this.memoryStore.get(key) || [];
+    return memories.slice(-limit);
   }
 
-  /**
-   * Clear conversation memory for a session
-   */
   async clearMemory(agentId: string, sessionId: string): Promise<void> {
-    const { error } = await supabase
-      .from('agent_memories')
-      .delete()
-      .eq('agent_id', agentId)
-      .eq('session_id', sessionId);
-
-    if (error) {
-      logAgentError(error, { context: 'clearMemory', agentId, sessionId });
-    }
+    const key = `${agentId}:${sessionId}`;
+    this.memoryStore.delete(key);
   }
 
   // ============================================================
@@ -471,7 +307,6 @@ class AgentService {
     if (expiry && expiry > Date.now()) {
       return this.agentCache.get(key) || null;
     }
-    // Cache expired
     this.agentCache.delete(key);
     this.cacheExpiry.delete(key);
     return null;
@@ -482,9 +317,6 @@ class AgentService {
     this.cacheExpiry.set(key, Date.now() + this.CACHE_TTL_MS);
   }
 
-  /**
-   * Clear agent cache
-   */
   clearCache(): void {
     this.agentCache.clear();
     this.cacheExpiry.clear();
@@ -494,31 +326,8 @@ class AgentService {
   // UTILITY METHODS
   // ============================================================
 
-  /**
-   * Generate a new session ID
-   */
   generateSessionId(): string {
     return crypto.randomUUID();
-  }
-
-  /**
-   * Build messages array from memory + new message
-   */
-  buildMessagesWithHistory(
-    memory: AgentMemory[],
-    newMessage: string
-  ): ChatMessage[] {
-    const historyMessages: ChatMessage[] = memory
-      .filter((m) => m.role !== 'system')
-      .map((m) => ({
-        role: m.role as 'user' | 'assistant',
-        content: m.content,
-      }));
-
-    return [
-      ...historyMessages,
-      { role: 'user', content: newMessage },
-    ];
   }
 }
 
@@ -527,15 +336,4 @@ class AgentService {
 // ============================================================
 
 export const agentService = new AgentService();
-
-// Re-export for convenience
-export { AgentServiceError } from './agent-errors';
-export type {
-  AIAgent,
-  AgentWithPrompt,
-  ChatMessage,
-  AgentRunRequest,
-  AgentRunResponse,
-  AgentStreamChunk,
-  RunAgentOptions,
-} from './types';
+export default agentService;

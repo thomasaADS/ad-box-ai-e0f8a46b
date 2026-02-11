@@ -1,4 +1,4 @@
-// API utilities for AdSync
+// API utilities for A.R.I.A
 // These are mock implementations - will be replaced with real Supabase edge functions
 
 interface BrandData {

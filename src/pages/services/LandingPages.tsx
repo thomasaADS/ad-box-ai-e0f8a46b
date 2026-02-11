@@ -26,9 +26,9 @@ export default function LandingPages() {
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Service',
-    name: 'בניית דפי נחיתה עם AI - AdSync',
+    name: 'בניית דפי נחיתה עם AI - A.R.I.A',
     description: 'בנה דפי נחיתה מקצועיים עם AI תוך דקות. תמונות מקוריות, טקסטים שיווקיים, רספונסיבי מלא.',
-    provider: { '@type': 'Organization', name: 'AdSync' },
+    provider: { '@type': 'Organization', name: 'A.R.I.A' },
   };
 
   const benefits = [
@@ -126,7 +126,7 @@ export default function LandingPages() {
       <section className="py-16 sm:py-20 px-4">
         <div className="container mx-auto max-w-5xl">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">בלי דף נחיתה vs עם AdSync</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">בלי דף נחיתה vs עם A.R.I.A</h2>
           </div>
           <div className="grid md:grid-cols-2 gap-8">
             <Card className="p-6 sm:p-8 border-red-200 bg-red-50/50">
@@ -141,7 +141,7 @@ export default function LandingPages() {
               </ul>
             </Card>
             <Card className="p-6 sm:p-8 border-green-200 bg-green-50/50">
-              <h3 className="text-xl font-bold mb-4 text-green-600">עם AdSync</h3>
+              <h3 className="text-xl font-bold mb-4 text-green-600">עם A.R.I.A</h3>
               <ul className="space-y-3">
                 {['דף נחיתה ממוקד למטרה שלך', 'אחוז המרה של 5-15%', 'חינם - כלול בפלטפורמה', 'מוכן תוך 5 דקות', 'עורך ויזואלי קל לשינויים'].map((item, idx) => (
                   <li key={idx} className="flex items-start gap-2 text-muted-foreground">
