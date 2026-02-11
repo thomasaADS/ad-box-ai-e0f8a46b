@@ -23,7 +23,7 @@ const features = [
     icon: Link2,
     title: 'התחל עם הלינק שלך',
     description:
-      'רק תזין את כתובת האתר שלך ו-A.R.I.A ינתח את העסק, הקהל והמוצרים שלך תוך שניות',
+      'רק תזין את כתובת האתר שלך ו-ARIA ינתח את העסק, הקהל והמוצרים שלך תוך שניות',
     gradient: 'from-purple-500 to-violet-600',
     bgLight: 'bg-purple-50',
   },

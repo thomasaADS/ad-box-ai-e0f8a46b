@@ -1,4 +1,4 @@
-// API utilities for A.R.I.A
+// API utilities for ARIA
 // These are mock implementations - will be replaced with real Supabase edge functions
 
 interface BrandData {

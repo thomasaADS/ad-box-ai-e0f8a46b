@@ -38,7 +38,7 @@ export const Footer = () => {
           <div className="text-center md:text-right">
             <h3 className="font-extrabold text-xl mb-2">
               <span className="bg-gradient-to-l from-purple-600 to-violet-500 bg-clip-text text-transparent">
-                A.R.I.A
+                ARIA
               </span>
             </h3>
             <p className="text-sm text-gray-400 max-w-sm">
@@ -83,7 +83,7 @@ export const Footer = () => {
         <div className="pt-6 border-t border-gray-100">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-gray-400">
-              &copy; {new Date().getFullYear()} A.R.I.A. כל הזכויות שמורות.
+              &copy; {new Date().getFullYear()} ARIA. כל הזכויות שמורות.
             </p>
             <div className="flex items-center gap-6 text-sm text-gray-400">
               <span className="flex items-center gap-1.5">

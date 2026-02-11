@@ -69,7 +69,7 @@ export function Logo({ className = '', size = 'md', showText = true }: LogoProps
       {showText && (
         <div className="flex flex-col">
           <span className={`${sizes[size].text} font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-pink-500 bg-clip-text text-transparent leading-none tracking-tight`}>
-            AdSync
+            ARIA
           </span>
           <span className="text-xs text-gray-500 font-medium tracking-wider">
             AI POWERED
