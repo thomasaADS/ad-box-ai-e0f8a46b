@@ -26,9 +26,9 @@ export default function TikTokAds() {
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Service',
-    name: 'יצירת קמפיינים לטיקטוק עם AI - A.R.I.A',
+    name: 'יצירת קמפיינים לטיקטוק עם AI - ARIA',
     description: 'צור קמפיינים מקצועיים לטיקטוק עם AI. סקריפטים לווידאו, האשטגים, קופי והמלצות תקציב.',
-    provider: { '@type': 'Organization', name: 'A.R.I.A' },
+    provider: { '@type': 'Organization', name: 'ARIA' },
   };
 
   const benefits = [

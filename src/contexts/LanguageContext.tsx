@@ -23,7 +23,7 @@ const translations: Record<Language, Record<string, any>> = {
     "nav.dashboard": "לוח בקרה",
     "nav.settings": "הגדרות",
     "nav.logout": "התנתק",
-    "brand.name": "A.R.I.A",
+    "brand.name": "ARIA",
     "hero.headline": "שיווק חכם שמביא לך לקוחות בקליק אחד",
     "hero.subheadline": "אסטרטגיה, קמפיינים ותוכן שבנויים בדיוק לקהל שלך - קבל הצעה מיידית ותתחיל לראות תוצאות",
     "hero.title": "צור קמפיינים רב-ערוציים בדקות",
@@ -35,7 +35,7 @@ const translations: Record<Language, Record<string, any>> = {
     "hero.trust.1": "אין צורך בהתקנה",
     "hero.trust.2": "תוצאות מיידיות",
     "hero.trust.3": "בשימוש של +1000 עסקים",
-    "auth.welcome": "ברוכים הבאים ל-A.R.I.A",
+    "auth.welcome": "ברוכים הבאים ל-ARIA",
     "auth.subtitle": "התחבר או הירשם כדי להתחיל ליצור קמפיינים",
     "auth.login": "התחברות",
     "auth.signup": "הרשמה",
@@ -57,7 +57,7 @@ const translations: Record<Language, Record<string, any>> = {
     "footer.contact": "צור קשר",
     "footer.privacy": "פרטיות",
     "footer.terms": "תנאי שימוש",
-    "footer.copyright": "© 2025 A.R.I.A. כל הזכויות שמורות.",
+    "footer.copyright": "© 2025 ARIA. כל הזכויות שמורות.",
     "footer.term": "תנאי שימוש"
   },
   en: {
@@ -71,10 +71,10 @@ const translations: Record<Language, Record<string, any>> = {
     "nav.dashboard": "Dashboard",
     "nav.settings": "Settings",
     "nav.logout": "Logout",
-    "brand.name": "A.R.I.A",
+    "brand.name": "ARIA",
     "hero.headline": "Smart Marketing That Brings You Customers in One Click",
     "hero.subheadline": "Strategy, campaigns, and content built exactly for your audience - get instant proposal and start seeing results",
-    "auth.welcome": "Welcome to A.R.I.A",
+    "auth.welcome": "Welcome to ARIA",
     "auth.subtitle": "Login or sign up to start creating campaigns",
     "auth.login": "Login",
     "auth.signup": "Sign Up",
@@ -96,7 +96,7 @@ const translations: Record<Language, Record<string, any>> = {
     "footer.contact": "Contact",
     "footer.privacy": "Privacy",
     "footer.terms": "Terms of Service",
-    "footer.copyright": "© 2025 A.R.I.A. All rights reserved."
+    "footer.copyright": "© 2025 ARIA. All rights reserved."
   },
   ar: {
     "nav.home": "الرئيسية",
@@ -109,8 +109,8 @@ const translations: Record<Language, Record<string, any>> = {
     "nav.dashboard": "لوحة التحكم",
     "nav.settings": "الإعدادات",
     "nav.logout": "تسجيل الخروج",
-    "brand.name": "A.R.I.A",
-    "auth.welcome": "مرحبًا بك في A.R.I.A",
+    "brand.name": "ARIA",
+    "auth.welcome": "مرحبًا بك في ARIA",
     "auth.subtitle": "قم بتسجيل الدخول أو التسجيل لبدء إنشاء الحملات",
     "auth.login": "تسجيل الدخول",
     "auth.signup": "إنشاء حساب",
@@ -132,7 +132,7 @@ const translations: Record<Language, Record<string, any>> = {
     "footer.contact": "اتصل",
     "footer.privacy": "الخصوصية",
     "footer.terms": "شروط الخدمة",
-    "footer.copyright": "© 2025 A.R.I.A. جميع الحقوق محفوظة."
+    "footer.copyright": "© 2025 ARIA. جميع الحقوق محفوظة."
   },
   ru: {
     "nav.home": "Главная",
@@ -145,8 +145,8 @@ const translations: Record<Language, Record<string, any>> = {
     "nav.dashboard": "Панель управления",
     "nav.settings": "Настройки",
     "nav.logout": "Выйти",
-    "brand.name": "A.R.I.A",
-    "auth.welcome": "Добро пожаловать в A.R.I.A",
+    "brand.name": "ARIA",
+    "auth.welcome": "Добро пожаловать в ARIA",
     "auth.subtitle": "Войдите или зарегистрируйтесь, чтобы начать создавать кампании",
     "auth.login": "Вход",
     "auth.signup": "Регистрация",
@@ -168,7 +168,7 @@ const translations: Record<Language, Record<string, any>> = {
     "footer.contact": "Контакты",
     "footer.privacy": "Конфиденциальность",
     "footer.terms": "Условия использования",
-    "footer.copyright": "© 2025 A.R.I.A. Все права защищены."
+    "footer.copyright": "© 2025 ARIA. Все права защищены."
   }
 };
 
