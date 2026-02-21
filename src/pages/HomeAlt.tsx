@@ -24,7 +24,7 @@ const HomeAlt = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background text-foreground">
       <SEOHead
         title="ARIA - מנוע AI ליצירת פרסום מקצועי | קמפיינים ומודעות"
         description="צור מודעות וקמפיינים מקצועיים עם AI תוך דקות. עד 14x יותר המרות. Meta, Google, TikTok ועוד. התחל חינם."

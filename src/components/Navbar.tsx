@@ -60,11 +60,10 @@ export const Navbar = () => {
 
   return (
     <nav
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? 'bg-white/95 backdrop-blur-xl border-b border-gray-100 shadow-sm'
+      className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled
+          ? 'glass-card border-b border-white/10 shadow-sm'
           : 'bg-transparent backdrop-blur-sm'
-      }`}
+        }`}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 sm:h-18">
@@ -78,11 +77,10 @@ export const Navbar = () => {
               <button
                 key={idx}
                 onClick={() => handleNavClick(item)}
-                className={`text-sm font-medium px-3.5 py-2 rounded-lg transition-all duration-200 hover:bg-purple-50 hover:text-purple-600 ${
-                  location.pathname === item.path && !item.hash
-                    ? 'text-purple-600 bg-purple-50'
-                    : 'text-gray-500'
-                }`}
+                className={`text-sm font-medium px-3.5 py-2 rounded-lg transition-all duration-200 hover:bg-white/5 hover:text-white ${location.pathname === item.path && !item.hash
+                    ? 'text-white bg-white/10'
+                    : 'text-foreground/80'
+                  }`}
               >
                 {item.label}
               </button>
@@ -97,7 +95,7 @@ export const Navbar = () => {
                   asChild
                   variant="ghost"
                   size="sm"
-                  className="text-gray-500 hover:text-purple-600"
+                  className="text-foreground/80 hover:text-white"
                 >
                   <Link to="/dashboard">{t('nav.dashboard')}</Link>
                 </Button>
@@ -143,7 +141,7 @@ export const Navbar = () => {
                   asChild
                   variant="ghost"
                   size="sm"
-                  className="text-gray-500 hover:text-purple-600"
+                  className="text-foreground/80 hover:text-white"
                 >
                   <Link to="/auth">התחבר</Link>
                 </Button>
@@ -162,7 +160,7 @@ export const Navbar = () => {
           </div>
 
           <button
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors text-foreground"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -176,9 +174,8 @@ export const Navbar = () => {
 
         {/* Mobile Menu */}
         <div
-          className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isMenuOpen ? 'max-h-[500px] opacity-100 pb-6' : 'max-h-0 opacity-0'
-          }`}
+          className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-[500px] opacity-100 pb-6' : 'max-h-0 opacity-0'
+            }`}
         >
           <div className="pt-3 border-t border-gray-100">
             <div className="flex flex-col gap-1">
@@ -189,11 +186,10 @@ export const Navbar = () => {
                     setIsMenuOpen(false);
                     handleNavClick(item);
                   }}
-                  className={`text-sm font-medium px-4 py-3 rounded-lg transition-colors text-right ${
-                    location.pathname === item.path && !item.hash
-                      ? 'text-purple-600 bg-purple-50'
-                      : 'text-gray-500 hover:bg-gray-50 hover:text-purple-600'
-                  }`}
+                  className={`text-sm font-medium px-4 py-3 rounded-lg transition-colors text-right ${location.pathname === item.path && !item.hash
+                      ? 'text-white bg-white/10'
+                      : 'text-foreground/80 hover:bg-white/5 hover:text-white'
+                    }`}
                 >
                   {item.label}
                 </button>

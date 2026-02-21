@@ -201,35 +201,35 @@ function HeroVisual() {
       </svg>
 
       {/* Floating elements around the orb */}
-      <div className="absolute top-[5%] right-[10%] sm:right-[15%] rounded-2xl bg-white/90 backdrop-blur-sm border border-purple-100 shadow-lg px-3 sm:px-4 py-2 sm:py-3 animate-float">
+      <div className="absolute top-[5%] right-[10%] sm:right-[15%] rounded-2xl glass-card border border-purple-500/30 shadow-glow px-3 sm:px-4 py-2 sm:py-3 animate-float drop-shadow-xl text-white">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-green-400" />
-          <span className="text-[10px] sm:text-xs font-bold text-gray-800">ROAS 4.8x</span>
+          <div className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.8)]" />
+          <span className="text-[10px] sm:text-xs font-bold">ROAS 4.8x</span>
         </div>
       </div>
 
       <div
-        className="absolute bottom-[8%] left-[5%] sm:left-[8%] rounded-2xl bg-white/90 backdrop-blur-sm border border-purple-100 shadow-lg px-3 sm:px-4 py-2 sm:py-3 animate-float"
+        className="absolute bottom-[8%] left-[5%] sm:left-[8%] rounded-2xl glass-card border border-purple-500/30 shadow-glow px-3 sm:px-4 py-2 sm:py-3 animate-float drop-shadow-xl"
         style={{ animationDelay: '2s' }}
       >
         <div className="flex items-center gap-2">
-          <span className="text-[10px] sm:text-xs text-green-500 font-bold">↑23%</span>
-          <span className="text-[10px] sm:text-xs font-bold text-gray-800">CTR 4.32%</span>
+          <span className="text-[10px] sm:text-xs text-green-400 font-bold drop-shadow-md">↑23%</span>
+          <span className="text-[10px] sm:text-xs font-bold text-white">CTR 4.32%</span>
         </div>
       </div>
 
       <div
-        className="absolute top-[40%] left-[2%] rounded-2xl bg-white/90 backdrop-blur-sm border border-purple-100 shadow-lg px-3 py-2 animate-float hidden sm:block"
+        className="absolute top-[40%] left-[2%] rounded-2xl glass-card border border-purple-500/30 shadow-glow px-3 py-2 animate-float hidden sm:block drop-shadow-xl"
         style={{ animationDelay: '4s' }}
       >
-        <span className="text-[11px] font-bold text-purple-600">AI מנתח...</span>
+        <span className="text-[11px] font-bold text-purple-300">AI מנתח...</span>
       </div>
 
       <div
-        className="absolute bottom-[25%] right-[2%] rounded-2xl bg-white/90 backdrop-blur-sm border border-purple-100 shadow-lg px-3 py-2 animate-float hidden sm:block"
+        className="absolute bottom-[25%] right-[2%] rounded-2xl glass-card border border-purple-500/30 shadow-glow px-3 py-2 animate-float hidden sm:block drop-shadow-xl"
         style={{ animationDelay: '3s' }}
       >
-        <span className="text-[11px] font-bold text-gray-700">₪2.95 CPC</span>
+        <span className="text-[11px] font-bold text-gray-300">₪2.95 CPC</span>
       </div>
     </div>
   );
@@ -240,9 +240,9 @@ export function HeroSection() {
   const rotator = useTextRotator(heroWords, 3000);
 
   return (
-    <section className="relative pt-24 sm:pt-32 lg:pt-40 pb-20 sm:pb-28 lg:pb-36 px-4 overflow-x-clip">
-      {/* Subtle gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white from-[12%] to-[#ebebff]" />
+    <section className="relative pt-24 sm:pt-32 lg:pt-40 pb-20 sm:pb-28 lg:pb-36 px-4 overflow-x-clip animated-mesh-bg">
+      {/* Subtle overlay */}
+      <div className="absolute inset-0 bg-background/50" />
 
       {/* Organic blobs */}
       <HeroBlobs />
@@ -251,17 +251,17 @@ export function HeroSection() {
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
           {/* Text content */}
           <div className="flex-1 text-center lg:text-right">
-            <div className="inline-block mb-6 animate-fade-in">
+            <div className="inline-block mb-6 animate-fade-in relative z-20">
               <Badge
                 variant="secondary"
-                className="text-xs sm:text-sm font-medium px-3 sm:px-5 py-2 sm:py-2.5 rounded-full border border-purple-200 bg-white/90 backdrop-blur-sm shadow-sm text-gray-700"
+                className="text-xs sm:text-sm font-medium px-3 sm:px-5 py-2 sm:py-2.5 rounded-full border border-purple-500/30 glass-card shadow-glow text-white"
               >
                 <Sparkles className="w-4 h-4 ml-2 text-purple-500" />
                 +3,200 עסקים ישראליים כבר משתמשים
               </Badge>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold leading-[1.15] mb-6 animate-fade-in text-gray-900">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold leading-[1.15] mb-6 animate-fade-in text-white hero-gradient-text drop-shadow-lg">
               מנוע ה-AI שלך ליצירת
               <br />
               <span
@@ -270,11 +270,10 @@ export function HeroSection() {
               >
                 <span
                   key={rotator.currentWord}
-                  className={`inline-block bg-gradient-to-l from-purple-600 via-violet-500 to-purple-700 bg-clip-text text-transparent ${
-                    rotator.isAnimating
+                  className={`inline-block bg-gradient-to-l from-purple-600 via-violet-500 to-purple-700 bg-clip-text text-transparent ${rotator.isAnimating
                       ? 'text-rotator-exit'
                       : 'text-rotator-enter'
-                  }`}
+                    }`}
                 >
                   {rotator.currentWord}
                 </span>
@@ -282,11 +281,11 @@ export function HeroSection() {
             </h1>
 
             <p
-              className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-500 leading-relaxed max-w-2xl mx-auto lg:mx-0 mb-10 animate-slide-up"
+              className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0 mb-10 animate-slide-up drop-shadow-md"
               style={{ animationDelay: '0.15s' }}
             >
               קבל עד{' '}
-              <span className="font-bold text-gray-800">14x יותר המרות</span>.
+              <span className="font-bold text-white">14x יותר המרות</span>.
               בלי מעצבים. בלי ניחושים.
               <br className="hidden sm:block" />
               קמפיין מוכן לפרסום תוך דקות.
